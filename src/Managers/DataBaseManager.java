@@ -85,14 +85,16 @@ public class DataBaseManager {
     }
 
     //region User Logic
-    public static void addIndividualUser(String tc_Id, String name, String surname, String password, LocalDate birthDate, String city, String phoneNumber) {
+    public static String addIndividualUser(String tc_Id, String name, String surname, String password, java.time.LocalDate birthDate, String city, String phoneNumber) {
+
+        // 1. Validasyonlar (Hata varsa null döndürür)
         if (!isValidPassword(password)) {
             System.out.println("Hata: Geçersiz şifre.");
-            return;
+            return null;
         }
         if (!isTCFormatValid(tc_Id)) {
             System.out.println("Hata: Geçersiz TC Formatı.");
-            return;
+            return null;
         }
 
         String sql = "INSERT INTO Individual_Users(UserId, TC_Kimlik, name, surname, password, Birth_Date, City, PhoneNumber) VALUES(?,?,?,?,?,?,?,?)";
@@ -100,11 +102,13 @@ public class DataBaseManager {
         try (Connection conn = DriverManager.getConnection(URL);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+            // 2. Benzersiz Müşteri No Üret
             String uniqueId;
             do {
-                uniqueId = ProduceRandomID();
+                uniqueId = ProduceRandomID(); // Senin yazdığın veya var olan ID üretici
             } while (isIDExists(uniqueId));
 
+            // 3. Kullanıcıyı Kaydet
             stmt.setString(1, uniqueId);
             stmt.setString(2, tc_Id);
             stmt.setString(3, name);
@@ -117,8 +121,16 @@ public class DataBaseManager {
             stmt.executeUpdate();
             System.out.println("Bireysel kullanıcı eklendi. ID: " + uniqueId);
 
+            // --- KRİTİK NOKTA: Kayıt bitti, şimdi Hoş Geldin Paketini oluştur ---
+            createWelcomePackage(uniqueId);
+            // -------------------------------------------------------------------
+
+            // 4. Müşteri Numarasını Geri Döndür (UI tarafında kullanacağız)
+            return uniqueId;
+
         } catch (SQLException e) {
             System.out.println("Kullanıcı Ekleme Hatası: " + e.getMessage());
+            return null;
         }
     }
 
@@ -852,8 +864,245 @@ public class DataBaseManager {
         return null;
     }
 
+// --- YARDIMCI ARAÇLAR (Rastgele Numara Üreticiler) ---
 
+    // Rastgele TR ile başlayan IBAN üretir
+    private static String generateIBAN() {
+        java.util.Random rand = new java.util.Random();
+        StringBuilder iban = new StringBuilder("TR");
+        for (int i = 0; i < 24; i++) {
+            iban.append(rand.nextInt(10));
+        }
+        return iban.toString();
+    }
 
+    // Rastgele 16 haneli Kart Numarası üretir (4 ile başlar)
+    private static String generateCardNumber() {
+        java.util.Random rand = new java.util.Random();
+        StringBuilder cardNo = new StringBuilder("4");
+        for (int i = 0; i < 15; i++) {
+            cardNo.append(rand.nextInt(10));
+        }
+        return cardNo.toString();
+    }
+
+    // 3 haneli CVV kodu üretir
+    private static String generateCVV() {
+        int cvv = new java.util.Random().nextInt(900) + 100;
+        return String.valueOf(cvv);
+    }
+
+    // Kart Son Kullanma Tarihi (Bugünden 5 yıl sonrası)
+    private static String generateExpiryDate() {
+        java.time.LocalDate futureDate = java.time.LocalDate.now().plusYears(5);
+        return futureDate.getMonthValue() + "/" + futureDate.getYear();
+    }
+
+    // --- OTOMATİK HESAP VE KART OLUŞTURUCU ---
+    private static void createWelcomePackage(String userId) {
+        // Hesaplar tablosuna ekleme komutu
+        String sqlAccount = "INSERT INTO Accounts(BelongedUserId, AccountId, Iban, Money_In_Account, AccountType, CreationDate, CurrencyType) VALUES(?,?,?,?,?,?,?)";
+        // Kartlar tablosuna ekleme komutu
+        String sqlCard = "INSERT INTO Cards(CardNumber, UserId, CardType, CVV, ExpiryDate, LinkedAccountId, CreditLimit, CurrentDebt) VALUES(?,?,?,?,?,?,?,?)";
+
+        try (Connection conn = DriverManager.getConnection(URL)) {
+            // Hata olursa yarım kalmasın diye otomatik kaydı durduruyoruz (Transaction)
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement pstmtAccount = conn.prepareStatement(sqlAccount);
+                 PreparedStatement pstmtCard = conn.prepareStatement(sqlCard)) {
+
+                // ---------------------------------------------------------
+                // 1. VADESİZ TL HESABI (ANA HESAP)
+                // ---------------------------------------------------------
+                String vadesizAccountId = String.valueOf(new java.util.Random().nextInt(900000) + 100000);
+                String vadesizIban = generateIBAN();
+
+                pstmtAccount.setString(1, userId);
+                pstmtAccount.setString(2, vadesizAccountId);
+                pstmtAccount.setString(3, vadesizIban);
+                pstmtAccount.setDouble(4, 0.0);        // Bakiye 0
+                pstmtAccount.setString(5, "CHECKING");  // Hesap Türü: Vadesiz
+                pstmtAccount.setString(6, java.time.LocalDate.now().toString());
+                pstmtAccount.setString(7, "TL");
+                pstmtAccount.executeUpdate();
+
+                // ---------------------------------------------------------
+                // 2. DÖVİZ HESAPLARI (DOLAR, EURO, ALTIN)
+                // ---------------------------------------------------------
+                String[] dovizTurleri = {"USD", "EUR", "ALTIN"};
+
+                for (String doviz : dovizTurleri) {
+                    String dovizAccountId = String.valueOf(new java.util.Random().nextInt(900000) + 100000);
+                    String dovizIban = generateIBAN();
+
+                    pstmtAccount.setString(1, userId);
+                    pstmtAccount.setString(2, dovizAccountId);
+                    pstmtAccount.setString(3, dovizIban);
+                    pstmtAccount.setDouble(4, 0.0);
+                    pstmtAccount.setString(5, "FOREIGN"); // Hesap Türü: Döviz
+                    pstmtAccount.setString(6, java.time.LocalDate.now().toString());
+                    pstmtAccount.setString(7, doviz);
+                    pstmtAccount.executeUpdate();
+                }
+
+                // ---------------------------------------------------------
+                // 3. BANKA KARTI (DEBIT) -> Vadesiz TL Hesabına Bağlı
+                // ---------------------------------------------------------
+                pstmtCard.setString(1, generateCardNumber());
+                pstmtCard.setString(2, userId);
+                pstmtCard.setString(3, "DEBIT");
+                pstmtCard.setString(4, generateCVV());
+                pstmtCard.setString(5, generateExpiryDate());
+                pstmtCard.setString(6, vadesizAccountId); // <-- Bağlantı burada!
+                pstmtCard.setDouble(7, 0.0); // Limiti yok
+                pstmtCard.setDouble(8, 0.0); // Borcu yok
+                pstmtCard.executeUpdate();
+
+                // ---------------------------------------------------------
+                // 4. KREDİ KARTI (CREDIT) -> 20.000 TL Limitli
+                // ---------------------------------------------------------
+                pstmtCard.setString(1, generateCardNumber());
+                pstmtCard.setString(2, userId);
+                pstmtCard.setString(3, "CREDIT");
+                pstmtCard.setString(4, generateCVV());
+                pstmtCard.setString(5, generateExpiryDate());
+                pstmtCard.setString(6, null);    // Hesaba bağlı değil
+                pstmtCard.setDouble(7, 20000.0); // LİMİT: 20.000 TL
+                pstmtCard.setDouble(8, 0.0);     // Borç: 0 TL
+                pstmtCard.executeUpdate();
+
+                conn.commit(); // Hepsini kaydet
+                System.out.println("Hoş geldin paketi (Hesaplar ve Kartlar) başarıyla oluşturuldu.");
+
+            } catch (SQLException e) {
+                conn.rollback(); // Hata varsa işlemleri geri al
+                System.out.println("Hoş geldin paketi hatası: " + e.getMessage());
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Bağlantı hatası: " + e.getMessage());
+        }
+    }
+    public static double getVadesizTLBakiye(String userId) {
+        double bakiye = 0.0;
+        String sql = "SELECT Money_In_Account FROM Accounts WHERE BelongedUserId = ? AND AccountType = 'CHECKING' AND CurrencyType = 'TL'";
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) bakiye = rs.getDouble("Money_In_Account");
+        } catch (SQLException e) { e.printStackTrace(); }
+        return bakiye;
+    }
+
+    // --- KREDİ KARTI BİLGİSİ SORGULA ---
+    // Dönüş Tipi: double dizisi [Limit, Borç]
+    public static double[] getCreditCardInfo(String userId) {
+        double[] kartBilgisi = {0.0, 0.0}; // [0]: Limit, [1]: Borç
+
+        String sql = "SELECT CreditLimit, CurrentDebt FROM Cards WHERE UserId = ? AND CardType = 'CREDIT'";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                kartBilgisi[0] = rs.getDouble("CreditLimit");
+                kartBilgisi[1] = rs.getDouble("CurrentDebt");
+            }
+        } catch (SQLException e) {
+            System.out.println("Kart Bilgisi Hatası: " + e.getMessage());
+        }
+        return kartBilgisi;
+    }
+
+    // --- HESAP DETAYI GETİR (Bakiye ve IBAN) ---
+    // Dönüş: String dizisi -> [0]: Bakiye, [1]: IBAN
+    public static String[] getAccountDetails(String userId, String currencyType) {
+        String[] details = {"0.0", "TR..."}; // Varsayılan değerler
+
+        // Vadesiz veya Döviz fark etmez, CurrencyType'a göre arıyoruz
+        String sql = "SELECT Money_In_Account, Iban FROM Accounts WHERE BelongedUserId = ? AND CurrencyType = ?";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userId);
+            pstmt.setString(2, currencyType); // "TL", "USD", "EUR", "ALTIN"
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                double bakiye = rs.getDouble("Money_In_Account");
+                String iban = rs.getString("Iban");
+
+                details[0] = String.valueOf(bakiye);
+                details[1] = iban;
+            }
+        } catch (SQLException e) {
+            System.out.println("Hesap Detay Hatası (" + currencyType + "): " + e.getMessage());
+        }
+        return details;
+    }
+
+    // --- YENİ VADELİ HESAP AÇMA ---
+    public static boolean createVadeliAccount(String userId, String hesapAdi, double miktar, int vadeGun, double faizOrani) {
+        String sql = "INSERT INTO Accounts(BelongedUserId, AccountId, Iban, Money_In_Account, AccountType, CreationDate, CurrencyType, Deposit_Days, AccountName) VALUES(?,?,?,?,?,?,?,?,?)";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // Hesap Numarası ve IBAN üret
+            String accountId = String.valueOf(new java.util.Random().nextInt(900000) + 100000);
+            String iban = generateIBAN(); // Mevcut metodunu kullanıyoruz
+
+            pstmt.setString(1, userId);
+            pstmt.setString(2, accountId);
+            pstmt.setString(3, iban);
+            pstmt.setDouble(4, miktar);       // Yatırılan Ana Para
+            pstmt.setString(5, "DEPOSIT");    // Tür: VADELİ (DEPOSIT)
+            pstmt.setString(6, java.time.LocalDate.now().toString());
+            pstmt.setString(7, "TL");         // Vadeli hesap genellikle TL olur
+            pstmt.setInt(8, vadeGun);         // Örn: 32 gün
+            pstmt.setString(9, hesapAdi);     // <--- YENİ SÜTUN: "Araba Parası" vb.
+
+            int rows = pstmt.executeUpdate();
+            return rows > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Vadeli Hesap Açma Hatası: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // --- KULLANICININ VADELİ HESAPLARINI LİSTELE (Ad ve Bakiye) ---
+    public static java.util.ArrayList<String> getVadeliAccountNames(String userId) {
+        java.util.ArrayList<String> hesapListesi = new java.util.ArrayList<>();
+        String sql = "SELECT AccountName, Money_In_Account FROM Accounts WHERE BelongedUserId = ? AND AccountType = 'DEPOSIT'";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String ad = rs.getString("AccountName");
+                double bakiye = rs.getDouble("Money_In_Account");
+
+                // İsim boşsa varsayılan bir şey yazalım
+                if (ad == null || ad.isEmpty()) { ad = "Vadeli Hesap"; }
+
+                // Listeye ekle: "Araba Parası (50.000 TL)" formatında
+                hesapListesi.add(ad + " (" + bakiye + " TL)");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return hesapListesi;
+    }
 
 
 

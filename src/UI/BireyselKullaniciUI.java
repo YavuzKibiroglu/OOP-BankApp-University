@@ -1,24 +1,23 @@
 package UI;
 
-/**
- *
- * @author akifa
- */
 public class BireyselKullaniciUI extends javax.swing.JFrame {
 
     private model.IndividualUser aktifKullanici;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(BireyselKullaniciUI.class.getName());
 
-    /**
-     * Creates new form BireyselKullaniciUI
-     */
-    public BireyselKullaniciUI() {
-        initComponents();
-    }
 
     public BireyselKullaniciUI(model.IndividualUser user) {
-        this.aktifKullanici = user; // Gelen kullanıcıyı içeri al
+        this.aktifKullanici = user;
         initComponents();
+
+        // Başlangıçta Ana Sayfa Açık
+        panelAdiLabel.setText("ANA SAYFA");
+
+        // Verileri Veritabanından Çek ve Doldur
+        kullaniciBilgileriniGoster();
+        anaSayfaGuncelle();    // Dashboard Bakiyesi ve Kredi Kartı
+        hesaplariGuncelle();   // Hesaplar Sekmesindeki (Vadesiz, Döviz) veriler
+
     }
 
     /**
@@ -30,10 +29,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
 
-        MainPanel = new javax.swing.JPanel();
-        UstPanel = new javax.swing.JPanel();
-        AdSoyadLabel = new javax.swing.JLabel();
-        MusteriNoLabel = new javax.swing.JLabel();
         YonlendirmePanel = new javax.swing.JPanel();
         AnaSayfaBtn = new javax.swing.JButton();
         IslemlerBtn = new javax.swing.JButton();
@@ -42,12 +37,24 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         FaturalarBtn = new javax.swing.JButton();
         VarliklarBtn = new javax.swing.JButton();
         GuncelKurBtn = new javax.swing.JButton();
+        MainPanel = new javax.swing.JPanel();
+        UstPanel = new javax.swing.JPanel();
+        AdSoyadLabel = new javax.swing.JLabel();
+        MusteriNoLabel = new javax.swing.JLabel();
+        panelAdiLabel = new javax.swing.JLabel();
+        lbl8 = new javax.swing.JLabel();
         PanelContainer = new javax.swing.JPanel();
         AnaSayfaPanel = new javax.swing.JPanel();
         AnaSayfaVadesizHesapPanel = new javax.swing.JPanel();
         lbl1 = new javax.swing.JLabel();
+        AnaSayfaVadesizBakiyeLabel = new javax.swing.JLabel();
+        AnaSayfaVadesizIBANLabel = new javax.swing.JLabel();
         AnaSayfaKrediKartiPanel = new javax.swing.JPanel();
         lbl2 = new javax.swing.JLabel();
+        AnaSayfaKrdLimitLabel = new javax.swing.JLabel();
+        AnaSayfaKrdKullanılabilirLimitLabel = new javax.swing.JLabel();
+        AnaSayfaKrdBorcLabel = new javax.swing.JLabel();
+        AnaSayfaBorcOdeBtn = new javax.swing.JButton();
         IslemlerPanel = new javax.swing.JPanel();
         IslemlerPanelContainer = new javax.swing.JPanel();
         IslParaGönderPanel = new javax.swing.JPanel();
@@ -92,11 +99,29 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         HesaplarPanel = new javax.swing.JPanel();
         HesaplarPanelContainer = new javax.swing.JPanel();
         HspVadesizPanel = new javax.swing.JPanel();
-        lbl3 = new javax.swing.JLabel();
+        HspVadesizBakiyeLbl = new javax.swing.JLabel();
+        HspVadesizIBANLbl = new javax.swing.JLabel();
+        HspVadesizParaTrnsfrBtn = new javax.swing.JButton();
+        HspVadesizFaturaOdeBtn = new javax.swing.JButton();
         HspVadeliPanel = new javax.swing.JPanel();
-        lbl4 = new javax.swing.JLabel();
+        HspVadeliYokPanel = new javax.swing.JPanel();
+        lbl9 = new javax.swing.JLabel();
+        HspVadeliAcBtn = new javax.swing.JButton();
+        HspVadeliVarPanel = new javax.swing.JPanel();
+        HspVadeliListComboBox = new javax.swing.JComboBox<>();
+        HspVadeliTürüLbl = new javax.swing.JLabel();
+        HspVadeliYatirilanTutarLbl = new javax.swing.JLabel();
+        HspVadeliKalanGunLbl = new javax.swing.JLabel();
+        HspVadeliKalanGetirisiLbl = new javax.swing.JLabel();
+        HspVadeliYeniHesapBtn = new javax.swing.JButton();
         HspDovizPanel = new javax.swing.JPanel();
-        lbl5 = new javax.swing.JLabel();
+        HspDovizDolarBakiyeLabel = new javax.swing.JLabel();
+        HspDovizEuroBakiyeLabel = new javax.swing.JLabel();
+        HspDovizAltınBakiyeLabel = new javax.swing.JLabel();
+        HspDovizDolarTLLabel = new javax.swing.JLabel();
+        HspDovizEuroTLLabel = new javax.swing.JLabel();
+        HspDovizAltınTLLabel = new javax.swing.JLabel();
+        HspDovizIslemleriBtn = new javax.swing.JButton();
         HspVadesizBtn = new javax.swing.JButton();
         HspVadeliBtn = new javax.swing.JButton();
         HspDövizBtn = new javax.swing.JButton();
@@ -125,33 +150,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         jLabel27 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        UstPanel.setBackground(new java.awt.Color(0, 102, 255));
-
-        AdSoyadLabel.setText("Ad Soyad");
-
-        MusteriNoLabel.setText("MusteriNo");
-
-        javax.swing.GroupLayout UstPanelLayout = new javax.swing.GroupLayout(UstPanel);
-        UstPanel.setLayout(UstPanelLayout);
-        UstPanelLayout.setHorizontalGroup(
-                UstPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(UstPanelLayout.createSequentialGroup()
-                                .addGap(32, 32, 32)
-                                .addComponent(AdSoyadLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(MusteriNoLabel)
-                                .addGap(22, 22, 22))
-        );
-        UstPanelLayout.setVerticalGroup(
-                UstPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(UstPanelLayout.createSequentialGroup()
-                                .addGap(21, 21, 21)
-                                .addGroup(UstPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(AdSoyadLabel)
-                                        .addComponent(MusteriNoLabel))
-                                .addContainerGap(23, Short.MAX_VALUE))
-        );
 
         AnaSayfaBtn.setText("jButton1");
         AnaSayfaBtn.addActionListener(this::AnaSayfaBtnActionPerformed);
@@ -209,44 +207,131 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                                         .addComponent(GuncelKurBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
+        UstPanel.setBackground(new java.awt.Color(0, 102, 255));
+
+        AdSoyadLabel.setText("Ad Soyad");
+
+        MusteriNoLabel.setText("MusteriNo");
+
+        panelAdiLabel.setText("panelAdi");
+
+        lbl8.setText("DİNO BANK");
+
+        javax.swing.GroupLayout UstPanelLayout = new javax.swing.GroupLayout(UstPanel);
+        UstPanel.setLayout(UstPanelLayout);
+        UstPanelLayout.setHorizontalGroup(
+                UstPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(UstPanelLayout.createSequentialGroup()
+                                .addGap(32, 32, 32)
+                                .addComponent(AdSoyadLabel)
+                                .addGap(388, 388, 388)
+                                .addGroup(UstPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                        .addComponent(panelAdiLabel)
+                                        .addComponent(lbl8))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(MusteriNoLabel)
+                                .addGap(22, 22, 22))
+        );
+        UstPanelLayout.setVerticalGroup(
+                UstPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(UstPanelLayout.createSequentialGroup()
+                                .addGap(21, 21, 21)
+                                .addGroup(UstPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(AdSoyadLabel)
+                                        .addComponent(MusteriNoLabel))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, UstPanelLayout.createSequentialGroup()
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lbl8)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(panelAdiLabel)
+                                .addGap(16, 16, 16))
+        );
+
         PanelContainer.setLayout(new java.awt.CardLayout());
 
         lbl1.setText("Vadesiz Hesap");
+
+        AnaSayfaVadesizBakiyeLabel.setText("Bakiye");
+
+        AnaSayfaVadesizIBANLabel.setText("Iban");
 
         javax.swing.GroupLayout AnaSayfaVadesizHesapPanelLayout = new javax.swing.GroupLayout(AnaSayfaVadesizHesapPanel);
         AnaSayfaVadesizHesapPanel.setLayout(AnaSayfaVadesizHesapPanelLayout);
         AnaSayfaVadesizHesapPanelLayout.setHorizontalGroup(
                 AnaSayfaVadesizHesapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(AnaSayfaVadesizHesapPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lbl1)
-                                .addContainerGap(629, Short.MAX_VALUE))
+                                .addGroup(AnaSayfaVadesizHesapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(AnaSayfaVadesizHesapPanelLayout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(lbl1))
+                                        .addGroup(AnaSayfaVadesizHesapPanelLayout.createSequentialGroup()
+                                                .addGap(63, 63, 63)
+                                                .addComponent(AnaSayfaVadesizBakiyeLabel))
+                                        .addGroup(AnaSayfaVadesizHesapPanelLayout.createSequentialGroup()
+                                                .addGap(63, 63, 63)
+                                                .addComponent(AnaSayfaVadesizIBANLabel)))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         AnaSayfaVadesizHesapPanelLayout.setVerticalGroup(
                 AnaSayfaVadesizHesapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(AnaSayfaVadesizHesapPanelLayout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(lbl1)
-                                .addContainerGap(198, Short.MAX_VALUE))
+                                .addGap(46, 46, 46)
+                                .addComponent(AnaSayfaVadesizBakiyeLabel)
+                                .addGap(28, 28, 28)
+                                .addComponent(AnaSayfaVadesizIBANLabel)
+                                .addContainerGap(101, Short.MAX_VALUE))
         );
 
         lbl2.setText("Kredi Kartı");
+
+        AnaSayfaKrdLimitLabel.setText("Kart Limit");
+
+        AnaSayfaKrdKullanılabilirLimitLabel.setText("Kullanılabilir Limit");
+
+        AnaSayfaKrdBorcLabel.setText("Güncel Borç");
+
+        AnaSayfaBorcOdeBtn.setText("Borç Öde");
 
         javax.swing.GroupLayout AnaSayfaKrediKartiPanelLayout = new javax.swing.GroupLayout(AnaSayfaKrediKartiPanel);
         AnaSayfaKrediKartiPanel.setLayout(AnaSayfaKrediKartiPanelLayout);
         AnaSayfaKrediKartiPanelLayout.setHorizontalGroup(
                 AnaSayfaKrediKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(AnaSayfaKrediKartiPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lbl2)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGroup(AnaSayfaKrediKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(AnaSayfaKrediKartiPanelLayout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(lbl2))
+                                        .addGroup(AnaSayfaKrediKartiPanelLayout.createSequentialGroup()
+                                                .addGap(52, 52, 52)
+                                                .addGroup(AnaSayfaKrediKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(AnaSayfaKrediKartiPanelLayout.createSequentialGroup()
+                                                                .addComponent(AnaSayfaKrdKullanılabilirLimitLabel)
+                                                                .addGap(222, 222, 222)
+                                                                .addComponent(AnaSayfaBorcOdeBtn))
+                                                        .addComponent(AnaSayfaKrdLimitLabel)
+                                                        .addComponent(AnaSayfaKrdBorcLabel))))
+                                .addContainerGap(303, Short.MAX_VALUE))
         );
         AnaSayfaKrediKartiPanelLayout.setVerticalGroup(
                 AnaSayfaKrediKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(AnaSayfaKrediKartiPanelLayout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(lbl2)
-                                .addContainerGap(198, Short.MAX_VALUE))
+                                .addGap(31, 31, 31)
+                                .addComponent(AnaSayfaKrdLimitLabel)
+                                .addGroup(AnaSayfaKrediKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(AnaSayfaKrediKartiPanelLayout.createSequentialGroup()
+                                                .addGap(29, 29, 29)
+                                                .addComponent(AnaSayfaKrdKullanılabilirLimitLabel))
+                                        .addGroup(AnaSayfaKrediKartiPanelLayout.createSequentialGroup()
+                                                .addGap(10, 10, 10)
+                                                .addComponent(AnaSayfaBorcOdeBtn)))
+                                .addGap(18, 18, 18)
+                                .addComponent(AnaSayfaKrdBorcLabel)
+                                .addContainerGap(71, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout AnaSayfaPanelLayout = new javax.swing.GroupLayout(AnaSayfaPanel);
@@ -258,16 +343,16 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                                 .addGroup(AnaSayfaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                         .addComponent(AnaSayfaKrediKartiPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(AnaSayfaVadesizHesapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap(122, Short.MAX_VALUE))
+                                .addContainerGap(77, Short.MAX_VALUE))
         );
         AnaSayfaPanelLayout.setVerticalGroup(
                 AnaSayfaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(AnaSayfaPanelLayout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(AnaSayfaVadesizHesapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGap(18, 18, 18)
                                 .addComponent(AnaSayfaKrediKartiPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(12, Short.MAX_VALUE))
+                                .addContainerGap(137, Short.MAX_VALUE))
         );
 
         PanelContainer.add(AnaSayfaPanel, "cardAnaSayfaPanel");
@@ -579,71 +664,203 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                                                 .addComponent(IslVadeliBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(18, 18, 18)
                                                 .addComponent(IslDovizBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap(22, Short.MAX_VALUE))
+                                .addContainerGap(167, Short.MAX_VALUE))
         );
 
         PanelContainer.add(IslemlerPanel, "cardIslemlerPanel");
 
         HesaplarPanelContainer.setLayout(new java.awt.CardLayout());
 
-        lbl3.setText("vadesiz");
+        HspVadesizBakiyeLbl.setText("Bakiye");
+
+        HspVadesizIBANLbl.setText("Iban");
+
+        HspVadesizParaTrnsfrBtn.setText("Para Transferi Yap");
+        HspVadesizParaTrnsfrBtn.addActionListener(this::HspVadesizParaTrnsfrBtnActionPerformed);
+
+        HspVadesizFaturaOdeBtn.setText("Fatura Öde");
+        HspVadesizFaturaOdeBtn.addActionListener(this::HspVadesizFaturaOdeBtnActionPerformed);
 
         javax.swing.GroupLayout HspVadesizPanelLayout = new javax.swing.GroupLayout(HspVadesizPanel);
         HspVadesizPanel.setLayout(HspVadesizPanelLayout);
         HspVadesizPanelLayout.setHorizontalGroup(
                 HspVadesizPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(HspVadesizPanelLayout.createSequentialGroup()
-                                .addGap(350, 350, 350)
-                                .addComponent(lbl3)
-                                .addContainerGap(349, Short.MAX_VALUE))
+                                .addGroup(HspVadesizPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(HspVadesizIBANLbl)
+                                        .addGroup(HspVadesizPanelLayout.createSequentialGroup()
+                                                .addGap(48, 48, 48)
+                                                .addComponent(HspVadesizBakiyeLbl)))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, HspVadesizPanelLayout.createSequentialGroup()
+                                .addGap(0, 370, Short.MAX_VALUE)
+                                .addGroup(HspVadesizPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(HspVadesizParaTrnsfrBtn)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, HspVadesizPanelLayout.createSequentialGroup()
+                                                .addComponent(HspVadesizFaturaOdeBtn)
+                                                .addGap(18, 18, 18)))
+                                .addGap(238, 238, 238))
         );
         HspVadesizPanelLayout.setVerticalGroup(
                 HspVadesizPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(HspVadesizPanelLayout.createSequentialGroup()
-                                .addComponent(lbl3)
-                                .addGap(0, 406, Short.MAX_VALUE))
+                                .addGap(73, 73, 73)
+                                .addComponent(HspVadesizBakiyeLbl)
+                                .addGap(1, 1, 1)
+                                .addComponent(HspVadesizParaTrnsfrBtn)
+                                .addGap(23, 23, 23)
+                                .addComponent(HspVadesizIBANLbl)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(HspVadesizFaturaOdeBtn)
+                                .addGap(0, 239, Short.MAX_VALUE))
         );
 
         HesaplarPanelContainer.add(HspVadesizPanel, "cardHspVadesizPanel");
 
-        lbl4.setText("vadeli");
+        HspVadeliPanel.setLayout(new java.awt.CardLayout());
 
-        javax.swing.GroupLayout HspVadeliPanelLayout = new javax.swing.GroupLayout(HspVadeliPanel);
-        HspVadeliPanel.setLayout(HspVadeliPanelLayout);
-        HspVadeliPanelLayout.setHorizontalGroup(
-                HspVadeliPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(HspVadeliPanelLayout.createSequentialGroup()
-                                .addGap(317, 317, 317)
-                                .addComponent(lbl4)
-                                .addContainerGap(389, Short.MAX_VALUE))
+        lbl9.setText("vadeli hesabın yok");
+
+        HspVadeliAcBtn.setText("vadeli hesap aç");
+        HspVadeliAcBtn.addActionListener(this::HspVadeliAcBtnActionPerformed);
+
+        javax.swing.GroupLayout HspVadeliYokPanelLayout = new javax.swing.GroupLayout(HspVadeliYokPanel);
+        HspVadeliYokPanel.setLayout(HspVadeliYokPanelLayout);
+        HspVadeliYokPanelLayout.setHorizontalGroup(
+                HspVadeliYokPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(HspVadeliYokPanelLayout.createSequentialGroup()
+                                .addGroup(HspVadeliYokPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(HspVadeliYokPanelLayout.createSequentialGroup()
+                                                .addGap(313, 313, 313)
+                                                .addComponent(lbl9))
+                                        .addGroup(HspVadeliYokPanelLayout.createSequentialGroup()
+                                                .addGap(304, 304, 304)
+                                                .addComponent(HspVadeliAcBtn)))
+                                .addContainerGap(319, Short.MAX_VALUE))
         );
-        HspVadeliPanelLayout.setVerticalGroup(
-                HspVadeliPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(HspVadeliPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lbl4)
-                                .addContainerGap(400, Short.MAX_VALUE))
+        HspVadeliYokPanelLayout.setVerticalGroup(
+                HspVadeliYokPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(HspVadeliYokPanelLayout.createSequentialGroup()
+                                .addGap(88, 88, 88)
+                                .addComponent(lbl9)
+                                .addGap(64, 64, 64)
+                                .addComponent(HspVadeliAcBtn)
+                                .addContainerGap(233, Short.MAX_VALUE))
         );
+
+        HspVadeliPanel.add(HspVadeliYokPanel, "cardHspVadeliYokPanel");
+
+        HspVadeliListComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        HspVadeliTürüLbl.setText("Türü");
+
+        HspVadeliYatirilanTutarLbl.setText("Yatırılan Tutar");
+
+        HspVadeliKalanGunLbl.setText("Kaç gün kaldı");
+
+        HspVadeliKalanGetirisiLbl.setText("Getirisi");
+
+        HspVadeliYeniHesapBtn.setText("Başka Bir Vadeli Hesap Oluştur");
+        HspVadeliYeniHesapBtn.addActionListener(this::HspVadeliYeniHesapBtnActionPerformed);
+
+        javax.swing.GroupLayout HspVadeliVarPanelLayout = new javax.swing.GroupLayout(HspVadeliVarPanel);
+        HspVadeliVarPanel.setLayout(HspVadeliVarPanelLayout);
+        HspVadeliVarPanelLayout.setHorizontalGroup(
+                HspVadeliVarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(HspVadeliVarPanelLayout.createSequentialGroup()
+                                .addGroup(HspVadeliVarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(HspVadeliVarPanelLayout.createSequentialGroup()
+                                                .addGap(169, 169, 169)
+                                                .addComponent(HspVadeliListComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(HspVadeliVarPanelLayout.createSequentialGroup()
+                                                .addGap(81, 81, 81)
+                                                .addGroup(HspVadeliVarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(HspVadeliKalanGunLbl)
+                                                        .addComponent(HspVadeliTürüLbl)
+                                                        .addComponent(HspVadeliKalanGetirisiLbl)
+                                                        .addComponent(HspVadeliYatirilanTutarLbl))))
+                                .addContainerGap(274, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, HspVadeliVarPanelLayout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(HspVadeliYeniHesapBtn)
+                                .addGap(20, 20, 20))
+        );
+        HspVadeliVarPanelLayout.setVerticalGroup(
+                HspVadeliVarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(HspVadeliVarPanelLayout.createSequentialGroup()
+                                .addGap(37, 37, 37)
+                                .addComponent(HspVadeliListComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(28, 28, 28)
+                                .addComponent(HspVadeliTürüLbl)
+                                .addGap(42, 42, 42)
+                                .addComponent(HspVadeliYatirilanTutarLbl)
+                                .addGap(44, 44, 44)
+                                .addComponent(HspVadeliKalanGunLbl)
+                                .addGap(34, 34, 34)
+                                .addComponent(HspVadeliKalanGetirisiLbl)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 98, Short.MAX_VALUE)
+                                .addComponent(HspVadeliYeniHesapBtn)
+                                .addGap(28, 28, 28))
+        );
+
+        HspVadeliPanel.add(HspVadeliVarPanel, "cardHspVadeliVarPanel");
 
         HesaplarPanelContainer.add(HspVadeliPanel, "cardHspVadeliPanel");
 
-        lbl5.setText("döviz");
+        HspDovizDolarBakiyeLabel.setText("Dolar Bakiyesi");
+
+        HspDovizEuroBakiyeLabel.setText("Euro Bakiyesi");
+
+        HspDovizAltınBakiyeLabel.setText("Altın Bakiyesi");
+
+        HspDovizDolarTLLabel.setText("Dolar-TL");
+
+        HspDovizEuroTLLabel.setText("Euro-TL");
+
+        HspDovizAltınTLLabel.setText("Altın-TL");
+
+        HspDovizIslemleriBtn.setText("Döviz İşlemleri");
+        HspDovizIslemleriBtn.addActionListener(this::HspDovizIslemleriBtnActionPerformed);
 
         javax.swing.GroupLayout HspDovizPanelLayout = new javax.swing.GroupLayout(HspDovizPanel);
         HspDovizPanel.setLayout(HspDovizPanelLayout);
         HspDovizPanelLayout.setHorizontalGroup(
                 HspDovizPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(HspDovizPanelLayout.createSequentialGroup()
-                                .addGap(324, 324, 324)
-                                .addComponent(lbl5)
-                                .addContainerGap(385, Short.MAX_VALUE))
+                                .addGap(72, 72, 72)
+                                .addGroup(HspDovizPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(HspDovizDolarBakiyeLabel)
+                                        .addComponent(HspDovizEuroBakiyeLabel)
+                                        .addComponent(HspDovizAltınBakiyeLabel))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 331, Short.MAX_VALUE)
+                                .addGroup(HspDovizPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(HspDovizAltınTLLabel)
+                                        .addComponent(HspDovizEuroTLLabel)
+                                        .addComponent(HspDovizDolarTLLabel))
+                                .addGap(215, 215, 215))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, HspDovizPanelLayout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(HspDovizIslemleriBtn)
+                                .addGap(78, 78, 78))
         );
         HspDovizPanelLayout.setVerticalGroup(
                 HspDovizPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(HspDovizPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lbl5)
-                                .addContainerGap(400, Short.MAX_VALUE))
+                                .addGap(66, 66, 66)
+                                .addGroup(HspDovizPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(HspDovizDolarBakiyeLabel)
+                                        .addComponent(HspDovizDolarTLLabel))
+                                .addGap(77, 77, 77)
+                                .addGroup(HspDovizPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(HspDovizEuroBakiyeLabel)
+                                        .addComponent(HspDovizEuroTLLabel))
+                                .addGap(60, 60, 60)
+                                .addGroup(HspDovizPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(HspDovizAltınBakiyeLabel)
+                                        .addComponent(HspDovizAltınTLLabel))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 107, Short.MAX_VALUE)
+                                .addComponent(HspDovizIslemleriBtn)
+                                .addGap(43, 43, 43))
         );
 
         HesaplarPanelContainer.add(HspDovizPanel, "cardHspDovizPanel");
@@ -685,7 +902,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                                         .addGroup(HesaplarPanelLayout.createSequentialGroup()
                                                 .addGap(17, 17, 17)
                                                 .addComponent(HesaplarPanelContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap(25, Short.MAX_VALUE))
+                                .addContainerGap(164, Short.MAX_VALUE))
         );
 
         PanelContainer.add(HesaplarPanel, "cardHesaplarPanel");
@@ -729,13 +946,10 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         KartlarPanelLayout.setHorizontalGroup(
                 KartlarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(KartlarPanelLayout.createSequentialGroup()
+                                .addGap(158, 158, 158)
                                 .addGroup(KartlarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(KartlarPanelLayout.createSequentialGroup()
-                                                .addGap(158, 158, 158)
-                                                .addComponent(KrtBankaKartiPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(KartlarPanelLayout.createSequentialGroup()
-                                                .addGap(158, 158, 158)
-                                                .addComponent(KrtKrediKartiPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(KrtBankaKartiPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(KrtKrediKartiPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addContainerGap(160, Short.MAX_VALUE))
         );
         KartlarPanelLayout.setVerticalGroup(
@@ -745,7 +959,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                                 .addComponent(KrtBankaKartiPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(KrtKrediKartiPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(16, Short.MAX_VALUE))
+                                .addContainerGap(161, Short.MAX_VALUE))
         );
 
         PanelContainer.add(KartlarPanel, "cardKartlarPanel");
@@ -825,7 +1039,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                                         .addGroup(FaturalarPanelLayout.createSequentialGroup()
                                                 .addGap(28, 28, 28)
                                                 .addComponent(FaturalarPanelContainer, javax.swing.GroupLayout.PREFERRED_SIZE, 407, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap(29, Short.MAX_VALUE))
+                                .addContainerGap(174, Short.MAX_VALUE))
         );
 
         PanelContainer.add(FaturalarPanel, "cardFaturalarPanel");
@@ -862,7 +1076,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                                         .addComponent(jLabel21)
                                         .addComponent(jLabel22)
                                         .addComponent(jLabel23))
-                                .addContainerGap(366, Short.MAX_VALUE))
+                                .addContainerGap(511, Short.MAX_VALUE))
         );
 
         PanelContainer.add(VarliklarPanel, "cardVarliklarPanel");
@@ -899,7 +1113,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                                         .addComponent(jLabel25)
                                         .addComponent(jLabel26)
                                         .addComponent(jLabel27))
-                                .addContainerGap(344, Short.MAX_VALUE))
+                                .addContainerGap(489, Short.MAX_VALUE))
         );
 
         PanelContainer.add(GuncelKurPanel, "cardGuncelKurPanel");
@@ -908,7 +1122,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         MainPanel.setLayout(MainPanelLayout);
         MainPanelLayout.setHorizontalGroup(
                 MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(YonlendirmePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(PanelContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(UstPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -916,11 +1129,9 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                 MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MainPanelLayout.createSequentialGroup()
                                 .addComponent(UstPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGap(18, 18, 18)
                                 .addComponent(PanelContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(YonlendirmePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(12, 12, 12))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -928,10 +1139,15 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(MainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(YonlendirmePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(MainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(MainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 630, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(YonlendirmePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -939,31 +1155,39 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
 
     private void AnaSayfaBtnActionPerformed(java.awt.event.ActionEvent evt) {
         mainSayfaDegistir("cardAnaSayfaPanel");
+        panelAdiLabel.setText("ANA SAYFA");
+
     }
 
     private void IslemlerBtnActionPerformed(java.awt.event.ActionEvent evt) {
         mainSayfaDegistir("cardIslemlerPanel");
+        panelAdiLabel.setText("İŞLEMLER");
 
     }
 
     private void HesaplarBtnActionPerformed(java.awt.event.ActionEvent evt) {
         mainSayfaDegistir("cardHesaplarPanel");
+        panelAdiLabel.setText("HESAPLARIM");
     }
 
     private void KartlarBtnActionPerformed(java.awt.event.ActionEvent evt) {
         mainSayfaDegistir("cardKartlarPanel");
+        panelAdiLabel.setText("KARTLARIM");
     }
 
     private void FaturalarBtnActionPerformed(java.awt.event.ActionEvent evt) {
         mainSayfaDegistir("cardFaturalarPanel");
+        panelAdiLabel.setText("FATURA VE ÖDEMELER");
     }
 
     private void VarliklarBtnActionPerformed(java.awt.event.ActionEvent evt) {
         mainSayfaDegistir("cardVarliklarPanel");
+        panelAdiLabel.setText("VARLIKLARIM");
     }
 
     private void GuncelKurBtnActionPerformed(java.awt.event.ActionEvent evt) {
         mainSayfaDegistir("cardGuncelKurPanel");
+        panelAdiLabel.setText("DÖVİZ KURLARI");
     }
 
     private void IslBilgiPanelBtnActionPerformed(java.awt.event.ActionEvent evt) {
@@ -1002,6 +1226,36 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         faturalarSayfaDegistir("cardFtrFaturalarımPanel");
     }
 
+    private void HspVadeliAcBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        // 1. Ana ekranı "İşlemler" paneline çevir
+        mainSayfaDegistir("cardIslemlerPanel");
+
+        // 2. Başlığı güncelle
+        panelAdiLabel.setText("İŞLEMLER");
+
+        // 3. İşlemler içindeki alt paneli "Vadeli İşlem Formu"na çevir
+        islemlerSayfaDegistir("cardIslVadeliPanel");
+    }
+
+    private void HspVadeliYeniHesapBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        // Mantık birebir aynı, bu da işlem sayfasına yönlendirir
+        mainSayfaDegistir("cardIslemlerPanel");
+        panelAdiLabel.setText("İŞLEMLER");
+        islemlerSayfaDegistir("cardIslVadeliPanel");
+    }
+
+    private void HspVadesizParaTrnsfrBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    private void HspVadesizFaturaOdeBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    private void HspDovizIslemleriBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -1024,7 +1278,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new BireyselKullaniciUI().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new BireyselKullaniciUI(null).setVisible(true));
     }
 
 
@@ -1049,13 +1303,137 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         java.awt.CardLayout subCardLayout = (java.awt.CardLayout) FaturalarPanelContainer.getLayout();
         subCardLayout.show(FaturalarPanelContainer, kartIsmi);
     }
+    // --- EKRANA VERİ BASAN METOTLAR ---
+
+    // 1. İsim ve Müşteri No Göster (Üst Panel)
+    private void kullaniciBilgileriniGoster() {
+        if (aktifKullanici != null) {
+            AdSoyadLabel.setText("Sn. " + aktifKullanici.getName() + " " + aktifKullanici.getSurname());
+            MusteriNoLabel.setText("Müşteri No: " + aktifKullanici.getUserId());
+        }
+    }
+
+    // 2. Ana Sayfa (Dashboard) Güncelleme
+    private void anaSayfaGuncelle() {
+        if (aktifKullanici != null) {
+            // Vadesiz Hesap Bakiyesi
+            double miktar = Managers.DataBaseManager.getVadesizTLBakiye(aktifKullanici.getUserId());
+            AnaSayfaVadesizBakiyeLabel.setText(String.format("%,.2f TL", miktar));
+            AnaSayfaVadesizIBANLabel.setText("TR......................");
+
+            // Kredi Kartı Bilgileri
+            double[] kartBilgisi = Managers.DataBaseManager.getCreditCardInfo(aktifKullanici.getUserId());
+            double limit = kartBilgisi[0];
+            double borc = kartBilgisi[1];
+            double kullanilabilir = limit - borc;
+
+            AnaSayfaKrdLimitLabel.setText(String.format("Limit: %,.2f TL", limit));
+            AnaSayfaKrdBorcLabel.setText(String.format("Borç: %,.2f TL", borc));
+            AnaSayfaKrdKullanılabilirLimitLabel.setText(String.format("Kullanılabilir: %,.2f TL", kullanilabilir));
+        }
+    }
+
+    // --- HESAPLAR SAYFASINI GÜNCELLE (Senin CurrencyManager ile Uyumlu) ---
+    private void hesaplariGuncelle() {
+        if (aktifKullanici == null) return;
+        String userId = aktifKullanici.getUserId();
+
+        // ---------------------------------------------------------
+        // 1. VADESİZ TL HESABI
+        // ---------------------------------------------------------
+        String[] tlDetay = Managers.DataBaseManager.getAccountDetails(userId, "TL");
+        double tlMiktar = Double.parseDouble(tlDetay[0]);
+
+        HspVadesizBakiyeLbl.setText(String.format("%,.2f TL", tlMiktar));
+        HspVadesizIBANLbl.setText("IBAN: " + tlDetay[1]);
+
+        // ---------------------------------------------------------
+        // 2. DOLAR HESABI (USD)
+        // ---------------------------------------------------------
+        String[] usdDetay = Managers.DataBaseManager.getAccountDetails(userId, "USD");
+        double usdMiktar = Double.parseDouble(usdDetay[0]);
+
+        // Bakiyeyi yaz
+        HspDovizDolarBakiyeLabel.setText(String.format("%,.2f $", usdMiktar));
+
+        // TL Karşılığını Hesapla (Bankanın ALIŞ fiyatından hesaplıyoruz)
+        // Senin kodunda: USD_BUY = 32.50
+        double usdKur = Managers.CurrencyManager.getBuyRate("USD");
+        double usdTlKarsiligi = usdMiktar * usdKur;
+
+        HspDovizDolarTLLabel.setText(String.format("≈ %,.2f TL", usdTlKarsiligi));
+
+        // ---------------------------------------------------------
+        // 3. EURO HESABI (EUR)
+        // ---------------------------------------------------------
+        String[] eurDetay = Managers.DataBaseManager.getAccountDetails(userId, "EUR");
+        double eurMiktar = Double.parseDouble(eurDetay[0]);
+
+        HspDovizEuroBakiyeLabel.setText(String.format("%,.2f €", eurMiktar));
+
+        // TL Karşılığı
+        double eurKur = Managers.CurrencyManager.getBuyRate("EUR");
+        double eurTlKarsiligi = eurMiktar * eurKur;
+
+        HspDovizEuroTLLabel.setText(String.format("≈ %,.2f TL", eurTlKarsiligi));
+
+        // ---------------------------------------------------------
+        // 4. ALTIN HESABI (ALTIN / GOLD)
+        // ---------------------------------------------------------
+        // Veritabanında tür "ALTIN" olarak geçiyor, ama CurrencyManager'da "GOLD" istiyor.
+        String[] altinDetay = Managers.DataBaseManager.getAccountDetails(userId, "ALTIN");
+        double altinMiktar = Double.parseDouble(altinDetay[0]);
+
+        HspDovizAltınBakiyeLabel.setText(String.format("%,.2f Gr", altinMiktar));
+
+        // TL Karşılığı (Parametre olarak "GOLD" gönderiyoruz)
+        double altinKur = Managers.CurrencyManager.getBuyRate("GOLD");
+        double altinTlKarsiligi = altinMiktar * altinKur;
+
+        HspDovizAltınTLLabel.setText(String.format("≈ %,.2f TL", altinTlKarsiligi));
+    }
+
+    // --- VADELİ HESAP EKRANI YÖNETİMİ (Mantık Burada) ---
+    private void vadeliHesapSayfasiniYonet() {
+        if (aktifKullanici == null) return;
+
+        // 1. Veritabanından İsim Listesini Çek (Senin yazdığın metot)
+        java.util.ArrayList<String> hesapListesi = Managers.DataBaseManager.getVadeliAccountNames(aktifKullanici.getUserId());
+
+        // 2. CardLayout'u Hazırla
+        java.awt.CardLayout layout = (java.awt.CardLayout) HspVadeliPanel.getLayout();
+
+        if (hesapListesi.isEmpty()) {
+            // --- Durum A: HESAP YOK (Reklam Göster) ---
+            layout.show(HspVadeliPanel, "cardHspVadeliYokPanel");
+
+        } else {
+            // --- Durum B: HESAP VAR (Listeyi Göster) ---
+            layout.show(HspVadeliPanel, "cardHspVadeliVarPanel");
+
+            // ComboBox'ı Temizle ve Doldur
+            HspVadeliListComboBox.removeAllItems();
+            for (String hesapAdi : hesapListesi) {
+                HspVadeliListComboBox.addItem(hesapAdi);
+            }
+
+            // İlk hesabı seçili yapınca detayları da doldurmak gerekecek
+            // Şimdilik sadece listeyi dolduruyoruz.
+        }
+    }
 
     // Variables declaration - do not modify
     private javax.swing.JLabel AdSoyadLabel;
+    private javax.swing.JButton AnaSayfaBorcOdeBtn;
     private javax.swing.JButton AnaSayfaBtn;
+    private javax.swing.JLabel AnaSayfaKrdBorcLabel;
+    private javax.swing.JLabel AnaSayfaKrdKullanılabilirLimitLabel;
+    private javax.swing.JLabel AnaSayfaKrdLimitLabel;
     private javax.swing.JPanel AnaSayfaKrediKartiPanel;
     private javax.swing.JPanel AnaSayfaPanel;
+    private javax.swing.JLabel AnaSayfaVadesizBakiyeLabel;
     private javax.swing.JPanel AnaSayfaVadesizHesapPanel;
+    private javax.swing.JLabel AnaSayfaVadesizIBANLabel;
     private javax.swing.JButton FaturalarBtn;
     private javax.swing.JPanel FaturalarPanel;
     private javax.swing.JPanel FaturalarPanelContainer;
@@ -1073,12 +1451,32 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     private javax.swing.JButton HesaplarBtn;
     private javax.swing.JPanel HesaplarPanel;
     private javax.swing.JPanel HesaplarPanelContainer;
+    private javax.swing.JLabel HspDovizAltınBakiyeLabel;
+    private javax.swing.JLabel HspDovizAltınTLLabel;
+    private javax.swing.JLabel HspDovizDolarBakiyeLabel;
+    private javax.swing.JLabel HspDovizDolarTLLabel;
+    private javax.swing.JLabel HspDovizEuroBakiyeLabel;
+    private javax.swing.JLabel HspDovizEuroTLLabel;
+    private javax.swing.JButton HspDovizIslemleriBtn;
     private javax.swing.JPanel HspDovizPanel;
     private javax.swing.JButton HspDövizBtn;
+    private javax.swing.JButton HspVadeliAcBtn;
     private javax.swing.JButton HspVadeliBtn;
+    private javax.swing.JLabel HspVadeliKalanGetirisiLbl;
+    private javax.swing.JLabel HspVadeliKalanGunLbl;
+    private javax.swing.JComboBox<String> HspVadeliListComboBox;
     private javax.swing.JPanel HspVadeliPanel;
+    private javax.swing.JLabel HspVadeliTürüLbl;
+    private javax.swing.JPanel HspVadeliVarPanel;
+    private javax.swing.JLabel HspVadeliYatirilanTutarLbl;
+    private javax.swing.JButton HspVadeliYeniHesapBtn;
+    private javax.swing.JPanel HspVadeliYokPanel;
+    private javax.swing.JLabel HspVadesizBakiyeLbl;
     private javax.swing.JButton HspVadesizBtn;
+    private javax.swing.JButton HspVadesizFaturaOdeBtn;
+    private javax.swing.JLabel HspVadesizIBANLbl;
     private javax.swing.JPanel HspVadesizPanel;
+    private javax.swing.JButton HspVadesizParaTrnsfrBtn;
     private javax.swing.JPanel IslBilgiPanel;
     private javax.swing.JButton IslBilgiPanelBtn;
     private javax.swing.JButton IslDovizBtn;
@@ -1139,11 +1537,11 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     private javax.swing.JToggleButton jToggleButton3;
     private javax.swing.JLabel lbl1;
     private javax.swing.JLabel lbl2;
-    private javax.swing.JLabel lbl3;
-    private javax.swing.JLabel lbl4;
-    private javax.swing.JLabel lbl5;
     private javax.swing.JLabel lbl6;
     private javax.swing.JLabel lbl7;
+    private javax.swing.JLabel lbl8;
+    private javax.swing.JLabel lbl9;
+    private javax.swing.JLabel panelAdiLabel;
     // End of variables declaration
 }
 

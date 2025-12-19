@@ -526,42 +526,48 @@ public class MainMenuUI extends javax.swing.JFrame {
             // 1. Formdaki Verileri Değişkenlere Alalım
             String ad = BireyselAdGirisTextF.getText();
             String soyad = BireyselSoyadGirisTextF.getText();
-            String tc = BireyselTcGirisFormattedTextF.getText();     // Maskeli alandan gelir
+            String tc = BireyselTcGirisFormattedTextF.getText();
             String sehir = BireyselSehirGirisTextF.getText();
-            String tel = BireyselTelefonGirisTextF.getText();       // Maskeli alandan gelir
+            String tel = BireyselTelefonGirisTextF.getText();
             String sifre = new String(BireyselSifreKayitPasswordTF.getPassword());
 
-            // Tarih verisini String olarak alıyoruz (Örn: "01/01/1990")
+            // Tarih verisini al
             String tarihMetni = BireyselDogumTGirisFormattedTextF.getText();
 
-            // 2. Boş Alan Kontrolü (Basit Validasyon)
-            // Maskeli alanlar boşsa bazen sadece boşluk karakteri dönebilir, trim() ile temizleyelim.
+            // 2. Boş Alan Kontrolü
             if (ad.trim().isEmpty() || soyad.trim().isEmpty() || sehir.trim().isEmpty() || sifre.trim().isEmpty()) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Lütfen Ad, Soyad, Şehir ve Şifre alanlarını eksiksiz doldurunuz.");
                 return;
             }
 
-            // 3. Tarih Dönüştürme (String -> LocalDate)
-            // Kullanıcı "Gün/Ay/Yıl" giriyor, Java'ya bunu öğretiyoruz.
+            // 3. Tarih Dönüştürme
             java.time.format.DateTimeFormatter formatlayici = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
             java.time.LocalDate dogumTarihi = java.time.LocalDate.parse(tarihMetni, formatlayici);
 
-            // 4. Veritabanı Yöneticisini Çağır ve Kaydet
-            // DataBaseManager'da yazdığımız addIndividualUser metodunu kullanıyoruz.
-            Managers.DataBaseManager.addIndividualUser(tc, ad, soyad, sifre, dogumTarihi, sehir, tel);
+            // 4. Veritabanına Kaydet ve MÜŞTERİ NO'YU AL
+            // Artık metot bize String olarak ID döndürüyor.
+            String olusanMusteriNo = Managers.DataBaseManager.addIndividualUser(tc, ad, soyad, sifre, dogumTarihi, sehir, tel);
 
-            // 5. Kullanıcıya Bilgi Ver
-            javax.swing.JOptionPane.showMessageDialog(this, "Kayıt Başarılı! Giriş ekranına yönlendiriliyorsunuz.");
+            // 5. Sonucu Kontrol Et ve Ekrana Yaz
+            if (olusanMusteriNo != null) {
+                // Başarılıysa ID'yi göster
+                String mesaj = "Kayıt İşlemi Başarılı!\n\n" +
+                        "Müşteri Numaranız: " + olusanMusteriNo + "\n\n" +
+                        "(Lütfen bu numarayı not ediniz, giriş yaparken kullanacaksınız.)";
 
-            // 6. Giriş Ekranına Geri Dön
-            // Kullanıcı kaydolduktan sonra direkt giriş yapsın diye giriş paneline atıyoruz.
-            sayfaDegistir("cardBireyselGirisYapPanel");
+                javax.swing.JOptionPane.showMessageDialog(this, mesaj, "Aramıza Hoş Geldiniz", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                // Giriş ekranına yönlendir
+                sayfaDegistir("cardBireyselGirisYapPanel");
+
+            } else {
+                // ID null geldiyse hata vardır
+                javax.swing.JOptionPane.showMessageDialog(this, "Kayıt sırasında bir hata oluştu! Lütfen bilgileri kontrol ediniz.");
+            }
 
         } catch (java.time.format.DateTimeParseException ex) {
-            // Eğer tarih formatı bozuksa (örn: 32/13/2020) burası çalışır
             javax.swing.JOptionPane.showMessageDialog(this, "Hatalı Tarih! Lütfen Gün/Ay/Yıl formatında giriniz.");
         } catch (Exception ex) {
-            // Diğer hatalar için
             javax.swing.JOptionPane.showMessageDialog(this, "Bir hata oluştu: " + ex.getMessage());
         }
     }
