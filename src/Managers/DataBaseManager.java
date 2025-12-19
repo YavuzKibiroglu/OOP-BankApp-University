@@ -122,27 +122,29 @@ public class DataBaseManager {
         }
     }
 
-    public static void addEnterpriseUser(String enterpriseName, String password, LocalDate enterpriseEstablishment, String enterpriseHQ) {
+    public static String addEnterpriseUser(String enterpriseName, String password, LocalDate enterpriseEstablishment, String enterpriseHQ) {
+
+        // Şifre kontrolü (Hata varsa null döndürür)
         if (!isValidPassword(password)) {
             System.out.println("Hata: Geçersiz şifre.");
-            return;
+            return null;
         }
 
-        // SQL sorgusuna Corporate_Code eklendi
         String sql = "INSERT INTO Enterprise_Users(UserId, Enterprise_Name, password, Enterprise_Establishment, Enterprise_HQ, Corporate_Code) VALUES(?,?,?,?,?,?)";
 
         try (Connection conn = DriverManager.getConnection(URL);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // User ID üret
+            // User ID üret (Konsolda görünecek)
             String uniqueId;
             do {
                 uniqueId = ProduceRandomID();
             } while (isIDExists(uniqueId));
 
-            // YENİ: Benzersiz Kurum Kodu üret
+            // YENİ: 12 Haneli Benzersiz Kurum Kodu üret (Ekranda görünecek)
             String uniqueCorpCode;
             do {
+                // Eğer generateCorporateCode metodun yoksa aşağıya onun kodunu da ekledim
                 uniqueCorpCode = generateCorporateCode();
             } while (isCorporateCodeExists(uniqueCorpCode));
 
@@ -151,13 +153,19 @@ public class DataBaseManager {
             stmt.setString(3, password);
             stmt.setString(4, enterpriseEstablishment.toString());
             stmt.setString(5, enterpriseHQ);
-            stmt.setString(6, uniqueCorpCode); // Kodu kaydet
+            stmt.setString(6, uniqueCorpCode);
 
             stmt.executeUpdate();
-            System.out.println("Kurumsal kullanıcı eklendi. ID: " + uniqueId + " | Kurum Kodu: " + uniqueCorpCode);
+
+            // KONSOL ÇIKTISI: ID burada görünüyor (İstediğin gibi)
+            System.out.println("Kurumsal kullanıcı eklendi. ID: " + uniqueId);
+
+            // EKRAN ÇIKTISI İÇİN: Kurum Kodunu geri döndürüyoruz
+            return uniqueCorpCode;
 
         } catch (SQLException e) {
             System.out.println("Kurumsal Ekleme Hatası: " + e.getMessage());
+            return null;
         }
     }
 
@@ -762,4 +770,92 @@ public class DataBaseManager {
         }
     }
     //endregion
+
+    public static model.IndividualUser getIndividualUserByLogin(String input, String password, String loginType) {
+        String sql = "";
+
+        // Hangi yöntemle giriş yapılıyor?
+        switch (loginType) {
+            case "TC":
+                sql = "SELECT * FROM Individual_Users WHERE TC_Kimlik = ? AND password = ?";
+                break;
+            case "MUSTERI_NO":
+                sql = "SELECT * FROM Individual_Users WHERE UserId = ? AND password = ?";
+                break;
+            case "TELEFON":
+                sql = "SELECT * FROM Individual_Users WHERE PhoneNumber = ? AND password = ?";
+                break;
+            default:
+                return null;
+        }
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, input);
+            pstmt.setString(2, password);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                // Kullanıcı bulundu, nesneyi oluşturup döndür
+                String userId = rs.getString("UserId");
+                String name = rs.getString("name");
+                String surname = rs.getString("surname");
+                String dbPassword = rs.getString("password");
+                String tc = rs.getString("TC_Kimlik");
+                String city = rs.getString("City");
+                String phone = rs.getString("PhoneNumber");
+
+                String dateStr = rs.getString("Birth_Date");
+                LocalDate birthDate = (dateStr != null) ? LocalDate.parse(dateStr) : LocalDate.now();
+
+                return new model.IndividualUser(userId, name, surname, dbPassword, tc, birthDate, city, phone);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Login Hatası: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public static model.EnterpriseUser getEnterpriseUserByLogin(String corporateCode, String password) {
+        // Kurum Kodu ve Şifre kontrolü yapıyoruz
+        String sql = "SELECT * FROM Enterprise_Users WHERE Corporate_Code = ? AND password = ?";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, corporateCode);
+            pstmt.setString(2, password);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                // Şirket bulundu! Verileri çekip nesne yapalım.
+                String userId = rs.getString("UserId");
+                String name = rs.getString("Enterprise_Name");
+                String dbPass = rs.getString("password");
+                String hq = rs.getString("Enterprise_HQ");
+                String code = rs.getString("Corporate_Code");
+
+                // Tarih dönüşümü
+                String dateStr = rs.getString("Enterprise_Establishment");
+                LocalDate estDate = (dateStr != null) ? LocalDate.parse(dateStr) : LocalDate.now();
+
+                return new model.EnterpriseUser(userId, name, dbPass, estDate, hq, code);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Kurumsal Login Hatası: " + e.getMessage());
+        }
+        return null;
+    }
+
+
+
+
+
+
+
 }
