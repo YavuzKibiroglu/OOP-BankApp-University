@@ -28,7 +28,8 @@ public class DataBaseManager {
                 "Enterprise_Name TEXT, " +
                 "password TEXT, " +
                 "Enterprise_Establishment TEXT, " +
-                "Enterprise_HQ TEXT)";
+                "Enterprise_HQ TEXT, " +
+                "Corporate_Code TEXT UNIQUE)";
 
         // GÜNCELLEME: Accounts tablosuna CreationDate ve DepositDays eklendi
         // Checking hesaplar için bu alanlar NULL kalabilir.
@@ -42,11 +43,41 @@ public class DataBaseManager {
                 "DepositDays INTEGER, " +
                 "CurrencyType TEXT)";  // YENİ: Vade günü (Sadece vadeli için)
 
+        String sqlCards = "CREATE TABLE IF NOT EXISTS Cards (" +
+                "CardNumber TEXT PRIMARY KEY, " +
+                "UserId TEXT, " +
+                "CardType TEXT, " +         // 'DEBIT' veya 'CREDIT'
+                "CVV TEXT, " +
+                "ExpiryDate TEXT, " +
+                "LinkedAccountId TEXT, " +  // Sadece Debit için dolu
+                "CreditLimit REAL, " +      // Sadece Credit için dolu
+                "CurrentDebt REAL)";        // Sadece Credit için dolu
+
+        String sqlSubscriptions = "CREATE TABLE IF NOT EXISTS Subscriptions (" +
+                "SubscriptionId TEXT PRIMARY KEY, " +
+                "SubscriberUserId TEXT, " +
+                "CompanyUserId TEXT, " +
+                "ServiceName TEXT, " +
+                "IsActive INTEGER, " + // 1: Aktif, 0: Kesik
+                "StartDate TEXT)";
+
+        String sqlInvoices = "CREATE TABLE IF NOT EXISTS Invoices (" +
+                "InvoiceId TEXT PRIMARY KEY, " +
+                "SubscriptionId TEXT, " +
+                "Amount REAL, " +
+                "DueDate TEXT, " +
+                "IsPaid INTEGER)"; // 1: Ödendi, 0: Ödenmedi
+
+
+
         try (Connection conn = DriverManager.getConnection(URL);
              Statement stmt = conn.createStatement()) {
             stmt.execute(sqlIndividualUsers);
             stmt.execute(sqlEnterpriseUsers);
             stmt.execute(sqlAccounts);
+            stmt.execute(sqlCards);
+            stmt.execute(sqlSubscriptions);
+            stmt.execute(sqlInvoices);
             System.out.println("Database created and connected successfully.");
         } catch (SQLException e) {
             System.out.println("Start Error: " + e.getMessage());
@@ -97,27 +128,59 @@ public class DataBaseManager {
             return;
         }
 
-        String sql = "INSERT INTO Enterprise_Users(UserId, Enterprise_Name, password, Enterprise_Establishment, Enterprise_HQ) VALUES(?,?,?,?,?)";
+        // SQL sorgusuna Corporate_Code eklendi
+        String sql = "INSERT INTO Enterprise_Users(UserId, Enterprise_Name, password, Enterprise_Establishment, Enterprise_HQ, Corporate_Code) VALUES(?,?,?,?,?,?)";
 
         try (Connection conn = DriverManager.getConnection(URL);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+            // User ID üret
             String uniqueId;
             do {
                 uniqueId = ProduceRandomID();
             } while (isIDExists(uniqueId));
+
+            // YENİ: Benzersiz Kurum Kodu üret
+            String uniqueCorpCode;
+            do {
+                uniqueCorpCode = generateCorporateCode();
+            } while (isCorporateCodeExists(uniqueCorpCode));
 
             stmt.setString(1, uniqueId);
             stmt.setString(2, enterpriseName);
             stmt.setString(3, password);
             stmt.setString(4, enterpriseEstablishment.toString());
             stmt.setString(5, enterpriseHQ);
+            stmt.setString(6, uniqueCorpCode); // Kodu kaydet
 
             stmt.executeUpdate();
-            System.out.println("Kurumsal kullanıcı eklendi. ID: " + uniqueId);
+            System.out.println("Kurumsal kullanıcı eklendi. ID: " + uniqueId + " | Kurum Kodu: " + uniqueCorpCode);
 
         } catch (SQLException e) {
             System.out.println("Kurumsal Ekleme Hatası: " + e.getMessage());
+        }
+    }
+
+    //12 Haneli Sadece Rakamlardan Oluşan Kod Üretici
+    private static String generateCorporateCode() {
+        Random rnd = new Random();
+        StringBuilder code = new StringBuilder();
+        for (int i = 0; i < 12; i++) {
+            code.append(rnd.nextInt(10)); // 0-9 arası rakam ekle
+        }
+        return code.toString();
+    }
+
+    //Kurum Kodu Veritabanında Var mı Kontrolü
+    private static boolean isCorporateCodeExists(String code) {
+        String sql = "SELECT 1 FROM Enterprise_Users WHERE Corporate_Code = ?";
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, code);
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            return false;
         }
     }
 
@@ -217,7 +280,6 @@ public class DataBaseManager {
     // 2. STANDART HESAP EKLEME (Vadesiz / Checking)
     public static void addAccount(String belongedUserId, String accountId, String ibanNumber, float moneyInAccount, AccountType accountType) throws SQLException {
 
-        // --- KISITLAMA BURADA KALIYOR ---
         // Eğer Vadesiz (Checking) hesapsa ve zaten varsa izin verme!
         if (accountType == AccountType.Checking && hasAccountType(belongedUserId, "Checking")) {
             System.out.println("UYARI: Zaten bir Vadesiz Hesabınız var. İkinciyi açamazsınız.");
@@ -421,5 +483,283 @@ public class DataBaseManager {
         return null;
     }
     //endregion
+    //endregion
+
+    //region Card Logic
+    public static void addDebitCard(String userId, String linkedAccountId) {
+        String cardNo = getRandomCardNumber();
+        String sql = "INSERT INTO Cards(CardNumber, UserId, CardType, CVV, ExpiryDate, LinkedAccountId) VALUES(?,?,?,?,?,?)";
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, cardNo);
+            pstmt.setString(2, userId);
+            pstmt.setString(3, "DEBIT");
+            pstmt.setString(4, String.valueOf(new Random().nextInt(900)+100)); // Random CVV
+            pstmt.setString(5, "12/30");
+            pstmt.setString(6, linkedAccountId);
+            pstmt.executeUpdate();
+            System.out.println("Banka Kartı Oluşturuldu: " + cardNo);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void addCreditCard(String userId, float limit) {
+        String cardNo = getRandomCardNumber();
+        String sql = "INSERT INTO Cards(CardNumber, UserId, CardType, CVV, ExpiryDate, CreditLimit, CurrentDebt) VALUES(?,?,?,?,?,?,?)";
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, cardNo);
+            pstmt.setString(2, userId);
+            pstmt.setString(3, "CREDIT");
+            pstmt.setString(4, String.valueOf(new Random().nextInt(900)+100));
+            pstmt.setString(5, "12/30");
+            pstmt.setFloat(6, limit);
+            pstmt.setFloat(7, 0);
+            pstmt.executeUpdate();
+            System.out.println("Kredi Kartı Oluşturuldu: " + cardNo);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //KART BORCUNU GÜNCELLEME (Kredi Kartı İçin)
+    public static void updateCardDebt(String cardNumber, float newDebt) {
+        String sql = "UPDATE Cards SET CurrentDebt = ? WHERE CardNumber = ?";
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setFloat(1, newDebt);
+            pstmt.setString(2, cardNumber);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Kart Güncelleme Hatası: " + e.getMessage());
+        }
+    }
+
+    //Random Kart No
+    private static String getRandomCardNumber() {
+        Random rnd = new Random();
+        StringBuilder sb = new StringBuilder("4543"); // Visa başlangıç
+        for(int i=0; i<12; i++) sb.append(rnd.nextInt(10));
+        return sb.toString();
+    }
+
+    //KULLANICININ KARTLARINI GETİRME METODU
+    public static java.util.ArrayList<model.Card> getCardsByUserId(String userId) {
+        java.util.ArrayList<model.Card> userCards = new java.util.ArrayList<>();
+
+        String sql = "SELECT * FROM Cards WHERE UserId = ?";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                // Ortak Veriler
+                String cardNo = rs.getString("CardNumber");
+                String uId = rs.getString("UserId");
+                String type = rs.getString("CardType"); // "DEBIT" veya "CREDIT"
+                String cvv = rs.getString("CVV");
+                String date = rs.getString("ExpiryDate");
+
+                if ("DEBIT".equalsIgnoreCase(type)) {
+                    // Banka Kartı ise LinkedAccountId verisini çek
+                    String linkedAcc = rs.getString("LinkedAccountId");
+
+                    // Listeye DebitCard olarak ekle
+                    userCards.add(new model.DebitCard(cardNo, uId, cvv, date, linkedAcc));
+                }
+                else if ("CREDIT".equalsIgnoreCase(type)) {
+                    // Kredi Kartı ise Limit ve Borç verilerini çek
+                    float limit = rs.getFloat("CreditLimit");
+                    float debt = rs.getFloat("CurrentDebt");
+
+                    // Listeye CreditCard olarak ekle
+                    userCards.add(new model.CreditCard(cardNo, uId, cvv, date, limit, debt));
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Kartları Getirme Hatası: " + e.getMessage());
+        }
+
+        return userCards;
+    }
+    //endregion
+
+    //region SubscriptionLogic
+
+    // 1. ABONELİK OLUŞTURMA (Tarih TimeManager'dan gelir)
+    public static void createSubscription(String subscriberId, String companyId, String serviceName) {
+        String subId = ProduceRandomID();
+        String sql = "INSERT INTO Subscriptions(SubscriptionId, SubscriberUserId, CompanyUserId, ServiceName, IsActive, StartDate) VALUES(?,?,?,?,?,?)";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, subId);
+            pstmt.setString(2, subscriberId);
+            pstmt.setString(3, companyId);
+            pstmt.setString(4, serviceName);
+            pstmt.setInt(5, 1); // Aktif
+            // KRİTİK NOKTA: TimeManager kullanıyoruz
+            pstmt.setString(6, TimeManager.getCurrentDate().toString());
+
+            pstmt.executeUpdate();
+            System.out.println("Abonelik Başladı: " + serviceName + " | Tarih: " + TimeManager.getCurrentDate());
+
+        } catch (SQLException e) {
+            System.out.println("Abonelik Hatası: " + e.getMessage());
+        }
+    }
+
+    // 2. OTOMATİK FATURA KESME SİMÜLASYONU
+    // Bu metot, her ay döngüsü geldiğinde yeni fatura keser.
+    public static void generateMonthlyInvoices() {
+        LocalDate simulationDate = TimeManager.getCurrentDate();
+
+        // Mantık: Abonelik tarihi bugünle aynı gün ise (örn: her ayın 15'i) fatura kes.
+        // Basitlik için: Eğer bugün fatura kesilmemişse kes (SQL kontrolü gerekir ama şimdilik manuel tetikleme varsayıyoruz)
+
+        // Örnek Senaryo: Tüm aktif aboneliklere bu ayki faturayı kes
+        String sqlSelect = "SELECT * FROM Subscriptions WHERE IsActive = 1";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sqlSelect)) {
+
+            while(rs.next()) {
+                String subId = rs.getString("SubscriptionId");
+                // Random Tutar (Elektrik, Su gibi) veya Sabit Tutar
+                float amount = (float)(Math.random() * 500) + 100;
+
+                // Fatura oluştur (Vade tarihi: Simülasyon tarihi + 30 gün)
+                createInvoice(subId, amount, simulationDate.plusDays(30));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Fatura Kaydetme (Yardımcı Metot)
+    private static void createInvoice(String subId, float amount, LocalDate dueDate) {
+        String invId = ProduceRandomID();
+        String sql = "INSERT INTO Invoices(InvoiceId, SubscriptionId, Amount, DueDate, IsPaid) VALUES(?,?,?,?,?)";
+
+        try(Connection conn = DriverManager.getConnection(URL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+
+            pstmt.setString(1, invId);
+            pstmt.setString(2, subId);
+            pstmt.setFloat(3, amount);
+            pstmt.setString(4, dueDate.toString());
+            pstmt.setInt(5, 0); // Ödenmedi
+
+            pstmt.executeUpdate();
+            System.out.println("Otomatik Fatura Kesildi (ID: "+invId+") Tutar: " + amount);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 3. ZAMAN ATLAYINCA BORÇLU HİZMETLERİ KESME
+    public static void checkOverdueAndCutServices() {
+        LocalDate simulationDate = TimeManager.getCurrentDate();
+
+        // Vadesi geçmiş (DueDate < SimülasyonTarihi) ve Ödenmemiş (IsPaid=0) faturaları bul
+        String sql = "SELECT SubscriptionId FROM Invoices WHERE IsPaid = 0 AND DueDate < ?";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, simulationDate.toString());
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String subId = rs.getString("SubscriptionId");
+                // Hizmeti Kes
+                cutService(subId);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Hizmet Kesme Update Sorgusu
+    private static void cutService(String subId) {
+        String sql = "UPDATE Subscriptions SET IsActive = 0 WHERE SubscriptionId = ?";
+        try(Connection conn = DriverManager.getConnection(URL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, subId);
+            pstmt.executeUpdate();
+            System.out.println("UYARI: Abonelik hizmeti borç nedeniyle durduruldu! SubID: " + subId);
+        } catch(SQLException e){ e.printStackTrace(); }
+    }
+
+    // ID ile Fatura Bulma Metodu
+    public static model.Invoice getInvoiceById(String invoiceId) {
+        String sql = "SELECT * FROM Invoices WHERE InvoiceId = ?";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, invoiceId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                // Veritabanından gelen verileri Model nesnesine çeviriyoruz
+                String subId = rs.getString("SubscriptionId");
+                float amount = rs.getFloat("Amount");
+                String dateStr = rs.getString("DueDate");
+                int isPaidInt = rs.getInt("IsPaid");
+
+                // Tarihi String'den LocalDate'e çevir
+                LocalDate dueDate = (dateStr != null) ? LocalDate.parse(dateStr) : null;
+
+                // 1 ise true (Ödendi), 0 ise false (Ödenmedi)
+                boolean isPaid = (isPaidInt == 1);
+
+                return new model.Invoice(invoiceId, subId, amount, dueDate, isPaid);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Fatura Bulma Hatası: " + e.getMessage());
+        }
+
+        return null; // Fatura bulunamazsa null döner
+    }
+
+    // Faturayı 'Ödendi' yap ve Hizmeti Tekrar Aç
+    public static void markInvoiceAsPaidAndActivateService(String invoiceId) {
+        // 1. Önce faturanın kime ait olduğunu bulalım (SubscriptionId lazım)
+        model.Invoice inv = getInvoiceById(invoiceId);
+        if (inv == null) return;
+
+        String sqlPay = "UPDATE Invoices SET IsPaid = 1 WHERE InvoiceId = ?";
+        String sqlActivate = "UPDATE Subscriptions SET IsActive = 1 WHERE SubscriptionId = ?";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmtPay = conn.prepareStatement(sqlPay);
+             PreparedStatement pstmtActivate = conn.prepareStatement(sqlActivate)) {
+
+            // Transaction başlatılabilir ama basit tutuyoruz
+
+            // A) Faturayı Ödendi İşaretle
+            pstmtPay.setString(1, invoiceId);
+            pstmtPay.executeUpdate();
+
+            // B) Abonelik Hizmetini Aç (Kesikse açılır, açıksa açık kalır)
+            pstmtActivate.setString(1, inv.getSubscriptionId());
+            pstmtActivate.executeUpdate();
+
+            System.out.println("Sistem: Fatura kapatıldı ve hizmet aktif edildi.");
+
+        } catch (SQLException e) {
+            System.out.println("Fatura Güncelleme Hatası: " + e.getMessage());
+        }
+    }
     //endregion
 }

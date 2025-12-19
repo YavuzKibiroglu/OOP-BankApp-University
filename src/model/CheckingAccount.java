@@ -82,4 +82,39 @@ public class CheckingAccount extends Account {
     public void transferToCurrent(float moneyAmount) throws SQLException {
         addMoneyToAccount(moneyAmount);
     }
+
+    // --- FATURA ÖDEME METODU ---
+    public void payBill(String invoiceId) {
+        // 1. Fatura Bilgilerini Çek
+        model.Invoice invoice = DataBaseManager.getInvoiceById(invoiceId);
+
+        if (invoice == null) {
+            System.out.println("Hata: Fatura bulunamadı.");
+            return;
+        }
+
+        if (invoice.isPaid()) {
+            System.out.println("Bilgi: Bu fatura zaten ödenmiş.");
+            return;
+        }
+
+        // 2. Bakiye Kontrolü
+        if (this.moneyInAccount < invoice.getAmount()) {
+            System.out.println("Hata: Fatura ödemesi için bakiye yetersiz!");
+            return;
+        }
+
+        // 3. Ödeme İşlemi (RAM)
+        this.moneyInAccount -= invoice.getAmount();
+
+        // 4. Veritabanı Güncellemeleri
+
+        // a) Parayı veritabanında düş
+        DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
+
+        // b) Faturayı 'Ödendi' yap ve Hizmeti aç (Artık bu metot var)
+        DataBaseManager.markInvoiceAsPaidAndActivateService(invoiceId);
+
+        System.out.println("Fatura Başarıyla Ödendi. Yeni Bakiye: " + this.moneyInAccount);
+    }
 }
