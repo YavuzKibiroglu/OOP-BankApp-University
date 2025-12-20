@@ -1,12 +1,13 @@
 package model;
 
-import java.sql.SQLException;
-
+// Bu ana sınıf (Parent Class).
+// DebitCard ve CreditCard buradan özellik alır.
 public abstract class Card {
+
     protected String cardNumber;
     protected String userId;
     protected String cvv;
-    protected String expiryDate; // "12/28" formatında
+    protected String expiryDate;
 
     public Card(String cardNumber, String userId, String cvv, String expiryDate) {
         this.cardNumber = cardNumber;
@@ -15,12 +16,29 @@ public abstract class Card {
         this.expiryDate = expiryDate;
     }
 
-    public String getCardNumber() { return cardNumber; }
-    public String getUserId() { return userId; }
+    // --- HATAYI ÇÖZEN METOTLAR BURADA ---
+    // Alt sınıflar (Debit/Credit) bu metotları miras alır.
 
-    // Her kartın harcama mantığı farklıdır
-    // Banka kartı hesaptan düşer, Kredi kartı borcu artırır.
-    public abstract boolean spend(float amount) throws SQLException;
+    public String getCardNumber() {
+        return cardNumber;
+    }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getCvv() {
+        return cvv;
+    }
+
+    public String getExpiryDate() {
+        return expiryDate;
+    }
+
+    // Her kartın bilgi verme şekli farklıdır, o yüzden abstract
     public abstract String getInformation();
+
+    // Her kartın harcama mantığı farklıdır, o yüzden abstract
+    // (Bunu eklemek, DebitCard ve CreditCard'daki @Override spend'i yasal kılar)
+    public abstract boolean spend(float amount) throws java.sql.SQLException;
 }

@@ -13,11 +13,18 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         // Başlangıçta Ana Sayfa Açık
         panelAdiLabel.setText("ANA SAYFA");
 
+        bilesenBoyutlariniSabitle();
+
         // Verileri Veritabanından Çek ve Doldur
         kullaniciBilgileriniGoster();
         anaSayfaGuncelle();    // Dashboard Bakiyesi ve Kredi Kartı
         hesaplariGuncelle();   // Hesaplar Sekmesindeki (Vadesiz, Döviz) veriler
         dovizKurlariniEkranaYaz();
+        kartlariGuncelle();
+        varliklariGuncelle();           // Varlıklar Sekmesi
+        vadeliIslemBilgisiniGuncelle(); // İşlemler -> Vadeli Bilgisi
+        guncelKurlariGuncelle();        // Güncel Kur Sekmesi
+
     }
 
     @SuppressWarnings("unchecked")
@@ -27,6 +34,10 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         DolarIslemleri = new javax.swing.ButtonGroup();
         EuroIslemleri = new javax.swing.ButtonGroup();
         AltinIslemleri = new javax.swing.ButtonGroup();
+        KrediKartBorcOdeForm = new javax.swing.JFrame();
+        KrediKartBorcOdePanel = new javax.swing.JPanel();
+        KrediKartBorcGoruntulemeLabel = new javax.swing.JLabel();
+        KrediKartBorcOdeFormBtn = new javax.swing.JButton();
         YonlendirmePanel = new javax.swing.JPanel();
         AnaSayfaBtn = new javax.swing.JButton();
         IslemlerBtn = new javax.swing.JButton();
@@ -55,8 +66,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         AnaSayfaBorcOdeBtn = new javax.swing.JButton();
         IslemlerPanel = new javax.swing.JPanel();
         IslemlerPanelContainer = new javax.swing.JPanel();
-        IslBilgiPanel = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
         IslParaGönderPanel = new javax.swing.JPanel();
         GonderilecekAdTextF = new javax.swing.JTextField();
         GonderilecekSoyadTextF = new javax.swing.JTextField();
@@ -90,19 +99,22 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         IslSatilacakEuroMiktariTextF = new javax.swing.JTextField();
         IslAlınacakAltınMiktariTextF = new javax.swing.JTextField();
         IslSatılacakAlMiktariTextF = new javax.swing.JTextField();
-        IslDovizDolarIslemi = new javax.swing.JToggleButton();
-        IslDovizEuroIslemi = new javax.swing.JToggleButton();
-        IslDovizAltinIslemi = new javax.swing.JToggleButton();
+        IslDovizDolarIslemi = new javax.swing.JButton();
+        IslDovizEuroIslemi = new javax.swing.JButton();
+        IslDovizAltinIslemi = new javax.swing.JButton();
         DolarAlRadioBtn = new javax.swing.JRadioButton();
         DolarSatRadioBtn = new javax.swing.JRadioButton();
         EuroAlRadioBtn = new javax.swing.JRadioButton();
         EuroSatRadioBtn = new javax.swing.JRadioButton();
         AltinAlRadioBtn = new javax.swing.JRadioButton();
         AltinSatRadioBtn = new javax.swing.JRadioButton();
+        IslNakitAvansPanel = new javax.swing.JPanel();
+        IslNakitAvansMiktariTextF = new javax.swing.JTextField();
+        IslNakitAvansGonderBtn = new javax.swing.JButton();
         IslParaGönderBtn = new javax.swing.JButton();
         IslVadeliBtn = new javax.swing.JButton();
         IslDovizBtn = new javax.swing.JButton();
-        IslBilgiPanelBtn = new javax.swing.JButton();
+        IslNakitAvansPanelBtn = new javax.swing.JButton();
         HesaplarPanel = new javax.swing.JPanel();
         HesaplarPanelContainer = new javax.swing.JPanel();
         HspVadesizPanel = new javax.swing.JPanel();
@@ -135,8 +147,22 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         KartlarPanel = new javax.swing.JPanel();
         KrtBankaKartiPanel = new javax.swing.JPanel();
         lbl6 = new javax.swing.JLabel();
+        BankaKartNoLabel = new javax.swing.JLabel();
+        BankaKartCVVLabel = new javax.swing.JLabel();
+        BankaKartSKTLabel = new javax.swing.JLabel();
+        BankaKartAdSoyadLabel = new javax.swing.JLabel();
+        BankaKartBakiye = new javax.swing.JLabel();
         KrtKrediKartiPanel = new javax.swing.JPanel();
         lbl7 = new javax.swing.JLabel();
+        KrediKartNoLabel = new javax.swing.JLabel();
+        KrediKartCVVLabel = new javax.swing.JLabel();
+        KrediKartSKTLabel = new javax.swing.JLabel();
+        KrediKartAdSoyadLabel = new javax.swing.JLabel();
+        KrediKartLimitLabel = new javax.swing.JLabel();
+        KrediKartKullanılabilirBakiyeLabel = new javax.swing.JLabel();
+        KrediKartBorcLabel = new javax.swing.JLabel();
+        KrediKartBorcOdeBtn = new javax.swing.JButton();
+        KrediKartNakitAvansBtn = new javax.swing.JButton();
         FaturalarPanel = new javax.swing.JPanel();
         FtrAboneliklerimBtn = new javax.swing.JButton();
         FtrFaturalarımBtn = new javax.swing.JButton();
@@ -146,37 +172,77 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         FtrFaturalarımPanel = new javax.swing.JPanel();
         jLabel32 = new javax.swing.JLabel();
         VarliklarPanel = new javax.swing.JPanel();
-        jLabel20 = new javax.swing.JLabel();
-        jLabel21 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
-        jLabel23 = new javax.swing.JLabel();
+        VarliklarTLLabel = new javax.swing.JLabel();
+        VarliklarDolarLabel = new javax.swing.JLabel();
+        VarliklarEuroLabel = new javax.swing.JLabel();
+        VarliklarAltinLabel = new javax.swing.JLabel();
         GuncelKurPanel = new javax.swing.JPanel();
-        jLabel24 = new javax.swing.JLabel();
-        jLabel25 = new javax.swing.JLabel();
-        jLabel26 = new javax.swing.JLabel();
-        jLabel27 = new javax.swing.JLabel();
+        GuncelKurDolarAlısLabel = new javax.swing.JLabel();
+        GuncelKurDolarSatısLabel = new javax.swing.JLabel();
+        GuncelKurEuroAlısLabel = new javax.swing.JLabel();
+        GuncelKurEuroSatisLabel = new javax.swing.JLabel();
+        GuncelKurAltinAlısLabel = new javax.swing.JLabel();
+        GuncelKurAltinSatisLabel = new javax.swing.JLabel();
+        GuncelKurDovizIslemleriYonlendirmeBtn = new javax.swing.JButton();
+
+        KrediKartBorcGoruntulemeLabel.setText("kart borcunuz");
+
+        KrediKartBorcOdeFormBtn.setText("öde");
+        KrediKartBorcOdeFormBtn.addActionListener(this::KrediKartBorcOdeFormBtnActionPerformed);
+
+        javax.swing.GroupLayout KrediKartBorcOdePanelLayout = new javax.swing.GroupLayout(KrediKartBorcOdePanel);
+        KrediKartBorcOdePanel.setLayout(KrediKartBorcOdePanelLayout);
+        KrediKartBorcOdePanelLayout.setHorizontalGroup(
+                KrediKartBorcOdePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(KrediKartBorcOdePanelLayout.createSequentialGroup()
+                                .addGap(92, 92, 92)
+                                .addGroup(KrediKartBorcOdePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(KrediKartBorcOdeFormBtn)
+                                        .addComponent(KrediKartBorcGoruntulemeLabel))
+                                .addContainerGap(132, Short.MAX_VALUE))
+        );
+        KrediKartBorcOdePanelLayout.setVerticalGroup(
+                KrediKartBorcOdePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(KrediKartBorcOdePanelLayout.createSequentialGroup()
+                                .addGap(59, 59, 59)
+                                .addComponent(KrediKartBorcGoruntulemeLabel)
+                                .addGap(141, 141, 141)
+                                .addComponent(KrediKartBorcOdeFormBtn)
+                                .addContainerGap(157, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout KrediKartBorcOdeFormLayout = new javax.swing.GroupLayout(KrediKartBorcOdeForm.getContentPane());
+        KrediKartBorcOdeForm.getContentPane().setLayout(KrediKartBorcOdeFormLayout);
+        KrediKartBorcOdeFormLayout.setHorizontalGroup(
+                KrediKartBorcOdeFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(KrediKartBorcOdePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        KrediKartBorcOdeFormLayout.setVerticalGroup(
+                KrediKartBorcOdeFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(KrediKartBorcOdePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        AnaSayfaBtn.setText("jButton1");
+        AnaSayfaBtn.setText("Ana");
         AnaSayfaBtn.addActionListener(this::AnaSayfaBtnActionPerformed);
 
-        IslemlerBtn.setText("jButton2");
+        IslemlerBtn.setText("Isl");
         IslemlerBtn.addActionListener(this::IslemlerBtnActionPerformed);
 
-        HesaplarBtn.setText("jButton2");
+        HesaplarBtn.setText("Hsp");
         HesaplarBtn.addActionListener(this::HesaplarBtnActionPerformed);
 
-        KartlarBtn.setText("jButton2");
+        KartlarBtn.setText("Krt");
         KartlarBtn.addActionListener(this::KartlarBtnActionPerformed);
 
-        FaturalarBtn.setText("jButton2");
+        FaturalarBtn.setText("Ftr");
         FaturalarBtn.addActionListener(this::FaturalarBtnActionPerformed);
 
-        VarliklarBtn.setText("jButton2");
+        VarliklarBtn.setText("Vrl");
         VarliklarBtn.addActionListener(this::VarliklarBtnActionPerformed);
 
-        GuncelKurBtn.setText("jButton2");
+        GuncelKurBtn.setText("GKur");
         GuncelKurBtn.addActionListener(this::GuncelKurBtnActionPerformed);
 
         javax.swing.GroupLayout YonlendirmePanelLayout = new javax.swing.GroupLayout(YonlendirmePanel);
@@ -301,6 +367,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         AnaSayfaKrdBorcLabel.setText("Güncel Borç");
 
         AnaSayfaBorcOdeBtn.setText("Borç Öde");
+        AnaSayfaBorcOdeBtn.addActionListener(this::AnaSayfaBorcOdeBtnActionPerformed);
 
         javax.swing.GroupLayout AnaSayfaKrediKartiPanelLayout = new javax.swing.GroupLayout(AnaSayfaKrediKartiPanel);
         AnaSayfaKrediKartiPanel.setLayout(AnaSayfaKrediKartiPanelLayout);
@@ -366,27 +433,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
 
         IslemlerPanelContainer.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         IslemlerPanelContainer.setLayout(new java.awt.CardLayout());
-
-        jLabel1.setText("jLabel1");
-
-        javax.swing.GroupLayout IslBilgiPanelLayout = new javax.swing.GroupLayout(IslBilgiPanel);
-        IslBilgiPanel.setLayout(IslBilgiPanelLayout);
-        IslBilgiPanelLayout.setHorizontalGroup(
-                IslBilgiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(IslBilgiPanelLayout.createSequentialGroup()
-                                .addGap(355, 355, 355)
-                                .addComponent(jLabel1)
-                                .addContainerGap(319, Short.MAX_VALUE))
-        );
-        IslBilgiPanelLayout.setVerticalGroup(
-                IslBilgiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, IslBilgiPanelLayout.createSequentialGroup()
-                                .addContainerGap(217, Short.MAX_VALUE)
-                                .addComponent(jLabel1)
-                                .addGap(235, 235, 235))
-        );
-
-        IslemlerPanelContainer.add(IslBilgiPanel, "cardIslBilgiPanel");
 
         GonderilecekAdTextF.setText("jTextField1");
 
@@ -556,13 +602,13 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
 
         IslSatılacakAlMiktariTextF.setText("jTextField6");
 
-        IslDovizDolarIslemi.setText("jToggleButton1");
+        IslDovizDolarIslemi.setText("jButton1");
         IslDovizDolarIslemi.addActionListener(this::IslDovizDolarIslemiActionPerformed);
 
-        IslDovizEuroIslemi.setText("jToggleButton2");
+        IslDovizEuroIslemi.setText("jButton2");
         IslDovizEuroIslemi.addActionListener(this::IslDovizEuroIslemiActionPerformed);
 
-        IslDovizAltinIslemi.setText("jToggleButton3");
+        IslDovizAltinIslemi.setText("jButton3");
         IslDovizAltinIslemi.addActionListener(this::IslDovizAltinIslemiActionPerformed);
 
         DolarIslemleri.add(DolarAlRadioBtn);
@@ -576,7 +622,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
 
         EuroIslemleri.add(EuroSatRadioBtn);
         EuroSatRadioBtn.setText("Euro Sat");
-        EuroSatRadioBtn.addActionListener(this::EuroSatRadioBtnActionPerformed);
 
         AltinIslemleri.add(AltinAlRadioBtn);
         AltinAlRadioBtn.setText("Altın Al");
@@ -648,13 +693,13 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                                         .addComponent(AltinAlRadioBtn)
                                         .addComponent(AltinSatRadioBtn))
                                 .addGap(95, 95, 95))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, IslDovizPanelLayout.createSequentialGroup()
+                        .addGroup(IslDovizPanelLayout.createSequentialGroup()
                                 .addGap(66, 66, 66)
-                                .addComponent(IslDovizDolarIslemi)
+                                .addComponent(IslDovizDolarIslemi, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(64, 64, 64)
-                                .addComponent(IslDovizEuroIslemi)
+                                .addComponent(IslDovizEuroIslemi, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(IslDovizAltinIslemi)
+                                .addComponent(IslDovizAltinIslemi, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(75, 75, 75))
         );
         IslDovizPanelLayout.setVerticalGroup(
@@ -685,12 +730,12 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                                         .addComponent(DolarSatRadioBtn)
                                         .addComponent(EuroSatRadioBtn)
                                         .addComponent(AltinSatRadioBtn))
-                                .addGap(39, 39, 39)
+                                .addGap(72, 72, 72)
                                 .addGroup(IslDovizPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(IslDovizDolarIslemi)
                                         .addComponent(IslDovizEuroIslemi)
                                         .addComponent(IslDovizAltinIslemi))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 104, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 71, Short.MAX_VALUE)
                                 .addGroup(IslDovizPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(IslDovizEuroAlısKur)
                                         .addComponent(IslDovizDolarAlısKur)
@@ -705,6 +750,34 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
 
         IslemlerPanelContainer.add(IslDovizPanel, "cardIslDovizPanel");
 
+        IslNakitAvansMiktariTextF.setText("jTextField1");
+
+        IslNakitAvansGonderBtn.setText("jButton1");
+        IslNakitAvansGonderBtn.addActionListener(this::IslNakitAvansGonderBtnActionPerformed);
+
+        javax.swing.GroupLayout IslNakitAvansPanelLayout = new javax.swing.GroupLayout(IslNakitAvansPanel);
+        IslNakitAvansPanel.setLayout(IslNakitAvansPanelLayout);
+        IslNakitAvansPanelLayout.setHorizontalGroup(
+                IslNakitAvansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(IslNakitAvansPanelLayout.createSequentialGroup()
+                                .addGap(89, 89, 89)
+                                .addGroup(IslNakitAvansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(IslNakitAvansGonderBtn)
+                                        .addComponent(IslNakitAvansMiktariTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(543, Short.MAX_VALUE))
+        );
+        IslNakitAvansPanelLayout.setVerticalGroup(
+                IslNakitAvansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(IslNakitAvansPanelLayout.createSequentialGroup()
+                                .addGap(70, 70, 70)
+                                .addComponent(IslNakitAvansMiktariTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(100, 100, 100)
+                                .addComponent(IslNakitAvansGonderBtn)
+                                .addContainerGap(245, Short.MAX_VALUE))
+        );
+
+        IslemlerPanelContainer.add(IslNakitAvansPanel, "cardIslNakitAvansPanel");
+
         IslParaGönderBtn.setText("Para Gönderme");
         IslParaGönderBtn.addActionListener(this::IslParaGönderBtnActionPerformed);
 
@@ -714,39 +787,39 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         IslDovizBtn.setText("Döviz İşlemleri");
         IslDovizBtn.addActionListener(this::IslDovizBtnActionPerformed);
 
-        IslBilgiPanelBtn.setText("BilgiPaneli");
-        IslBilgiPanelBtn.addActionListener(this::IslBilgiPanelBtnActionPerformed);
+        IslNakitAvansPanelBtn.setText("Nakit Avans Çekme");
+        IslNakitAvansPanelBtn.addActionListener(this::IslNakitAvansPanelBtnActionPerformed);
 
         javax.swing.GroupLayout IslemlerPanelLayout = new javax.swing.GroupLayout(IslemlerPanel);
         IslemlerPanel.setLayout(IslemlerPanelLayout);
         IslemlerPanelLayout.setHorizontalGroup(
                 IslemlerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(IslemlerPanelLayout.createSequentialGroup()
-                                .addGap(57, 57, 57)
+                                .addGap(60, 60, 60)
                                 .addGroup(IslemlerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(IslDovizBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(IslParaGönderBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(IslVadeliBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(IslBilgiPanelBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(58, 58, 58)
+                                        .addComponent(IslNakitAvansPanelBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(55, 55, 55)
                                 .addComponent(IslemlerPanelContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         IslemlerPanelLayout.setVerticalGroup(
                 IslemlerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(IslemlerPanelLayout.createSequentialGroup()
-                                .addGap(110, 110, 110)
-                                .addComponent(IslBilgiPanelBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(IslemlerPanelContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 13, Short.MAX_VALUE))
+                        .addGroup(IslemlerPanelLayout.createSequentialGroup()
+                                .addGap(85, 85, 85)
                                 .addComponent(IslParaGönderBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(IslVadeliBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(IslDovizBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(79, Short.MAX_VALUE))
-                        .addGroup(IslemlerPanelLayout.createSequentialGroup()
-                                .addComponent(IslemlerPanelContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addComponent(IslNakitAvansPanelBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         PanelContainer.add(IslemlerPanel, "cardIslemlerPanel");
@@ -988,7 +1061,19 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
 
         PanelContainer.add(HesaplarPanel, "cardHesaplarPanel");
 
+        KrtBankaKartiPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
         lbl6.setText("Banka Kartı");
+
+        BankaKartNoLabel.setText("debitcardnumber");
+
+        BankaKartCVVLabel.setText("debit cvv");
+
+        BankaKartSKTLabel.setText("debit skt");
+
+        BankaKartAdSoyadLabel.setText("debit ad soyad");
+
+        BankaKartBakiye.setText("debit bakiye");
 
         javax.swing.GroupLayout KrtBankaKartiPanelLayout = new javax.swing.GroupLayout(KrtBankaKartiPanel);
         KrtBankaKartiPanel.setLayout(KrtBankaKartiPanelLayout);
@@ -997,15 +1082,65 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                         .addGroup(KrtBankaKartiPanelLayout.createSequentialGroup()
                                 .addComponent(lbl6, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 589, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, KrtBankaKartiPanelLayout.createSequentialGroup()
+                                .addGroup(KrtBankaKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(KrtBankaKartiPanelLayout.createSequentialGroup()
+                                                .addGap(46, 46, 46)
+                                                .addComponent(BankaKartNoLabel))
+                                        .addGroup(KrtBankaKartiPanelLayout.createSequentialGroup()
+                                                .addGap(55, 55, 55)
+                                                .addGroup(KrtBankaKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(BankaKartBakiye)
+                                                        .addComponent(BankaKartSKTLabel))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(KrtBankaKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(BankaKartAdSoyadLabel)
+                                        .addComponent(BankaKartCVVLabel))
+                                .addGap(57, 57, 57))
         );
         KrtBankaKartiPanelLayout.setVerticalGroup(
                 KrtBankaKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(KrtBankaKartiPanelLayout.createSequentialGroup()
                                 .addComponent(lbl6)
-                                .addGap(0, 186, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addGroup(KrtBankaKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(BankaKartNoLabel)
+                                        .addComponent(BankaKartAdSoyadLabel))
+                                .addGap(27, 27, 27)
+                                .addComponent(BankaKartBakiye)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
+                                .addGroup(KrtBankaKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, KrtBankaKartiPanelLayout.createSequentialGroup()
+                                                .addComponent(BankaKartCVVLabel)
+                                                .addGap(41, 41, 41))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, KrtBankaKartiPanelLayout.createSequentialGroup()
+                                                .addComponent(BankaKartSKTLabel)
+                                                .addGap(33, 33, 33))))
         );
 
+        KrtKrediKartiPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
         lbl7.setText("Kredi Kartı");
+
+        KrediKartNoLabel.setText("credit card number");
+
+        KrediKartCVVLabel.setText("credit cvv");
+
+        KrediKartSKTLabel.setText("credt skt");
+
+        KrediKartAdSoyadLabel.setText("credit ad soyad");
+
+        KrediKartLimitLabel.setText("credit limit");
+
+        KrediKartKullanılabilirBakiyeLabel.setText("credit kullanılabilir bakiye");
+
+        KrediKartBorcLabel.setText("credit borc");
+
+        KrediKartBorcOdeBtn.setText("borc ode");
+        KrediKartBorcOdeBtn.addActionListener(this::KrediKartBorcOdeBtnActionPerformed);
+
+        KrediKartNakitAvansBtn.setText("nakit avans cek");
+        KrediKartNakitAvansBtn.addActionListener(this::KrediKartNakitAvansBtnActionPerformed);
 
         javax.swing.GroupLayout KrtKrediKartiPanelLayout = new javax.swing.GroupLayout(KrtKrediKartiPanel);
         KrtKrediKartiPanel.setLayout(KrtKrediKartiPanelLayout);
@@ -1014,12 +1149,58 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                         .addGroup(KrtKrediKartiPanelLayout.createSequentialGroup()
                                 .addComponent(lbl7)
                                 .addGap(0, 627, Short.MAX_VALUE))
+                        .addGroup(KrtKrediKartiPanelLayout.createSequentialGroup()
+                                .addGap(47, 47, 47)
+                                .addGroup(KrtKrediKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(KrtKrediKartiPanelLayout.createSequentialGroup()
+                                                .addComponent(KrediKartBorcLabel)
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addGroup(KrtKrediKartiPanelLayout.createSequentialGroup()
+                                                .addComponent(KrediKartKullanılabilirBakiyeLabel)
+                                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGroup(KrtKrediKartiPanelLayout.createSequentialGroup()
+                                                .addComponent(KrediKartSKTLabel)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(KrediKartCVVLabel)
+                                                .addGap(187, 187, 187))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, KrtKrediKartiPanelLayout.createSequentialGroup()
+                                                .addGroup(KrtKrediKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addGroup(KrtKrediKartiPanelLayout.createSequentialGroup()
+                                                                .addGap(0, 0, Short.MAX_VALUE)
+                                                                .addComponent(KrediKartBorcOdeBtn))
+                                                        .addGroup(KrtKrediKartiPanelLayout.createSequentialGroup()
+                                                                .addComponent(KrediKartNoLabel)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(KrediKartLimitLabel)
+                                                                .addGap(171, 171, 171)
+                                                                .addComponent(KrediKartAdSoyadLabel)))
+                                                .addGap(51, 51, 51))))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, KrtKrediKartiPanelLayout.createSequentialGroup()
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(KrediKartNakitAvansBtn)
+                                .addGap(36, 36, 36))
         );
         KrtKrediKartiPanelLayout.setVerticalGroup(
                 KrtKrediKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(KrtKrediKartiPanelLayout.createSequentialGroup()
                                 .addComponent(lbl7)
-                                .addGap(0, 198, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addGroup(KrtKrediKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(KrediKartNoLabel)
+                                        .addComponent(KrediKartLimitLabel)
+                                        .addComponent(KrediKartAdSoyadLabel))
+                                .addGap(26, 26, 26)
+                                .addComponent(KrediKartKullanılabilirBakiyeLabel)
+                                .addGap(18, 18, 18)
+                                .addComponent(KrediKartBorcLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(KrediKartBorcOdeBtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(KrtKrediKartiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(KrediKartSKTLabel)
+                                        .addComponent(KrediKartCVVLabel)
+                                        .addComponent(KrediKartNakitAvansBtn))
+                                .addGap(22, 22, 22))
         );
 
         javax.swing.GroupLayout KartlarPanelLayout = new javax.swing.GroupLayout(KartlarPanel);
@@ -1031,14 +1212,13 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                                 .addGroup(KartlarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(KrtBankaKartiPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(KrtKrediKartiPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(170, Short.MAX_VALUE))
+                                .addContainerGap(166, Short.MAX_VALUE))
         );
         KartlarPanelLayout.setVerticalGroup(
                 KartlarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(KartlarPanelLayout.createSequentialGroup()
-                                .addGap(26, 26, 26)
                                 .addComponent(KrtBankaKartiPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGap(18, 18, 18)
                                 .addComponent(KrtKrediKartiPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(37, Short.MAX_VALUE))
         );
@@ -1125,13 +1305,13 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
 
         PanelContainer.add(FaturalarPanel, "cardFaturalarPanel");
 
-        jLabel20.setText("jLabel20");
+        VarliklarTLLabel.setText("jLabel20");
 
-        jLabel21.setText("jLabel21");
+        VarliklarDolarLabel.setText("jLabel21");
 
-        jLabel22.setText("jLabel22");
+        VarliklarEuroLabel.setText("jLabel22");
 
-        jLabel23.setText("jLabel23");
+        VarliklarAltinLabel.setText("jLabel23");
 
         javax.swing.GroupLayout VarliklarPanelLayout = new javax.swing.GroupLayout(VarliklarPanel);
         VarliklarPanel.setLayout(VarliklarPanelLayout);
@@ -1139,13 +1319,13 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                 VarliklarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(VarliklarPanelLayout.createSequentialGroup()
                                 .addGap(94, 94, 94)
-                                .addComponent(jLabel20)
+                                .addComponent(VarliklarTLLabel)
                                 .addGap(196, 196, 196)
-                                .addComponent(jLabel21)
+                                .addComponent(VarliklarDolarLabel)
                                 .addGap(184, 184, 184)
-                                .addComponent(jLabel22)
+                                .addComponent(VarliklarEuroLabel)
                                 .addGap(165, 165, 165)
-                                .addComponent(jLabel23)
+                                .addComponent(VarliklarAltinLabel)
                                 .addContainerGap(199, Short.MAX_VALUE))
         );
         VarliklarPanelLayout.setVerticalGroup(
@@ -1153,48 +1333,70 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                         .addGroup(VarliklarPanelLayout.createSequentialGroup()
                                 .addGap(82, 82, 82)
                                 .addGroup(VarliklarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel20)
-                                        .addComponent(jLabel21)
-                                        .addComponent(jLabel22)
-                                        .addComponent(jLabel23))
+                                        .addComponent(VarliklarTLLabel)
+                                        .addComponent(VarliklarDolarLabel)
+                                        .addComponent(VarliklarEuroLabel)
+                                        .addComponent(VarliklarAltinLabel))
                                 .addContainerGap(387, Short.MAX_VALUE))
         );
 
         PanelContainer.add(VarliklarPanel, "cardVarliklarPanel");
 
-        jLabel24.setText("jLabel24");
+        GuncelKurDolarAlısLabel.setText("GuncelKurDolarAlıs");
 
-        jLabel25.setText("jLabel25");
+        GuncelKurDolarSatısLabel.setText("GuncelKurDolarSatıs");
 
-        jLabel26.setText("jLabel26");
+        GuncelKurEuroAlısLabel.setText("GuncelKurEuroAlıs");
 
-        jLabel27.setText("jLabel27");
+        GuncelKurEuroSatisLabel.setText("GuncelKurEuroSatis");
+
+        GuncelKurAltinAlısLabel.setText("GuncelKurAltinAlıs");
+
+        GuncelKurAltinSatisLabel.setText("GuncelKurAltinSatis");
+
+        GuncelKurDovizIslemleriYonlendirmeBtn.setText("Döviz İşlemleri");
+        GuncelKurDovizIslemleriYonlendirmeBtn.addActionListener(this::GuncelKurDovizIslemleriYonlendirmeBtnActionPerformed);
 
         javax.swing.GroupLayout GuncelKurPanelLayout = new javax.swing.GroupLayout(GuncelKurPanel);
         GuncelKurPanel.setLayout(GuncelKurPanelLayout);
         GuncelKurPanelLayout.setHorizontalGroup(
                 GuncelKurPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(GuncelKurPanelLayout.createSequentialGroup()
-                                .addGap(157, 157, 157)
-                                .addComponent(jLabel24)
-                                .addGap(225, 225, 225)
-                                .addComponent(jLabel25)
-                                .addGap(170, 170, 170)
-                                .addComponent(jLabel26)
-                                .addGap(129, 129, 129)
-                                .addComponent(jLabel27)
-                                .addContainerGap(157, Short.MAX_VALUE))
+                                .addGap(165, 165, 165)
+                                .addGroup(GuncelKurPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addGroup(GuncelKurPanelLayout.createSequentialGroup()
+                                                .addGroup(GuncelKurPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(GuncelKurDolarSatısLabel)
+                                                        .addComponent(GuncelKurDolarAlısLabel))
+                                                .addGap(123, 123, 123)
+                                                .addGroup(GuncelKurPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(GuncelKurEuroSatisLabel)
+                                                        .addGroup(GuncelKurPanelLayout.createSequentialGroup()
+                                                                .addGap(5, 5, 5)
+                                                                .addComponent(GuncelKurEuroAlısLabel))))
+                                        .addComponent(GuncelKurDovizIslemleriYonlendirmeBtn))
+                                .addGap(115, 115, 115)
+                                .addGroup(GuncelKurPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(GuncelKurAltinAlısLabel)
+                                        .addComponent(GuncelKurAltinSatisLabel))
+                                .addContainerGap(293, Short.MAX_VALUE))
         );
         GuncelKurPanelLayout.setVerticalGroup(
                 GuncelKurPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(GuncelKurPanelLayout.createSequentialGroup()
-                                .addGap(104, 104, 104)
+                                .addGap(112, 112, 112)
                                 .addGroup(GuncelKurPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel24)
-                                        .addComponent(jLabel25)
-                                        .addComponent(jLabel26)
-                                        .addComponent(jLabel27))
-                                .addContainerGap(365, Short.MAX_VALUE))
+                                        .addComponent(GuncelKurDolarAlısLabel)
+                                        .addComponent(GuncelKurEuroAlısLabel)
+                                        .addComponent(GuncelKurAltinAlısLabel))
+                                .addGap(17, 17, 17)
+                                .addGroup(GuncelKurPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(GuncelKurDolarSatısLabel)
+                                        .addComponent(GuncelKurEuroSatisLabel)
+                                        .addComponent(GuncelKurAltinSatisLabel))
+                                .addGap(119, 119, 119)
+                                .addComponent(GuncelKurDovizIslemleriYonlendirmeBtn)
+                                .addContainerGap(178, Short.MAX_VALUE))
         );
 
         PanelContainer.add(GuncelKurPanel, "cardGuncelKurPanel");
@@ -1247,13 +1449,8 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     }
 
     private void HesaplarBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        // 1. Sayfayı Aç
         mainSayfaDegistir("cardHesaplarPanel");
         panelAdiLabel.setText("HESAPLARIM");
-
-        // 2. --- EKSİK OLAN KISIM ---
-        hesaplariGuncelle();          // Döviz ve Vadesiz bakiyeleri çek
-        vadeliHesapSayfasiniYonet();  // Vadeli hesap var mı kontrol et
     }
 
     private void KartlarBtnActionPerformed(java.awt.event.ActionEvent evt) {
@@ -1276,10 +1473,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         panelAdiLabel.setText("DÖVİZ KURLARI");
     }
 
-    private void IslBilgiPanelBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        islemlerSayfaDegistir("cardIslBilgiPanel");
-    }
-
     private void IslParaGönderBtnActionPerformed(java.awt.event.ActionEvent evt) {
         islemlerSayfaDegistir("cardIslParaGönderPanel");
     }
@@ -1292,15 +1485,16 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         islemlerSayfaDegistir("cardIslDovizPanel");
     }
 
+    private void IslNakitAvansPanelBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        islemlerSayfaDegistir("cardIslNakitAvansPanel");
+    }
+
     private void HspVadesizBtnActionPerformed(java.awt.event.ActionEvent evt) {
         hesaplarSayfaDegistir("cardHspVadesizPanel");
     }
 
     private void HspVadeliBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        // 1. Sekmeyi Aç
         hesaplarSayfaDegistir("cardHspVadeliPanel");
-
-        // 2. --- EKSİK OLAN KISIM ---
         vadeliHesapSayfasiniYonet(); // Listeyi anında tazele
     }
 
@@ -1335,72 +1529,80 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     }
 
     private void HspVadesizParaTrnsfrBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        mainSayfaDegistir("cardIslemlerPanel");
+        panelAdiLabel.setText("İŞLEMLER");
+        islemlerSayfaDegistir("cardIslParaGönderPanel");
     }
 
     private void HspVadesizFaturaOdeBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        mainSayfaDegistir("cardFaturalarPanel");
+        panelAdiLabel.setText("FATURA VE ÖDEMELER");
     }
 
     private void HspDovizIslemleriBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-    }
-
-    private void EuroSatRadioBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        mainSayfaDegistir("cardIslemlerPanel");
+        panelAdiLabel.setText("İŞLEMLER");
+        islemlerSayfaDegistir("cardIslDovizPanel");
     }
 
     private void GonderBtnActionPerformed(java.awt.event.ActionEvent evt) {
         String aliciIban = GonderilecekIBANTextF.getText().trim();
         String miktarStr = GonderilecekMiktarTextF.getText().trim();
 
-        if(aliciIban.isEmpty() || miktarStr.isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Lütfen IBAN ve Tutar giriniz.");
-            return;
-        }
+        if(aliciIban.isEmpty() || miktarStr.isEmpty()) return;
 
         try {
             double miktar = Double.parseDouble(miktarStr);
-            // DataBaseManager'a eklediğimiz metodu çağırıyoruz
-            String sonuc = Managers.DataBaseManager.paraTransferiYap(aktifKullanici.getUserId(), aliciIban, miktar);
 
-            if(sonuc.equals("BASARILI")) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Transfer Başarıyla Gerçekleşti!");
-                hesaplariGuncelle(); // Bakiyeyi yenile
-                anaSayfaGuncelle();
-                GonderilecekMiktarTextF.setText("");
-                GonderilecekIBANTextF.setText("");
+            // 1. Kaynak Hesabı Getir (Bizim hesap)
+            model.CheckingAccount sourceAccount = Managers.DataBaseManager.getCheckingAccountObject(aktifKullanici.getUserId());
+
+            // 2. Hedef Hesabı Bul (IBAN'dan)
+            // (Bu noktada helper olarak Manager'dan ID veya Account bulmak zorundayız, bu normal)
+            String targetAccountId = Managers.DataBaseManager.getAccountIdByIBAN(aliciIban);
+            model.Account targetAccount = Managers.DataBaseManager.getAccountById(targetAccountId);
+
+            if (sourceAccount != null && targetAccount != null) {
+
+                // 3. İŞLEMİ NESNEYE YAPTIR (Manager'a değil!)
+                // "Benim hesabımdan, şu hesaba, şu kadar yolla"
+                boolean sonuc = sourceAccount.transferTo(targetAccount, miktar);
+
+                if (sonuc) {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Transfer Başarılı (OOP)!");
+                    hesaplariGuncelle();
+                    anaSayfaGuncelle();
+                } else {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Transfer Başarısız! (Bakiye yetersiz olabilir)");
+                }
             } else {
-                javax.swing.JOptionPane.showMessageDialog(this, sonuc); // Hata mesajı
+                javax.swing.JOptionPane.showMessageDialog(this, "Hesap bulunamadı.");
             }
-        } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Lütfen geçerli bir tutar giriniz.");
+
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Hata: " + e.getMessage());
         }
     }
 
     private void IslVadeliHesapOnizleActionPerformed(java.awt.event.ActionEvent evt) {
-        String miktarStr = IslVadeYatirilacakMiktarTextF.getText().trim();
-        String secilenVade = (String) IslVadeSecenekleriComboBox.getSelectedItem(); // "Kısa (32 Gün) - %40"
-
-        if (miktarStr.isEmpty()) return;
-
         try {
+            String miktarStr = IslVadeYatirilacakMiktarTextF.getText();
+            if(miktarStr.isEmpty()) return;
+
             double miktar = Double.parseDouble(miktarStr);
+            String secilenVade = (String) IslVadeSecenekleriComboBox.getSelectedItem();
 
-            // Basit faiz hesaplama simülasyonu
             int gun = 32;
-            double oran = 40.0;
+            if (secilenVade.contains("92")) gun = 92;
+            else if (secilenVade.contains("181")) gun = 181;
+            else if (secilenVade.contains("365")) gun = 365;
 
-            if (secilenVade.contains("92")) { gun = 92; oran = 45.0; }
-            else if (secilenVade.contains("181")) { gun = 181; oran = 48.0; }
-            else if (secilenVade.contains("365")) { gun = 365; oran = 50.0; }
+            // --- DEĞİŞİKLİK BURADA ---
+            // Artık formül UI'da değil, Model'de!
+            double netKazanc = model.DepositAccount.calculateProjectedNetProfit(miktar, gun);
 
-            // Formül: (AnaPara * Faiz * Gün) / 36500
-            double brurKazanc = (miktar * oran * gun) / 36500.0;
-            double netKazanc = brurKazanc * 0.95; // %5 Stopaj düşelim
-
-            IslVadeliKazancLabel.setText(String.format("Tahmini Net Kazanç: %.2f TL", netKazanc));
-            IslVadeliBilgilendirmeLabel.setText(gun + " Gün sonunda toplam: " + String.format("%.2f", (miktar + netKazanc)) + " TL");
+            IslVadeliKazancLabel.setText("Tahmini Net Getiri: " + String.format("%.2f TL", netKazanc));
+            IslVadeliBilgilendirmeLabel.setText("Vade Sonu Toplam: " + String.format("%.2f TL", (miktar + netKazanc)));
 
         } catch (Exception e) {
             IslVadeliKazancLabel.setText("Hesaplama Hatası");
@@ -1408,19 +1610,13 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     }
 
     private void IslVadeliHesapOlusturActionPerformed(java.awt.event.ActionEvent evt) {
-        // 1. Verileri Al
-        String hesapAdi = IslVadeliHesapAdlandirmaTextF.getText().trim();
-        String miktarStr = IslVadeYatirilacakMiktarTextF.getText().trim();
+        String ad = IslVadeliHesapAdlandirmaTextF.getText();
+        String miktarStr = IslVadeYatirilacakMiktarTextF.getText();
         String secilenVade = (String) IslVadeSecenekleriComboBox.getSelectedItem();
 
-        // 2. Basit Kontroller
-        if (hesapAdi.isEmpty() || miktarStr.isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Lütfen hesap adı ve tutar giriniz.");
-            return;
-        }
+        if(ad.isEmpty() || miktarStr.isEmpty()) return;
 
-        // Vade Gününü Ayıkla (String içinden)
-        int vadeGun = 32; // Varsayılan
+        int vadeGun = 32;
         if (secilenVade.contains("92")) vadeGun = 92;
         else if (secilenVade.contains("181")) vadeGun = 181;
         else if (secilenVade.contains("365")) vadeGun = 365;
@@ -1428,41 +1624,42 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         try {
             double miktar = Double.parseDouble(miktarStr);
 
-            // 3. İŞLEMİ YAP (Yeni yazdığımız Manager metodunu çağırıyoruz)
-            String sonuc = Managers.DataBaseManager.createVadeliAccountWithDeduction(aktifKullanici.getUserId(), hesapAdi, miktar, vadeGun);
+            String sonuc = Managers.BankService.openDepositAccount(aktifKullanici.getUserId(), ad, miktar, vadeGun);
 
             if (sonuc.equals("BASARILI")) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Vadeli Hesap Başarıyla Açıldı!\n" + miktar + " TL vadesiz hesabınızdan çekildi.");
+                javax.swing.JOptionPane.showMessageDialog(this, "Vadeli Hesap Açıldı!");
 
-                // 4. EKRANLARI GÜNCELLE
-                anaSayfaGuncelle(); // Vadesiz bakiye düşsün
-                hesaplariGuncelle(); // Hesap listeleri yenilensin
-                vadeliHesapSayfasiniYonet(); // Vadeli listesi dolsun
+                // --- EKRANLARI YENİLE ---
+                hesaplariGuncelle();
+                anaSayfaGuncelle();
+                vadeliHesapSayfasiniYonet(); // Hesaplar sekmesini yeniler
+                varliklariGuncelle();       // Varlıkları yeniler (TL azaldı, Vadeli arttı)
 
-                // 5. YÖNLENDİRME (Kritik Kısım)
-                // Önce ana kartı "HESAPLAR" yap
+                // --- UNUTULAN KISIM BURASIYDI: ---
+                vadeliIslemBilgisiniGuncelle(); // "Hiç hesabınız yok" yazısını günceller!
+                // ---------------------------------
+
+                // Hesaplar sayfasına yönlendir
                 mainSayfaDegistir("cardHesaplarPanel");
-                panelAdiLabel.setText("HESAPLARIM");
-
-                // Sonra hesaplar içindeki alt kartı "VADELİ" yap
                 hesaplarSayfaDegistir("cardHspVadeliPanel");
-
-                // Formu temizle
-                IslVadeliHesapAdlandirmaTextF.setText("");
-                IslVadeYatirilacakMiktarTextF.setText("");
-
             } else {
-                // Hata mesajı (Yetersiz bakiye vb.)
                 javax.swing.JOptionPane.showMessageDialog(this, sonuc);
             }
 
         } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Lütfen geçerli bir tutar giriniz.");
+            javax.swing.JOptionPane.showMessageDialog(this, "Geçersiz Tutar.");
         }
     }
 
     private void IslVadeliVadeliHesapGormeBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        // 1. Önce ANA EKRANI "Hesaplar" sekmesine geçir (Eksik olan buydu)
+        mainSayfaDegistir("cardHesaplarPanel");
+        panelAdiLabel.setText("HESAPLARIM");
+
+        // 2. Sonra Hesaplar içindeki alt sekmeyi "Vadeli" yap
         hesaplarSayfaDegistir("cardHspVadeliPanel");
+
+        // 3. Verileri tazele
         vadeliHesapSayfasiniYonet();
     }
 
@@ -1475,7 +1672,98 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     }
 
     private void IslDovizAltinIslemiActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        // "ALTIN" parametresi gönderiyoruz, yukarıdaki metot bunu "GOLD"a çevirip işlem yapacak.
+        dovizIslemiYap( "ALTIN",IslAlınacakAltınMiktariTextF,IslSatılacakAlMiktariTextF,AltinAlRadioBtn,AltinSatRadioBtn);
+    }
+
+    private void AnaSayfaBorcOdeBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        KrediKartBorcOdeBtnActionPerformed(evt);
+    }
+
+    private void IslNakitAvansGonderBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        String miktarStr = IslNakitAvansMiktariTextF.getText().trim();
+
+        if (miktarStr.isEmpty()) return;
+
+        try {
+            double miktar = Double.parseDouble(miktarStr);
+
+            // Service Katmanını Çağır
+            String sonuc = Managers.BankService.nakitAvansCek(aktifKullanici.getUserId(), miktar);
+
+            if (sonuc.equals("BASARILI")) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Nakit Avans Vadesiz Hesabınıza Aktarıldı!");
+
+                // Bakiyeleri Güncelle
+                anaSayfaGuncelle();
+                hesaplariGuncelle();
+                varliklariGuncelle();
+                kartlariGuncelle(); // Limit düştüğü için bunu da güncelle
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, sonuc);
+            }
+
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Lütfen geçerli bir sayı giriniz.");
+        }
+    }
+
+    private void KrediKartBorcOdeBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        // 1. Güncel Borcu Çek
+        model.CreditCard kart = Managers.DataBaseManager.getCreditCardObject(aktifKullanici.getUserId());
+
+        if (kart != null) {
+            // Formdaki Label'a borcu yaz
+            KrediKartBorcGoruntulemeLabel.setText(String.format("Güncel Borcunuz: %,.2f TL", kart.getCurrentDebt()));
+
+            // 2. Formu Hazırla ve Aç
+            KrediKartBorcOdeForm.pack(); // Boyutları ayarla
+            KrediKartBorcOdeForm.setLocationRelativeTo(this); // Merkeze al
+            KrediKartBorcOdeForm.setVisible(true);
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Kredi kartınız bulunamadı.");
+        }
+    }
+
+    private void KrediKartNakitAvansBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        mainSayfaDegistir("cardIslemlerPanel");
+        panelAdiLabel.setText("İŞLEMLER");
+        islemlerSayfaDegistir("cardIslNakitAvansPanel");
+    }
+
+    private void GuncelKurDovizIslemleriYonlendirmeBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        mainSayfaDegistir("cardIslemlerPanel");
+        panelAdiLabel.setText("İŞLEMLER");
+        islemlerSayfaDegistir("cardIslDovizPanel");
+    }
+
+    private void KrediKartBorcOdeFormBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        // Kullanıcıdan ödeme miktarını al
+        String miktarStr = javax.swing.JOptionPane.showInputDialog(KrediKartBorcOdeForm, "Ödemek istediğiniz tutarı giriniz:");
+
+        if (miktarStr != null && !miktarStr.isEmpty()) {
+            try {
+                double miktar = Double.parseDouble(miktarStr);
+
+                // BankService ile ödeme yap
+                String sonuc = Managers.BankService.krediKartiBorcuOde(aktifKullanici.getUserId(), miktar);
+
+                if (sonuc.equals("BASARILI")) {
+                    javax.swing.JOptionPane.showMessageDialog(KrediKartBorcOdeForm, "Borç Ödeme Başarılı!");
+
+                    // Tüm ekranları güncelle
+                    kartlariGuncelle();
+                    anaSayfaGuncelle();
+                    varliklariGuncelle();
+
+                    KrediKartBorcOdeForm.dispose(); // Formu kapat
+                } else {
+                    javax.swing.JOptionPane.showMessageDialog(KrediKartBorcOdeForm, sonuc);
+                }
+            } catch (Exception e) {
+                javax.swing.JOptionPane.showMessageDialog(KrediKartBorcOdeForm, "Geçersiz Tutar!");
+            }
+        }
     }
 
     /**
@@ -1525,6 +1813,8 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         java.awt.CardLayout subCardLayout = (java.awt.CardLayout) FaturalarPanelContainer.getLayout();
         subCardLayout.show(FaturalarPanelContainer, kartIsmi);
     }
+
+
     // --- EKRANA VERİ BASAN METOTLAR ---
 
     // 1. İsim ve Müşteri No Göster (Üst Panel)
@@ -1616,7 +1906,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         HspDovizAltınBakiyeLabel.setText(String.format("%,.2f Gr", altinMiktar));
 
         // TL Karşılığı (Parametre olarak "GOLD" gönderiyoruz)
-        double altinKur = Managers.CurrencyManager.getBuyRate("GOLD");
+        double altinKur = Managers.CurrencyManager.getBuyRate("ALTIN");
         double altinTlKarsiligi = altinMiktar * altinKur;
 
         HspDovizAltınTLLabel.setText(String.format("≈ %,.2f TL", altinTlKarsiligi));
@@ -1667,52 +1957,178 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         IslDovizEuroSatısKur.setText(String.valueOf(Managers.CurrencyManager.EUR_SELL));
 
         // Altın
-        IslDovizAltinAlısKur.setText(String.valueOf(Managers.CurrencyManager.GOLD_BUY));
-        IslDovizAltinSatisKur.setText(String.valueOf(Managers.CurrencyManager.GOLD_SELL));
+        IslDovizAltinAlısKur.setText(String.valueOf(Managers.CurrencyManager.ALTIN_BUY));
+        IslDovizAltinSatisKur.setText(String.valueOf(Managers.CurrencyManager.ALTIN_SELL));
     }
 
     // --- E. DÖVİZ İŞLEMLERİ (ORTAK METOT) ---
     private void dovizIslemiYap(String tur, javax.swing.JTextField alText, javax.swing.JTextField satText, javax.swing.JRadioButton rAl, javax.swing.JRadioButton rSat) {
-        String accountType = "";
-        if (tur.equals("DOLAR")) accountType = "USD";
-        else if (tur.equals("EURO")) accountType = "EUR";
-        else if (tur.equals("ALTIN")) accountType = "GOLD"; // veya ALTIN veritabanına göre
+        String currencyCode = "";
+        if (tur.equals("DOLAR")) currencyCode = "USD";
+        else if (tur.equals("EURO")) currencyCode = "EUR";
+        else if (tur.equals("ALTIN")) currencyCode = "ALTIN";
 
         try {
-            // ALIŞ İŞLEMİ
-            if (rAl.isSelected()) {
-                String tutarStr = alText.getText().trim();
-                if(tutarStr.isEmpty()) return;
-                double tutarTL = Double.parseDouble(tutarStr);
+            // 1. Gerekli Nesneleri Oluştur
+            model.CheckingAccount tlAccount = Managers.DataBaseManager.getCheckingAccountObject(aktifKullanici.getUserId());
+            model.ForeignCurrencyAccount forexAccount = Managers.DataBaseManager.getForeignCurrencyAccountObject(aktifKullanici.getUserId(), currencyCode);
 
-                // Burada Model paketindeki ForeignCurrencyAccount.buyCurrency mantığını çağıracağız.
-                // Ancak elimizde o account nesnesi yok.
-                // Basit yol: DataBaseManager'da bir 'dovizAl(userId, type, tlAmount)' metodu olmalı.
-                // Yoksa sadece simülasyon mesajı verelim:
-
-                double kur = Managers.CurrencyManager.getSellRate(accountType);
-                double alinanDoviz = tutarTL / kur;
-
-                javax.swing.JOptionPane.showMessageDialog(this,
-                        tutarTL + " TL karşılığında " + String.format("%.2f", alinanDoviz) + " " + tur + " alındı.\n(Hesap bakiyesi güncellenmedi - Manager metodu gerekli)");
+            if (tlAccount == null || forexAccount == null) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Hesap bilgilerine ulaşılamadı.");
+                return;
             }
-            // SATIŞ İŞLEMİ
+
+            // --- ALIŞ İŞLEMİ ---
+            if (rAl.isSelected()) {
+                double tlAmount = Double.parseDouble(alText.getText().trim());
+
+                boolean success = forexAccount.buyCurrency(tlAccount, tlAmount);
+
+                if(success) {
+                    javax.swing.JOptionPane.showMessageDialog(this, tur + " Alışı Başarılı!");
+
+                    // --- EKRANLARI YENİLE ---
+                    hesaplariGuncelle();
+                    anaSayfaGuncelle();
+                    varliklariGuncelle(); // <--- YENİ EKLENEN SATIR (Varlıkları Günceller)
+                } else {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Yetersiz TL Bakiyesi!");
+                }
+            }
+            // --- SATIŞ İŞLEMİ ---
             else if (rSat.isSelected()) {
-                String tutarStr = satText.getText().trim();
-                if(tutarStr.isEmpty()) return;
-                double miktarDoviz = Double.parseDouble(tutarStr);
+                double forexAmount = Double.parseDouble(satText.getText().trim());
 
-                double kur = Managers.CurrencyManager.getBuyRate(accountType);
-                double kazanilanTL = miktarDoviz * kur;
+                boolean success = forexAccount.sellCurrency(tlAccount, forexAmount);
 
-                javax.swing.JOptionPane.showMessageDialog(this,
-                        miktarDoviz + " " + tur + " satıldı. Hesaba " + String.format("%.2f", kazanilanTL) + " TL geçti.\n(Hesap bakiyesi güncellenmedi - Manager metodu gerekli)");
-            } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Lütfen Alış veya Satış seçeneğini işaretleyin.");
+                if(success) {
+                    javax.swing.JOptionPane.showMessageDialog(this, tur + " Satışı Başarılı!");
+
+                    // --- EKRANLARI YENİLE ---
+                    hesaplariGuncelle();
+                    anaSayfaGuncelle();
+                    varliklariGuncelle(); // <--- YENİ EKLENEN SATIR (Varlıkları Günceller)
+                } else {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Yetersiz Döviz Bakiyesi!");
+                }
             }
 
         } catch (Exception e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Geçersiz Tutar.");
+            javax.swing.JOptionPane.showMessageDialog(this, "Hata: " + e.getMessage());
+        }
+    }
+
+    // =============================================================
+    // KART BİLGİLERİNİ EKRANA YAZAN METOT
+    // =============================================================
+    private void kartlariGuncelle() {
+        if (aktifKullanici == null) return;
+        String userId = aktifKullanici.getUserId();
+
+        // --- 1. BANKA KARTI (DEBIT CARD) GÜNCELLEME ---
+        model.DebitCard bankaKarti = Managers.DataBaseManager.getDebitCardObject(userId);
+
+        if (bankaKarti != null) {
+            // Kart Bilgileri (Parent Class 'Card'dan gelenler)
+            BankaKartNoLabel.setText(bankaKarti.getCardNumber());
+            BankaKartAdSoyadLabel.setText(aktifKullanici.getName() + " " + aktifKullanici.getSurname());
+            BankaKartSKTLabel.setText(bankaKarti.getExpiryDate());
+            BankaKartCVVLabel.setText(bankaKarti.getCvv());
+
+            // Bakiye (Bağlı olduğu hesaptan çekiyoruz)
+            if (bankaKarti.getLinkedAccount() != null) {
+                double bakiye = bankaKarti.getLinkedAccount().getMoneyInAccount();
+                BankaKartBakiye.setText(String.format("%,.2f TL", bakiye));
+            } else {
+                BankaKartBakiye.setText("Bağlantı Hatası");
+            }
+        } else {
+            // Kart Yoksa
+            BankaKartNoLabel.setText("BANKA KARTINIZ YOK");
+            BankaKartBakiye.setText("---");
+            BankaKartSKTLabel.setText("--/--");
+            BankaKartCVVLabel.setText("---");
+        }
+
+        // --- 2. KREDİ KARTI (CREDIT CARD) GÜNCELLEME ---
+        model.CreditCard krediKarti = Managers.DataBaseManager.getCreditCardObject(userId);
+
+        if (krediKarti != null) {
+            // Temel Bilgiler
+            KrediKartNoLabel.setText(krediKarti.getCardNumber());
+            KrediKartAdSoyadLabel.setText(aktifKullanici.getName() + " " + aktifKullanici.getSurname());
+            KrediKartSKTLabel.setText(krediKarti.getExpiryDate());
+            KrediKartCVVLabel.setText(krediKarti.getCvv());
+
+            // Finansal Bilgiler
+            double limit = krediKarti.getCreditLimit();
+            double borc = krediKarti.getCurrentDebt();
+            double kullanilabilir = limit - borc;
+
+            KrediKartLimitLabel.setText(String.format("%,.2f TL", limit));
+            KrediKartBorcLabel.setText(String.format("%,.2f TL", borc));
+            KrediKartKullanılabilirBakiyeLabel.setText(String.format("%,.2f TL", kullanilabilir));
+
+        } else {
+            // Kart Yoksa
+            KrediKartNoLabel.setText("KREDİ KARTINIZ YOK");
+            KrediKartLimitLabel.setText("---");
+            KrediKartBorcLabel.setText("---");
+        }
+    }
+
+    // --- A. VARLIKLARIMI GÜNCELLE ---
+    private void varliklariGuncelle() {
+        if (aktifKullanici == null) return;
+        String userId = aktifKullanici.getUserId();
+
+        // 1. TL Varlığı (Vadesiz + Varsa Vadeli Toplamı)
+        // Basitlik için şu an sadece Vadesiz TL'yi çekiyoruz, istersen vadeli de eklenebilir.
+        String[] tlDetay = Managers.DataBaseManager.getAccountDetails(userId, "TL");
+        double tlMiktar = Double.parseDouble(tlDetay[0]);
+        VarliklarTLLabel.setText(String.format("%,.2f TL", tlMiktar));
+
+        // 2. Dolar Varlığı
+        String[] usdDetay = Managers.DataBaseManager.getAccountDetails(userId, "USD");
+        double usdMiktar = Double.parseDouble(usdDetay[0]);
+        VarliklarDolarLabel.setText(String.format("%,.2f $", usdMiktar));
+
+        // 3. Euro Varlığı
+        String[] eurDetay = Managers.DataBaseManager.getAccountDetails(userId, "EUR");
+        double eurMiktar = Double.parseDouble(eurDetay[0]);
+        VarliklarEuroLabel.setText(String.format("%,.2f €", eurMiktar));
+
+        // 4. Altın Varlığı
+        String[] altinDetay = Managers.DataBaseManager.getAccountDetails(userId, "ALTIN");
+        double altinMiktar = Double.parseDouble(altinDetay[0]);
+        VarliklarAltinLabel.setText(String.format("%,.2f Gr", altinMiktar));
+    }
+
+    // --- B. GÜNCEL KURLARI GÜNCELLE ---
+    private void guncelKurlariGuncelle() {
+        GuncelKurDolarAlısLabel.setText("Dolar Alış: " + Managers.CurrencyManager.USD_BUY);
+        GuncelKurDolarSatısLabel.setText("Dolar Satış: " + Managers.CurrencyManager.USD_SELL);
+
+        GuncelKurEuroAlısLabel.setText("Euro Alış: " + Managers.CurrencyManager.EUR_BUY);
+        GuncelKurEuroSatisLabel.setText("Euro Satış: " + Managers.CurrencyManager.EUR_SELL);
+
+        GuncelKurAltinAlısLabel.setText("Altın Alış: " + Managers.CurrencyManager.ALTIN_BUY);
+        GuncelKurAltinSatisLabel.setText("Altın Satış: " + Managers.CurrencyManager.ALTIN_SELL);
+    }
+
+    // --- C. İŞLEMLER SAYFASINDAKİ VADELİ HESAP BİLGİSİ ---
+    private void vadeliIslemBilgisiniGuncelle() {
+        if (aktifKullanici == null) return;
+
+        java.util.ArrayList<String> hesaplar = Managers.DataBaseManager.getVadeliAccountNames(aktifKullanici.getUserId());
+        int sayi = hesaplar.size();
+
+        if (sayi > 0) {
+            IslVadeliHesapBilgilendirmeLabel.setText(sayi + " adet vadeli hesabınız bulunmaktadır.");
+            IslVadeliVadeliHesapGormeBtn.setVisible(true); // Butonu Göster
+        } else {
+            IslVadeliHesapBilgilendirmeLabel.setText("Hiç vadeli hesabınız bulunmamaktadır.");
+            IslVadeliVadeliHesapGormeBtn.setVisible(false); // Butonu Gizle
         }
     }
 
@@ -1732,6 +2148,11 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     private javax.swing.JLabel AnaSayfaVadesizBakiyeLabel;
     private javax.swing.JPanel AnaSayfaVadesizHesapPanel;
     private javax.swing.JLabel AnaSayfaVadesizIBANLabel;
+    private javax.swing.JLabel BankaKartAdSoyadLabel;
+    private javax.swing.JLabel BankaKartBakiye;
+    private javax.swing.JLabel BankaKartCVVLabel;
+    private javax.swing.JLabel BankaKartNoLabel;
+    private javax.swing.JLabel BankaKartSKTLabel;
     private javax.swing.JRadioButton DolarAlRadioBtn;
     private javax.swing.ButtonGroup DolarIslemleri;
     private javax.swing.JRadioButton DolarSatRadioBtn;
@@ -1750,7 +2171,14 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     private javax.swing.JTextField GonderilecekIBANTextF;
     private javax.swing.JTextField GonderilecekMiktarTextF;
     private javax.swing.JTextField GonderilecekSoyadTextF;
+    private javax.swing.JLabel GuncelKurAltinAlısLabel;
+    private javax.swing.JLabel GuncelKurAltinSatisLabel;
     private javax.swing.JButton GuncelKurBtn;
+    private javax.swing.JLabel GuncelKurDolarAlısLabel;
+    private javax.swing.JLabel GuncelKurDolarSatısLabel;
+    private javax.swing.JButton GuncelKurDovizIslemleriYonlendirmeBtn;
+    private javax.swing.JLabel GuncelKurEuroAlısLabel;
+    private javax.swing.JLabel GuncelKurEuroSatisLabel;
     private javax.swing.JPanel GuncelKurPanel;
     private javax.swing.JButton HesaplarBtn;
     private javax.swing.JPanel HesaplarPanel;
@@ -1784,19 +2212,21 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     private javax.swing.JTextField IslAlınacakAltınMiktariTextF;
     private javax.swing.JTextField IslAlınacakDolarMiktariTextF;
     private javax.swing.JTextField IslAlınacakEuroMiktariTextF;
-    private javax.swing.JPanel IslBilgiPanel;
-    private javax.swing.JButton IslBilgiPanelBtn;
     private javax.swing.JLabel IslDovizAltinAlısKur;
-    private javax.swing.JToggleButton IslDovizAltinIslemi;
+    private javax.swing.JButton IslDovizAltinIslemi;
     private javax.swing.JLabel IslDovizAltinSatisKur;
     private javax.swing.JButton IslDovizBtn;
     private javax.swing.JLabel IslDovizDolarAlısKur;
-    private javax.swing.JToggleButton IslDovizDolarIslemi;
+    private javax.swing.JButton IslDovizDolarIslemi;
     private javax.swing.JLabel IslDovizDolarSatısKur;
     private javax.swing.JLabel IslDovizEuroAlısKur;
-    private javax.swing.JToggleButton IslDovizEuroIslemi;
+    private javax.swing.JButton IslDovizEuroIslemi;
     private javax.swing.JLabel IslDovizEuroSatısKur;
     private javax.swing.JPanel IslDovizPanel;
+    private javax.swing.JButton IslNakitAvansGonderBtn;
+    private javax.swing.JTextField IslNakitAvansMiktariTextF;
+    private javax.swing.JPanel IslNakitAvansPanel;
+    private javax.swing.JButton IslNakitAvansPanelBtn;
     private javax.swing.JButton IslParaGönderBtn;
     private javax.swing.JPanel IslParaGönderPanel;
     private javax.swing.JTextField IslSatilacakDolarMiktariTextF;
@@ -1819,24 +2249,32 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     private javax.swing.JPanel IslemlerPanelContainer;
     private javax.swing.JButton KartlarBtn;
     private javax.swing.JPanel KartlarPanel;
+    private javax.swing.JLabel KrediKartAdSoyadLabel;
+    private javax.swing.JLabel KrediKartBorcGoruntulemeLabel;
+    private javax.swing.JLabel KrediKartBorcLabel;
+    private javax.swing.JButton KrediKartBorcOdeBtn;
+    private javax.swing.JFrame KrediKartBorcOdeForm;
+    private javax.swing.JButton KrediKartBorcOdeFormBtn;
+    private javax.swing.JPanel KrediKartBorcOdePanel;
+    private javax.swing.JLabel KrediKartCVVLabel;
+    private javax.swing.JLabel KrediKartKullanılabilirBakiyeLabel;
+    private javax.swing.JLabel KrediKartLimitLabel;
+    private javax.swing.JButton KrediKartNakitAvansBtn;
+    private javax.swing.JLabel KrediKartNoLabel;
+    private javax.swing.JLabel KrediKartSKTLabel;
     private javax.swing.JPanel KrtBankaKartiPanel;
     private javax.swing.JPanel KrtKrediKartiPanel;
     private javax.swing.JPanel MainPanel;
     private javax.swing.JLabel MusteriNoLabel;
     private javax.swing.JPanel PanelContainer;
     private javax.swing.JPanel UstPanel;
+    private javax.swing.JLabel VarliklarAltinLabel;
     private javax.swing.JButton VarliklarBtn;
+    private javax.swing.JLabel VarliklarDolarLabel;
+    private javax.swing.JLabel VarliklarEuroLabel;
     private javax.swing.JPanel VarliklarPanel;
+    private javax.swing.JLabel VarliklarTLLabel;
     private javax.swing.JPanel YonlendirmePanel;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel23;
-    private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel25;
-    private javax.swing.JLabel jLabel26;
-    private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel lbl1;
@@ -1850,4 +2288,41 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     private javax.swing.JLabel lbl9;
     private javax.swing.JLabel panelAdiLabel;
     // End of variables declaration
+
+    private void bilesenBoyutlariniSabitle() {
+        // İdeal Boyut (Genişlik: 150px, Yükseklik: 30px)
+        // Ekran tasarımına göre 150 yerine 200 de yapabilirsin.
+        java.awt.Dimension standartBoyut = new java.awt.Dimension(180, 30);
+
+        // --- 1. PARA GÖNDERME EKRANI ---
+        GonderilecekAdTextF.setPreferredSize(standartBoyut);
+        GonderilecekAdTextF.setMinimumSize(standartBoyut); // Asla bundan küçük olma
+
+        GonderilecekSoyadTextF.setPreferredSize(standartBoyut);
+        GonderilecekSoyadTextF.setMinimumSize(standartBoyut);
+
+        GonderilecekIBANTextF.setPreferredSize(standartBoyut);
+        GonderilecekIBANTextF.setMinimumSize(standartBoyut);
+
+        GonderilecekMiktarTextF.setPreferredSize(standartBoyut);
+        GonderilecekMiktarTextF.setMinimumSize(standartBoyut);
+
+        // --- 2. VADELİ HESAP EKRANI ---
+        IslVadeliHesapAdlandirmaTextF.setPreferredSize(standartBoyut);
+        IslVadeYatirilacakMiktarTextF.setPreferredSize(standartBoyut);
+
+        // --- 3. DÖVİZ EKRANI ---
+        IslAlınacakDolarMiktariTextF.setPreferredSize(standartBoyut);
+        IslSatilacakDolarMiktariTextF.setPreferredSize(standartBoyut);
+
+        IslAlınacakEuroMiktariTextF.setPreferredSize(standartBoyut);
+        IslSatilacakEuroMiktariTextF.setPreferredSize(standartBoyut);
+
+        IslAlınacakAltınMiktariTextF.setPreferredSize(standartBoyut);
+        IslSatılacakAlMiktariTextF.setPreferredSize(standartBoyut);
+
+        // --- 4. NAKİT AVANS EKRANI ---
+        IslNakitAvansMiktariTextF.setPreferredSize(standartBoyut);
+    }
+
 }

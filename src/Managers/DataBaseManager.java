@@ -543,16 +543,50 @@ public class DataBaseManager {
         }
     }
 
-    //KART BORCUNU GÜNCELLEME (Kredi Kartı İçin)
-    public static void updateCardDebt(String cardNumber, float newDebt) {
+    // 2. KREDİ KARTI ÇEKME (Cards tablosundan)
+    public static model.CreditCard getCreditCardObject(String userId) {
+        // Kartı bulmak için: UserId ve Tip = 'CREDIT' kontrolü yapıyoruz
+        String sql = "SELECT * FROM Cards WHERE UserId = ? AND CardType = 'CREDIT'";
+
+        try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userId);
+            java.sql.ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return new model.CreditCard(
+                        rs.getString("CardNumber"),
+                        userId,
+                        rs.getString("CVV"),        // Sütun adı: CVV
+                        rs.getString("ExpiryDate"), // Sütun adı: ExpiryDate
+                        rs.getFloat("CreditLimit"),
+                        rs.getFloat("CurrentDebt")
+                );
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // --- EĞER YOKSA: BORÇ GÜNCELLEME METODU ---
+    // (CreditCard sınıfında harcama yaparken bu metot çağrılıyor)
+    // 3. KREDİ KARTI BORÇ GÜNCELLEME (Cards tablosunu günceller)
+    public static boolean updateCardDebt(String cardNumber, float newDebt) {
+        // Tablo adı: Cards
         String sql = "UPDATE Cards SET CurrentDebt = ? WHERE CardNumber = ?";
-        try (Connection conn = DriverManager.getConnection(URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setFloat(1, newDebt);
             pstmt.setString(2, cardNumber);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Kart Güncelleme Hatası: " + e.getMessage());
+            return pstmt.executeUpdate() > 0;
+
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -563,51 +597,6 @@ public class DataBaseManager {
         for(int i=0; i<12; i++) sb.append(rnd.nextInt(10));
         return sb.toString();
     }
-
-    //KULLANICININ KARTLARINI GETİRME METODU
-    public static java.util.ArrayList<model.Card> getCardsByUserId(String userId) {
-        java.util.ArrayList<model.Card> userCards = new java.util.ArrayList<>();
-
-        String sql = "SELECT * FROM Cards WHERE UserId = ?";
-
-        try (Connection conn = DriverManager.getConnection(URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, userId);
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                // Ortak Veriler
-                String cardNo = rs.getString("CardNumber");
-                String uId = rs.getString("UserId");
-                String type = rs.getString("CardType"); // "DEBIT" veya "CREDIT"
-                String cvv = rs.getString("CVV");
-                String date = rs.getString("ExpiryDate");
-
-                if ("DEBIT".equalsIgnoreCase(type)) {
-                    // Banka Kartı ise LinkedAccountId verisini çek
-                    String linkedAcc = rs.getString("LinkedAccountId");
-
-                    // Listeye DebitCard olarak ekle
-                    userCards.add(new model.DebitCard(cardNo, uId, cvv, date, linkedAcc));
-                }
-                else if ("CREDIT".equalsIgnoreCase(type)) {
-                    // Kredi Kartı ise Limit ve Borç verilerini çek
-                    float limit = rs.getFloat("CreditLimit");
-                    float debt = rs.getFloat("CurrentDebt");
-
-                    // Listeye CreditCard olarak ekle
-                    userCards.add(new model.CreditCard(cardNo, uId, cvv, date, limit, debt));
-                }
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Kartları Getirme Hatası: " + e.getMessage());
-        }
-
-        return userCards;
-    }
-    //endregion
 
     //region SubscriptionLogic
 
@@ -1048,70 +1037,33 @@ public class DataBaseManager {
     }
 
     // --- YENİ VADELİ HESAP AÇMA ---
-    public static String createVadeliAccountWithDeduction(String userId, String hesapAdi, double miktar, int vadeGun) {
-        Connection conn = null;
-        PreparedStatement checkStmt = null;
-        PreparedStatement deductStmt = null;
-        PreparedStatement createStmt = null;
+    // --- SADECE KAYIT YAPAN METOT (Logic Yok, Sadece SQL) ---
+    // BankService tarafından çağrılır.
+    public static boolean createDepositAccountRaw(String userId, String hesapAdi, double miktar, int vadeGun) {
+        String sql = "INSERT INTO Accounts(BelongedUserId, AccountId, Iban, Money_In_Account, AccountType, CreationDate, CurrencyType, DepositDays, AccountName) VALUES(?,?,?,?,?,?,?,?,?)";
 
-        try {
-            conn = DriverManager.getConnection(URL);
-            conn.setAutoCommit(false); // İşlem bütünlüğü başlat
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            // 1. ADIM: Vadesiz Hesapta Yeterli Para Var mı?
-            // (Checking ve TL olan hesabı buluyoruz)
-            String checkSql = "SELECT AccountId, Money_In_Account FROM Accounts WHERE BelongedUserId = ? AND AccountType = 'CHECKING' AND CurrencyType = 'TL'";
-            checkStmt = conn.prepareStatement(checkSql);
-            checkStmt.setString(1, userId);
-            ResultSet rs = checkStmt.executeQuery();
+            // Rastgele ID ve IBAN üretimi (Helper metodun varsa onu kullan)
+            String newAccountId = String.valueOf(new java.util.Random().nextInt(900000) + 100000);
+            String newIban = "TR" + (new java.util.Random().nextLong() & Long.MAX_VALUE);
 
-            if (!rs.next()) return "HATA: Vadesiz TL hesabınız bulunamadı.";
+            pstmt.setString(1, userId);
+            pstmt.setString(2, newAccountId);
+            pstmt.setString(3, newIban);
+            pstmt.setDouble(4, miktar);
+            pstmt.setString(5, "DEPOSIT");
+            pstmt.setString(6, java.time.LocalDate.now().toString());
+            pstmt.setString(7, "TL");
+            pstmt.setInt(8, vadeGun);
+            pstmt.setString(9, hesapAdi);
 
-            String vadesizAccountId = rs.getString("AccountId");
-            double mevcutBakiye = rs.getDouble("Money_In_Account");
-
-            if (mevcutBakiye < miktar) return "HATA: Yetersiz Bakiye! (Mevcut: " + mevcutBakiye + " TL)";
-
-            // 2. ADIM: Parayı Vadesizden Düş
-            String deductSql = "UPDATE Accounts SET Money_In_Account = Money_In_Account - ? WHERE AccountId = ?";
-            deductStmt = conn.prepareStatement(deductSql);
-            deductStmt.setDouble(1, miktar);
-            deductStmt.setString(2, vadesizAccountId);
-            deductStmt.executeUpdate();
-
-            // 3. ADIM: Yeni Vadeli Hesabı Oluştur
-            String createSql = "INSERT INTO Accounts(BelongedUserId, AccountId, Iban, Money_In_Account, AccountType, CreationDate, CurrencyType, DepositDays, AccountName) VALUES(?,?,?,?,?,?,?,?,?)";
-            createStmt = conn.prepareStatement(createSql);
-
-            // Hesap No ve IBAN üretimi (Manager içindeki mevcut metodlarını kullanıyoruz)
-            String newAccountId = String.valueOf(new Random().nextInt(900000) + 100000);
-            String newIban = "TR" + (new Random().nextLong() & Long.MAX_VALUE); // Basit random IBAN
-
-            createStmt.setString(1, userId);
-            createStmt.setString(2, newAccountId);
-            createStmt.setString(3, newIban);
-            createStmt.setDouble(4, miktar);       // Yatırılan para
-            createStmt.setString(5, "DEPOSIT");    // Vadeli türü
-            createStmt.setString(6, LocalDate.now().toString());
-            createStmt.setString(7, "TL");
-            createStmt.setInt(8, vadeGun);
-            createStmt.setString(9, hesapAdi);
-
-            createStmt.executeUpdate();
-
-            conn.commit(); // Her şey başarılıysa kaydet
-            return "BASARILI";
+            return pstmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            try { if (conn != null) conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            return "HATA: Veritabanı sorunu: " + e.getMessage();
-        } finally {
-            try {
-                if (checkStmt != null) checkStmt.close();
-                if (deductStmt != null) deductStmt.close();
-                if (createStmt != null) createStmt.close();
-                if (conn != null) { conn.setAutoCommit(true); conn.close(); }
-            } catch (SQLException e) { e.printStackTrace(); }
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -1229,6 +1181,103 @@ public class DataBaseManager {
             }
         }
     }
+
+    // --- OOP İÇİN: KULLANICININ VADESİZ HESABINI NESNE OLARAK GETİR ---
+    public static model.CheckingAccount getCheckingAccountObject(String userId) {
+        String sql = "SELECT * FROM Accounts WHERE BelongedUserId = ? AND AccountType = 'CHECKING' AND CurrencyType = 'TL'";
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return new model.CheckingAccount(
+                        userId,
+                        rs.getString("AccountId"),
+                        rs.getString("Iban"),
+                        rs.getFloat("Money_In_Account")
+                );
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
+    }
+
+    // --- OOP İÇİN: KULLANICININ DÖVİZ HESABINI NESNE OLARAK GETİR ---
+    public static model.ForeignCurrencyAccount getForeignCurrencyAccountObject(String userId, String currencyType) {
+        String sql = "SELECT * FROM Accounts WHERE BelongedUserId = ? AND CurrencyType = ?";
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, userId);
+            pstmt.setString(2, currencyType); // "USD", "EUR", "GOLD"
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return new model.ForeignCurrencyAccount(
+                        userId,
+                        rs.getString("AccountId"),
+                        rs.getFloat("Money_In_Account"),
+                        currencyType
+                );
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
+    }
+
+    // --- NESNEYİ GÜNCELLE (Save/Update) ---
+    // Modelde değişen bakiyeyi veritabanına yazar.
+    public static boolean saveAccount(model.CheckingAccount account) {
+        String sql = "UPDATE Accounts SET Money_In_Account = ? WHERE AccountId = ?";
+
+        try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // Nesnenin RAM'deki güncel bakiyesini alıp SQL'e koyuyoruz
+            pstmt.setDouble(1, account.getMoneyInAccount());
+            pstmt.setString(2, account.getAccountId());
+
+            return pstmt.executeUpdate() > 0;
+
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // --- OOP: BANKA KARTI NESNESİNİ GETİR ---
+    public static model.DebitCard getDebitCardObject(String userId) {
+        // Kartı bulmak için: UserId ve Tip = 'DEBIT' kontrolü yapıyoruz
+        String sql = "SELECT * FROM Cards WHERE UserId = ? AND CardType = 'DEBIT'";
+
+        try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userId);
+            java.sql.ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                // Önce bağlı olduğu hesabı nesne olarak çekiyoruz
+                // Veritabanındaki sütun adı: LinkedAccountId
+                String linkedAccountId = rs.getString("LinkedAccountId");
+
+                // Eğer AccountId null ise veya hesap bulunamazsa kartı oluşturamayız
+                if (linkedAccountId == null) return null;
+
+                model.Account account = getAccountById(linkedAccountId);
+                if (account == null || !(account instanceof model.CheckingAccount)) return null;
+
+                return new model.DebitCard(
+                        rs.getString("CardNumber"),
+                        userId,
+                        rs.getString("CVV"),       // Sütun adı: CVV
+                        rs.getString("ExpiryDate"),// Sütun adı: ExpiryDate
+                        (model.CheckingAccount) account // Bağlı hesap nesnesi
+                );
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 
 
 

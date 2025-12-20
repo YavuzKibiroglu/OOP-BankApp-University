@@ -1,51 +1,42 @@
 package model;
 
-import Managers.DataBaseManager;
-import java.sql.SQLException;
-
 public class DebitCard extends Card {
 
-    private String linkedAccountId; // Bağlı olduğu Vadesiz Hesap ID'si
+    // Sadece ID değil, hesabın KENDİSİNİ tutuyoruz (Composition)
+    private CheckingAccount linkedAccount;
 
-    public DebitCard(String cardNumber, String userId, String cvv, String expiryDate, String linkedAccountId) {
+    // Constructor artık CheckingAccount nesnesi istiyor
+    public DebitCard(String cardNumber, String userId, String cvv, String expiryDate, CheckingAccount linkedAccount) {
         super(cardNumber, userId, cvv, expiryDate);
-        this.linkedAccountId = linkedAccountId;
+        this.linkedAccount = linkedAccount;
     }
 
-    @Override
-    public boolean spend(float amount) throws SQLException {
-        // 1. Bağlı olduğu hesabı bul
-        Account account = DataBaseManager.getAccountById(linkedAccountId);
-
-        // 2. Hesap kontrolü
-        if (account == null || !(account instanceof CheckingAccount)) {
-            System.out.println("Hata: Bu karta bağlı geçerli bir vadesiz hesap bulunamadı.");
-            return false;
-        }
-
-        CheckingAccount checkingAccount = (CheckingAccount) account;
-
-        // 3. Bakiye Yeterli mi?
-        if (checkingAccount.getMoneyInAccount() >= amount) {
-            // 4. Parayı hesaptan düş (Karttan değil, hesaptan düşer)
-            float newBalance = checkingAccount.getMoneyInAccount() - amount;
-
-            // Veritabanını güncelle
-            DataBaseManager.updateBalance(linkedAccountId, newBalance);
-
-            // RAM'deki nesneyi güncelle
-            checkingAccount.setMoneyInAccount(newBalance);
-
-            System.out.println("Banka Kartı ile ödeme başarılı. Hesaptan düşülen: " + amount + " TL");
-            return true;
-        } else {
-            System.out.println("Yetersiz Bakiye! Hesabınızda yeterli para yok.");
-            return false;
-        }
+    public CheckingAccount getLinkedAccount() {
+        return linkedAccount;
     }
 
     @Override
     public String getInformation() {
-        return "BANKA KARTI | No: " + cardNumber + " | Bağlı Hesap: " + linkedAccountId;
+        return "BANKA KARTI | No: " + cardNumber + " | Bağlı Hesap: " + linkedAccount.getIbanNumber();
+    }
+
+    // --- HARCAMA YAP (OOP) ---
+    @Override
+    public boolean spend(float amount) {
+        if (linkedAccount == null) return false;
+
+        try {
+            // Kart harcaması aslında hesaptan para çekmektir.
+            // Modeldeki 'withdraw' metodu kuralları kontrol eder (Bakiye yetiyor mu?)
+            linkedAccount.withdraw(amount);
+
+            // Eğer withdraw hata vermediyse işlem RAM'de başarılıdır.
+            // (Veritabanı kaydı Service katmanında yapılacak)
+            return true;
+
+        } catch (Exception e) {
+            // Yetersiz bakiye vb. durumlarda false döner
+            return false;
+        }
     }
 }

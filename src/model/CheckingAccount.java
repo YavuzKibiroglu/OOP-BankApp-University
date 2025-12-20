@@ -5,10 +5,10 @@ import java.sql.SQLException;
 
 public class CheckingAccount extends Account {
 
-    private final String ibanNumber; // Vadesiz hesaba özel alan
+    private final String ibanNumber;
 
     public CheckingAccount(String userId, String accountId, String ibanNumber, float moneyInAccount) {
-        super(userId, accountId, moneyInAccount); // Abstract sınıfın constructor'ı
+        super(userId, accountId, moneyInAccount);
         this.ibanNumber = ibanNumber;
     }
 
@@ -21,100 +21,77 @@ public class CheckingAccount extends Account {
         return String.format("Vadesiz Hesap | IBAN: %s | Bakiye: %.2f TL", ibanNumber, moneyInAccount);
     }
 
-    // Para Ekleme Metodu (Hem RAM hem Veritabanı)
-    public void addMoneyToAccount(float moneyToAdd) {
-        this.moneyInAccount += moneyToAdd;
-        // Veritabanını güncelle
-        DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
-    }
+    // =============================================================
+    // 1. BANKSERVICE İÇİN GEREKLİ METOTLAR (SAF OOP)
+    // =============================================================
 
-    // --- BAŞKASINA PARA TRANSFERİ (IBAN İLE) ---
-    // Senaryo: Arkadaşına para yolluyorsun.
-    public void transferMoneyToOtherAccount(String targetIban, float amountToSend) {
-        // 1. Bakiye Yeterli mi?
-        if (this.moneyInAccount < amountToSend) {
-            System.out.println("Yetersiz Bakiye! İşlem iptal edildi.");
-            return;
+    // Para Çekme (Sadece RAM'de işlem yapar, kuralı kontrol eder)
+    // BankService bunu çağırır ve sonra saveAccount yapar.
+    public boolean withdraw(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Çekilecek tutar 0'dan büyük olmalı.");
         }
-
-        try {
-            // 2. IBAN'dan Karşı Tarafın ID'sini bul (Manager Metodu)
-            String targetAccountId = DataBaseManager.getAccountIdByIBAN(targetIban);
-
-            if (targetAccountId == null) {
-                System.out.println("Hata: Bu IBAN'a ait hesap bulunamadı.");
-                return;
-            }
-
-            // 3. Karşı Hesabı Getir
-            Account receiverAccount = DataBaseManager.getAccountById(targetAccountId);
-
-            // 4. Transfer İşlemi
-            if (receiverAccount != null) {
-                // A) Benden Düş
-                this.moneyInAccount -= amountToSend;
-                DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
-
-                // B) Karşı Tarafa Ekle
-                // Karşı taraf Vadesiz Hesap ise:
-                if (receiverAccount instanceof CheckingAccount) {
-                    ((CheckingAccount) receiverAccount).addMoneyToAccount(amountToSend);
-                    System.out.println("Transfer Başarılı: " + amountToSend + " TL gönderildi.");
-                } else {
-                    // Karşı taraf Vadeli ise para gönderilemez, iade et.
-                    System.out.println("Hata: Vadeli hesaba doğrudan para gönderilemez.");
-                    this.addMoneyToAccount(amountToSend); // İade
-                }
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Transfer sırasında veritabanı hatası: " + e.getMessage());
+        if (this.moneyInAccount < amount) {
+            throw new IllegalStateException("Yetersiz Bakiye!"); // Service bunu yakalar
         }
+        this.moneyInAccount -= amount;
+        return false;
     }
 
-    // Interface'den gelen metot (Genelde sistem tarafından çağrılır)
-    @Override
-    public void transferToCurrent(float moneyAmount, String accountId) throws SQLException {
-        addMoneyToAccount(moneyAmount);
+    // Para Yatırma (Sadece RAM'de işlem yapar)
+    public void deposit(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Yatırılacak tutar 0'dan büyük olmalı.");
+        }
+        this.moneyInAccount += amount;
     }
 
+    // =============================================================
+    // 2. DİĞER YARDIMCI METOTLAR
+    // =============================================================
+
+    // Interface Zorunluluğu
     @Override
     public void transferToCurrent(float moneyAmount) throws SQLException {
-        addMoneyToAccount(moneyAmount);
+        deposit(moneyAmount); // deposit metodunu kullanabiliriz
+        // Veritabanı güncellemesi gerekiyorsa:
+        DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
     }
 
-    // --- FATURA ÖDEME METODU ---
-    public void payBill(String invoiceId) {
-        // 1. Fatura Bilgilerini Çek
-        model.Invoice invoice = DataBaseManager.getInvoiceById(invoiceId);
-
-        if (invoice == null) {
-            System.out.println("Hata: Fatura bulunamadı.");
-            return;
-        }
-
-        if (invoice.isPaid()) {
-            System.out.println("Bilgi: Bu fatura zaten ödenmiş.");
-            return;
-        }
-
-        // 2. Bakiye Kontrolü
-        if (this.moneyInAccount < invoice.getAmount()) {
-            System.out.println("Hata: Fatura ödemesi için bakiye yetersiz!");
-            return;
-        }
-
-        // 3. Ödeme İşlemi (RAM)
-        this.moneyInAccount -= invoice.getAmount();
-
-        // 4. Veritabanı Güncellemeleri
-
-        // a) Parayı veritabanında düş
+    // Helper: Hızlı para ekleme (Eski kodlarla uyum için)
+    public void addMoneyToAccount(float moneyToAdd) {
+        deposit(moneyToAdd);
         DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
+    }
 
-        // b) Faturayı 'Ödendi' yap ve Hizmeti aç (Artık bu metot var)
-        DataBaseManager.markInvoiceAsPaidAndActivateService(invoiceId);
+    // Transfer İşlemi (UI tarafında kullanılıyor)
+    public boolean transferTo(Account targetAccount, double amount) {
+        if (targetAccount == null || amount <= 0) return false;
 
-        System.out.println("Fatura Başarıyla Ödendi. Yeni Bakiye: " + this.moneyInAccount);
+        try {
+            // 1. Kendinden düş
+            this.withdraw(amount);
+            DataBaseManager.updateBalance(this.accountId, this.moneyInAccount); // Kaydet
+
+            // 2. Hedefe ekle
+            if (targetAccount instanceof CheckingAccount) {
+                ((CheckingAccount) targetAccount).addMoneyToAccount((float)amount);
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
+
+    // Fatura Ödeme
+    public boolean payBill(String invoiceId, double amount) {
+        try {
+            this.withdraw(amount);
+            boolean guncellendi = DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
+            return guncellendi;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
