@@ -1538,12 +1538,19 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     // 2. Ana Sayfa (Dashboard) Güncelleme
     private void anaSayfaGuncelle() {
         if (aktifKullanici != null) {
-            // Vadesiz Hesap Bakiyesi
-            double miktar = Managers.DataBaseManager.getVadesizTLBakiye(aktifKullanici.getUserId());
-            AnaSayfaVadesizBakiyeLabel.setText(String.format("%,.2f TL", miktar));
-            AnaSayfaVadesizIBANLabel.setText("TR......................");
+            // --- DEĞİŞİKLİK BURADA ---
+            // Eskiden sadece bakiyeyi çekiyorduk (getVadesizTLBakiye).
+            // Şimdi Hesaplar sayfasındaki gibi hem BAKİYE hem IBAN'ı "TL" koduyla çekiyoruz.
+            String[] hesapBilgisi = Managers.DataBaseManager.getAccountDetails(aktifKullanici.getUserId(), "TL");
 
-            // Kredi Kartı Bilgileri
+            double miktar = Double.parseDouble(hesapBilgisi[0]); // [0] Bakiye
+            String iban = hesapBilgisi[1];                       // [1] IBAN
+
+            AnaSayfaVadesizBakiyeLabel.setText(String.format("%,.2f TL", miktar));
+            AnaSayfaVadesizIBANLabel.setText(iban); // <-- Artık gerçek IBAN yazıyor
+            // -------------------------
+
+            // Kredi Kartı Bilgileri (Aynı kaldı)
             double[] kartBilgisi = Managers.DataBaseManager.getCreditCardInfo(aktifKullanici.getUserId());
             double limit = kartBilgisi[0];
             double borc = kartBilgisi[1];

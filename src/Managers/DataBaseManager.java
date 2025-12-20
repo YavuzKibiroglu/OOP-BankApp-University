@@ -3,7 +3,7 @@ package Managers;
 import model.Account;
 import model.AccountType;
 import model.CheckingAccount;
-import model.DepositAccount; // DepositAccount import edildi
+import model.DepositAccount;
 
 import java.sql.*;
 import java.time.LocalDate;
