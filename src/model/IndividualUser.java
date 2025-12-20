@@ -30,6 +30,10 @@ public class IndividualUser extends User {
     public String getCity() { return city; }
     public String getPhoneNumber() { return phoneNumber; }
 
+    public String getTcNo() {
+        return this.tcKimlik; // Hata verirse burayı değişken adınla (örn: this.TC_Kimlik) düzelt.
+    }
+
     @Override
     public String getInformation() {
         return String.format("Bireysel Müşteri: %s %s (TC: %s) - %s",

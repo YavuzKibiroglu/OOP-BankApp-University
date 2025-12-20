@@ -303,7 +303,11 @@ public class MainMenuUI extends javax.swing.JFrame {
         KurumsalKayıtTamamlaBtn.setText("Kayıt Ol");
         KurumsalKayıtTamamlaBtn.addActionListener(this::KurumsalKayıtTamamlaBtnActionPerformed);
 
-        KurumsalTarihGirisFormattedTF.setEditable(false);
+        try {
+            KurumsalTarihGirisFormattedTF.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##/##/####")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
 
         KurumsalKayitSifreGoster.setText("Şifreyi Göster");
 
@@ -382,6 +386,8 @@ public class MainMenuUI extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>
+
+
 
 
 
@@ -595,6 +601,7 @@ public class MainMenuUI extends javax.swing.JFrame {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
+        Managers.DataBaseManager.start();
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {

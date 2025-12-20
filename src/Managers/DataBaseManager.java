@@ -8,6 +8,7 @@ import model.DepositAccount;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.Random;
+import java.util.ArrayList;
 
 public class DataBaseManager {
     public static final String URL = "jdbc:sqlite:Bank.db";
@@ -41,7 +42,8 @@ public class DataBaseManager {
                 "AccountType TEXT, " +
                 "CreationDate TEXT, " +
                 "DepositDays INTEGER, " +
-                "CurrencyType TEXT)";  // YENİ: Vade günü (Sadece vadeli için)
+                "CurrencyType TEXT, " +
+                "AccountName TEXT)";
 
         String sqlCards = "CREATE TABLE IF NOT EXISTS Cards (" +
                 "CardNumber TEXT PRIMARY KEY, " +
@@ -54,11 +56,16 @@ public class DataBaseManager {
                 "CurrentDebt REAL)";        // Sadece Credit için dolu
 
         String sqlSubscriptions = "CREATE TABLE IF NOT EXISTS Subscriptions (" +
-                "SubscriptionId TEXT PRIMARY KEY, " +
-                "SubscriberUserId TEXT, " +
+                "SubscriptionId INTEGER PRIMARY KEY AUTOINCREMENT, " + // Otomatik artan ID daha iyidir
+                "SubscriberUserId TEXT, " + // (Opsiyonel: UserId varsa buraya)
+                "SubscriberTC TEXT, " +     // YENİ: TC Kimlik
+                "SubscriberName TEXT, " +   // YENİ: Ad
+                "SubscriberSurname TEXT, " +// YENİ: Soyad
                 "CompanyUserId TEXT, " +
                 "ServiceName TEXT, " +
-                "IsActive INTEGER, " + // 1: Aktif, 0: Kesik
+                "IsActive INTEGER, " +
+                "BillingDay INTEGER, " +    // YENİ: Fatura Günü
+                "FixedAmount REAL, " +      // YENİ: Sabit Tutar
                 "StartDate TEXT)";
 
         String sqlInvoices = "CREATE TABLE IF NOT EXISTS Invoices (" +
@@ -169,6 +176,7 @@ public class DataBaseManager {
 
             stmt.executeUpdate();
 
+            createAccountRaw(uniqueId, "TL", 0.0);
             // KONSOL ÇIKTISI: ID burada görünüyor (İstediğin gibi)
             System.out.println("Kurumsal kullanıcı eklendi. ID: " + uniqueId);
 
@@ -1277,9 +1285,410 @@ public class DataBaseManager {
         return null;
     }
 
+    // =============================================================
+    // KURUMSAL MODÜL VE ABONELİK (YENİ EKLENEN KISIMLAR)
+    // =============================================================
 
+    public static int getAboneSayisi(String corpId) {
+        String sql = "SELECT COUNT(*) FROM Subscriptions WHERE CompanyUserId = ? AND IsActive = 1";
+        try (Connection conn = DriverManager.getConnection(URL); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, corpId); ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) {} return 0;
+    }
 
+    public static double getBeklenenTahsilat(String corpId) {
+        String sql = "SELECT SUM(FixedAmount) FROM Subscriptions WHERE CompanyUserId = ? AND IsActive = 1";
+        try (Connection conn = DriverManager.getConnection(URL); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, corpId); ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) return rs.getDouble(1);
+        } catch (Exception e) {} return 0.0;
+    }
 
+    public static ArrayList<String[]> getAboneler(String corpId) {
+        ArrayList<String[]> liste = new ArrayList<>();
+        String sql = "SELECT SubscriptionId, SubscriberTC, SubscriberName, SubscriberSurname, BillingDay, FixedAmount FROM Subscriptions WHERE CompanyUserId = ? AND IsActive = 1";
+        try (Connection conn = DriverManager.getConnection(URL); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, corpId); ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                String[] satir = new String[5];
+                satir[0] = rs.getString("SubscriptionId");
+                satir[1] = rs.getString("SubscriberTC");
+                satir[2] = rs.getString("SubscriberName") + " " + rs.getString("SubscriberSurname");
+                satir[3] = String.valueOf(rs.getInt("BillingDay"));
+                satir[4] = String.valueOf(rs.getDouble("FixedAmount")) + " TL";
+                liste.add(satir);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return liste;
+    }
 
+    // 4. YENİ ABONE KAYDETME (GÜNCELLENDİ)
+    public static boolean addSubscription(String corpId, String tc, String ad, String soyad, int gun, double tutar) {
+
+        // --- DEĞİŞİKLİK BURADA: Artık 3 parametreyi de kontrol ediyoruz ---
+        if (!validateIndividualUser(tc, ad, soyad)) {
+            // Buradan false dönersek UI tarafında "Kullanıcı bulunamadı" hatası gösterilecek.
+            System.out.println("Doğrulama Başarısız: " + tc + " - " + ad + " " + soyad);
+            return false;
+        }
+        // ------------------------------------------------------------------
+
+        String sql = "INSERT INTO Subscriptions(CompanyUserId, SubscriberTC, SubscriberName, SubscriberSurname, BillingDay, FixedAmount, IsActive, StartDate, ServiceName) VALUES(?,?,?,?,?,?,?,?,?)";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, corpId);
+            pstmt.setString(2, tc);
+            pstmt.setString(3, ad);
+            pstmt.setString(4, soyad);
+            pstmt.setInt(5, gun);
+            pstmt.setDouble(6, tutar);
+            pstmt.setInt(7, 1); // Aktif
+            pstmt.setString(8, java.time.LocalDate.now().toString());
+            pstmt.setString(9, "Hizmet Aboneliği");
+
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Abone Ekleme Hatası: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // 5. GÜNCELLENMİŞ VE HATA AYIKLAYICI DOĞRULAMA METODU
+    public static boolean validateIndividualUser(String tc, String ad, String soyad) {
+
+        // Girdileri temizle (Boşlukları sil)
+        String cleanTC = tc.trim();
+        String cleanAd = ad.trim();
+        String cleanSoyad = soyad.trim();
+
+        // Konsola ne aradığımızı yazdıralım (Hata ayıklama için)
+        System.out.println("--- KULLANICI SORGULANIYOR ---");
+        System.out.println("Aranan TC: '" + cleanTC + "'");
+        System.out.println("Aranan Ad: '" + cleanAd + "'");
+        System.out.println("Aranan Soyad: '" + cleanSoyad + "'");
+
+        // SQL Sorgusu:
+        // 1. LOWER() kullanarak büyük/küçük harf sorununu çözeriz.
+        // 2. TRIM() kullanımı veritabanındaki olası boşlukları yoksayar.
+        String sql = "SELECT * FROM Individual_Users WHERE TC_Kimlik = ? AND LOWER(name) = LOWER(?) AND LOWER(surname) = LOWER(?)";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, cleanTC);
+            pstmt.setString(2, cleanAd);
+            pstmt.setString(3, cleanSoyad);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                System.out.println("SONUÇ: Kullanıcı BULUNDU! ID: " + rs.getString("UserId"));
+                return true;
+            } else {
+                System.out.println("SONUÇ: Eşleşen kayıt BULUNAMADI.");
+                // Yardımcı kontrol: Sadece TC var mı bakalım? Sorun adda mı TC'de mi anlayalım.
+                checkIfOnlyTCExists(cleanTC);
+                return false;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Kullanıcı Doğrulama Hatası: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // DEBUG İÇİN YARDIMCI METOT (Bunu da validateIndividualUser'ın altına ekle)
+    private static void checkIfOnlyTCExists(String tc) {
+        String sql = "SELECT name, surname FROM Individual_Users WHERE TC_Kimlik = ?";
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, tc);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                System.out.println("HATA ANALİZİ: TC (" + tc + ") veritabanında VAR.");
+                System.out.println("Veritabanındaki Kayıt -> Ad: '" + rs.getString("name") + "', Soyad: '" + rs.getString("surname") + "'");
+                System.out.println("Sizin Girdiğiniz      -> Ad ve Soyad uyuşmuyor olabilir.");
+            } else {
+                System.out.println("HATA ANALİZİ: Bu TC (" + tc + ") veritabanında HİÇ YOK.");
+                System.out.println("Aktif Veritabanı Yolu: " + new java.io.File("Bank.db").getAbsolutePath());
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+    // =============================================================
+    // EKSİK OLAN BİREYSEL FATURA VE ABONELİK METOTLARI
+    // =============================================================
+
+    // 1. Müşterinin Aboneliklerini Getir
+    public static java.util.ArrayList<String[]> getBireyselAbonelikler(String tc) {
+        java.util.ArrayList<String[]> liste = new java.util.ArrayList<>();
+        String sql = "SELECT s.ServiceName, e.Enterprise_Name, s.FixedAmount, s.BillingDay " +
+                "FROM Subscriptions s " +
+                "JOIN Enterprise_Users e ON s.CompanyUserId = e.UserId " +
+                "WHERE s.SubscriberTC = ? AND s.IsActive = 1";
+
+        try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, tc);
+            java.sql.ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String[] satir = new String[4];
+                satir[0] = rs.getString("ServiceName");
+                satir[1] = rs.getString("Enterprise_Name");
+                satir[2] = rs.getString("FixedAmount") + " TL";
+                satir[3] = "Her ayın " + rs.getInt("BillingDay") + ". günü";
+                liste.add(satir);
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+        return liste;
+    }
+
+    // 2. Müşterinin Ödenmemiş Faturalarını Getir
+    public static java.util.ArrayList<String[]> getBireyselFaturalar(String tc) {
+        java.util.ArrayList<String[]> liste = new java.util.ArrayList<>();
+        String sql = "SELECT i.InvoiceId, s.ServiceName, e.Enterprise_Name, i.Amount, i.DueDate " +
+                "FROM Invoices i " +
+                "JOIN Subscriptions s ON i.SubscriptionId = s.SubscriptionId " +
+                "JOIN Enterprise_Users e ON s.CompanyUserId = e.UserId " +
+                "WHERE s.SubscriberTC = ? AND i.IsPaid = 0";
+
+        try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, tc);
+            java.sql.ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String[] satir = new String[5];
+                satir[0] = rs.getString("InvoiceId");
+                satir[1] = rs.getString("ServiceName");
+                satir[2] = rs.getString("Enterprise_Name");
+                satir[3] = rs.getString("Amount") + " TL";
+                satir[4] = rs.getString("DueDate");
+                liste.add(satir);
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+        return liste;
+    }
+
+    // =============================================================
+    // 3. FATURA ÖDEME İŞLEMİ (DEBUG VERSİYONU)
+    // =============================================================
+    public static String faturaOde(String userId, String invoiceId) {
+        System.out.println("--- FATURA ÖDEME İŞLEMİ BAŞLADI ---");
+        System.out.println("Kullanıcı ID: " + userId);
+        System.out.println("Fatura ID: " + invoiceId);
+
+        java.sql.Connection conn = null;
+        try {
+            conn = java.sql.DriverManager.getConnection(URL);
+            conn.setAutoCommit(false); // Transaction Başlangıcı
+
+            // ---------------------------------------------------------
+            // ADIM 1: Faturayı ve Şirket ID'sini Bul
+            // ---------------------------------------------------------
+            String sqlFatura = "SELECT i.Amount, s.CompanyUserId " +
+                    "FROM Invoices i " +
+                    "JOIN Subscriptions s ON i.SubscriptionId = s.SubscriptionId " +
+                    "WHERE i.InvoiceId = ? AND i.IsPaid = 0";
+
+            java.sql.PreparedStatement pstmtFatura = conn.prepareStatement(sqlFatura);
+            pstmtFatura.setString(1, invoiceId);
+            java.sql.ResultSet rsFatura = pstmtFatura.executeQuery();
+
+            if (!rsFatura.next()) {
+                System.out.println("HATA: Fatura bulunamadı veya zaten ödenmiş!");
+                return "HATA: Fatura bulunamadı.";
+            }
+
+            double tutar = rsFatura.getDouble("Amount");
+            String sirketId = rsFatura.getString("CompanyUserId");
+
+            System.out.println("1. ADIM BAŞARILI: Tutar=" + tutar + " , Alıcı Şirket ID=" + sirketId);
+
+            // ---------------------------------------------------------
+            // ADIM 2: Kullanıcının (Ödeyenin) TL Hesabını Bul
+            // ---------------------------------------------------------
+            String sqlUser = "SELECT AccountId, Money_In_Account FROM Accounts WHERE BelongedUserId = ? AND CurrencyType = 'TL'";
+            java.sql.PreparedStatement pstmtUser = conn.prepareStatement(sqlUser);
+            pstmtUser.setString(1, userId);
+            java.sql.ResultSet rsUser = pstmtUser.executeQuery();
+
+            if (!rsUser.next()) return "HATA: Vadesiz TL Hesabınız yok.";
+
+            String userAccId = rsUser.getString("AccountId");
+            double currentBalance = rsUser.getDouble("Money_In_Account");
+
+            System.out.println("2. ADIM BAŞARILI: Gönderen Hesap ID=" + userAccId + " , Mevcut Bakiye=" + currentBalance);
+
+            if (currentBalance < tutar) return "HATA: Yetersiz Bakiye.";
+
+            // ---------------------------------------------------------
+            // ADIM 3: Şirketin (Alıcının) TL Hesabını Bul (KRİTİK NOKTA)
+            // ---------------------------------------------------------
+            String sqlCorp = "SELECT AccountId FROM Accounts WHERE BelongedUserId = ? AND CurrencyType = 'TL'";
+            java.sql.PreparedStatement pstmtCorp = conn.prepareStatement(sqlCorp);
+            pstmtCorp.setString(1, sirketId);
+            java.sql.ResultSet rsCorp = pstmtCorp.executeQuery();
+
+            if(!rsCorp.next()) {
+                // !!! HATA BURADA OLABİLİR !!!
+                System.out.println("!!! HATA !!!: Şirket ID (" + sirketId + ") için 'Accounts' tablosunda TL hesabı bulunamadı!");
+                System.out.println("Lütfen DB Browser'dan 'Accounts' tablosunu kontrol edin.");
+                return "HATA: Şirketin banka hesabı bulunamadı.";
+            }
+
+            String corpAccId = rsCorp.getString("AccountId");
+            System.out.println("3. ADIM BAŞARILI: Alıcı Şirket Hesap ID=" + corpAccId);
+
+            // ---------------------------------------------------------
+            // ADIM 4: TRANSFER (UPDATE)
+            // ---------------------------------------------------------
+
+            // A) Kullanıcıdan Düş
+            java.sql.PreparedStatement sub = conn.prepareStatement("UPDATE Accounts SET Money_In_Account = Money_In_Account - ? WHERE AccountId = ?");
+            sub.setDouble(1, tutar);
+            sub.setString(2, userAccId);
+            int rowsUser = sub.executeUpdate();
+            System.out.println("4A. Kullanıcı Bakiyesi Güncellendi: " + (rowsUser > 0 ? "EVET" : "HAYIR"));
+
+            // B) Şirkete Ekle
+            java.sql.PreparedStatement add = conn.prepareStatement("UPDATE Accounts SET Money_In_Account = Money_In_Account + ? WHERE AccountId = ?");
+            add.setDouble(1, tutar);
+            add.setString(2, corpAccId);
+            int rowsCorp = add.executeUpdate();
+            System.out.println("4B. Şirket Bakiyesi Güncellendi: " + (rowsCorp > 0 ? "EVET" : "HAYIR"));
+
+            // C) Faturayı Kapat
+            java.sql.PreparedStatement close = conn.prepareStatement("UPDATE Invoices SET IsPaid = 1 WHERE InvoiceId = ?");
+            close.setString(1, invoiceId);
+            close.executeUpdate();
+
+            conn.commit(); // İşlemi Onayla
+            System.out.println("--- İŞLEM BAŞARIYLA TAMAMLANDI ---");
+            return "BASARILI";
+
+        } catch (java.sql.SQLException e) {
+            System.out.println("SQL HATASI: " + e.getMessage());
+            try { if(conn!=null) conn.rollback(); } catch(Exception ex){}
+            return "HATA: " + e.getMessage();
+        } finally {
+            try { if(conn!=null) { conn.setAutoCommit(true); conn.close(); }} catch(Exception e){}
+        }
+    }
+
+    // =============================================================
+    // KURUMSAL: MANUEL FATURA KESME (INSERT)
+    // =============================================================
+    public static boolean addInvoice(String subscriptionId, double amount) {
+        // Rastgele Fatura ID
+        String invoiceId = ProduceRandomID();
+
+        // Vade tarihi: Bugünden 30 gün sonrası
+        String dueDate = java.time.LocalDate.now().plusDays(30).toString();
+
+        String sql = "INSERT INTO Invoices(InvoiceId, SubscriptionId, Amount, DueDate, IsPaid) VALUES(?,?,?,?,?)";
+
+        try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, invoiceId);
+            pstmt.setString(2, subscriptionId);
+            pstmt.setDouble(3, amount);
+            pstmt.setString(4, dueDate);
+            pstmt.setInt(5, 0); // 0 = Ödenmedi (Borç)
+
+            int rows = pstmt.executeUpdate();
+            if (rows > 0) {
+                System.out.println("Fatura Veritabanına Eklendi! ID: " + invoiceId);
+                return true;
+            }
+        } catch (java.sql.SQLException e) {
+            System.out.println("Fatura Ekleme Hatası: " + e.getMessage());
+        }
+        return false;
+    }
+    // =============================================================
+    // EKSİK OLAN METOT: BASİT HESAP AÇMA (Kurumsal İçin)
+    // =============================================================
+    private static void createAccountRaw(String userId, String currency, double amount) {
+        // Hesaplar tablosuna ekleme yapan SQL
+        String sql = "INSERT INTO Accounts(BelongedUserId, AccountId, Iban, Money_In_Account, AccountType, CurrencyType, CreationDate) VALUES(?,?,?,?,?,?,?)";
+
+        try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // 1. Rastgele Hesap ID'si üret
+            String accId = String.valueOf(new java.util.Random().nextInt(900000) + 100000);
+
+            // 2. Rastgele IBAN üret (Mevcut metodunu kullanıyoruz)
+            String iban = generateIBAN();
+
+            pstmt.setString(1, userId);
+            pstmt.setString(2, accId);
+            pstmt.setString(3, iban);
+            pstmt.setDouble(4, amount);     // Bakiye (0.0)
+            pstmt.setString(5, "CHECKING"); // Hesap Türü: Vadesiz
+            pstmt.setString(6, currency);   // Para Birimi: TL
+            pstmt.setString(7, java.time.LocalDate.now().toString()); // Tarih
+
+            pstmt.executeUpdate();
+            System.out.println("Sistem: Kurumsal kullanıcı için otomatik " + currency + " hesabı açıldı.");
+
+        } catch (Exception e) {
+            System.out.println("Otomatik Hesap Açma Hatası: " + e.getMessage());
+        }
+    }
+
+    // =============================================================
+    // KREDİ KARTI İLE ÖDEMEDE ŞİRKETE PARA YATIRMA
+    // =============================================================
+    public static boolean depositToCompany(String invoiceId) {
+        String sqlInfo = "SELECT i.Amount, s.CompanyUserId FROM Invoices i " +
+                "JOIN Subscriptions s ON i.SubscriptionId = s.SubscriptionId WHERE i.InvoiceId = ?";
+
+        String sqlUpdate = "UPDATE Accounts SET Money_In_Account = Money_In_Account + ? WHERE BelongedUserId = ? AND CurrencyType = 'TL'";
+
+        try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
+             java.sql.PreparedStatement pstmtInfo = conn.prepareStatement(sqlInfo);
+             java.sql.PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdate)) {
+
+            // 1. Fatura Tutarını ve Şirketi Bul
+            pstmtInfo.setString(1, invoiceId);
+            java.sql.ResultSet rs = pstmtInfo.executeQuery();
+
+            if (rs.next()) {
+                double tutar = rs.getDouble("Amount");
+                String sirketId = rs.getString("CompanyUserId");
+
+                // 2. Şirketin Hesabına Ekle
+                pstmtUpdate.setDouble(1, tutar);
+                pstmtUpdate.setString(2, sirketId);
+                int rows = pstmtUpdate.executeUpdate();
+
+                if(rows > 0) {
+                    System.out.println("Sistem: " + tutar + " TL şirketin hesabına yatırıldı.");
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Şirkete Yatırma Hatası: " + e.getMessage());
+        }
+        return false;
+    }
 
 }
+
+
+
+
+
