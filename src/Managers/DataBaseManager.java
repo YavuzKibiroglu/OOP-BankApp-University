@@ -1048,39 +1048,80 @@ public class DataBaseManager {
     }
 
     // --- YENİ VADELİ HESAP AÇMA ---
-    public static boolean createVadeliAccount(String userId, String hesapAdi, double miktar, int vadeGun, double faizOrani) {
-        String sql = "INSERT INTO Accounts(BelongedUserId, AccountId, Iban, Money_In_Account, AccountType, CreationDate, CurrencyType, Deposit_Days, AccountName) VALUES(?,?,?,?,?,?,?,?,?)";
+    public static String createVadeliAccountWithDeduction(String userId, String hesapAdi, double miktar, int vadeGun) {
+        Connection conn = null;
+        PreparedStatement checkStmt = null;
+        PreparedStatement deductStmt = null;
+        PreparedStatement createStmt = null;
 
-        try (Connection conn = DriverManager.getConnection(URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try {
+            conn = DriverManager.getConnection(URL);
+            conn.setAutoCommit(false); // İşlem bütünlüğü başlat
 
-            // Hesap Numarası ve IBAN üret
-            String accountId = String.valueOf(new java.util.Random().nextInt(900000) + 100000);
-            String iban = generateIBAN(); // Mevcut metodunu kullanıyoruz
+            // 1. ADIM: Vadesiz Hesapta Yeterli Para Var mı?
+            // (Checking ve TL olan hesabı buluyoruz)
+            String checkSql = "SELECT AccountId, Money_In_Account FROM Accounts WHERE BelongedUserId = ? AND AccountType = 'CHECKING' AND CurrencyType = 'TL'";
+            checkStmt = conn.prepareStatement(checkSql);
+            checkStmt.setString(1, userId);
+            ResultSet rs = checkStmt.executeQuery();
 
-            pstmt.setString(1, userId);
-            pstmt.setString(2, accountId);
-            pstmt.setString(3, iban);
-            pstmt.setDouble(4, miktar);       // Yatırılan Ana Para
-            pstmt.setString(5, "DEPOSIT");    // Tür: VADELİ (DEPOSIT)
-            pstmt.setString(6, java.time.LocalDate.now().toString());
-            pstmt.setString(7, "TL");         // Vadeli hesap genellikle TL olur
-            pstmt.setInt(8, vadeGun);         // Örn: 32 gün
-            pstmt.setString(9, hesapAdi);     // <--- YENİ SÜTUN: "Araba Parası" vb.
+            if (!rs.next()) return "HATA: Vadesiz TL hesabınız bulunamadı.";
 
-            int rows = pstmt.executeUpdate();
-            return rows > 0;
+            String vadesizAccountId = rs.getString("AccountId");
+            double mevcutBakiye = rs.getDouble("Money_In_Account");
+
+            if (mevcutBakiye < miktar) return "HATA: Yetersiz Bakiye! (Mevcut: " + mevcutBakiye + " TL)";
+
+            // 2. ADIM: Parayı Vadesizden Düş
+            String deductSql = "UPDATE Accounts SET Money_In_Account = Money_In_Account - ? WHERE AccountId = ?";
+            deductStmt = conn.prepareStatement(deductSql);
+            deductStmt.setDouble(1, miktar);
+            deductStmt.setString(2, vadesizAccountId);
+            deductStmt.executeUpdate();
+
+            // 3. ADIM: Yeni Vadeli Hesabı Oluştur
+            String createSql = "INSERT INTO Accounts(BelongedUserId, AccountId, Iban, Money_In_Account, AccountType, CreationDate, CurrencyType, DepositDays, AccountName) VALUES(?,?,?,?,?,?,?,?,?)";
+            createStmt = conn.prepareStatement(createSql);
+
+            // Hesap No ve IBAN üretimi (Manager içindeki mevcut metodlarını kullanıyoruz)
+            String newAccountId = String.valueOf(new Random().nextInt(900000) + 100000);
+            String newIban = "TR" + (new Random().nextLong() & Long.MAX_VALUE); // Basit random IBAN
+
+            createStmt.setString(1, userId);
+            createStmt.setString(2, newAccountId);
+            createStmt.setString(3, newIban);
+            createStmt.setDouble(4, miktar);       // Yatırılan para
+            createStmt.setString(5, "DEPOSIT");    // Vadeli türü
+            createStmt.setString(6, LocalDate.now().toString());
+            createStmt.setString(7, "TL");
+            createStmt.setInt(8, vadeGun);
+            createStmt.setString(9, hesapAdi);
+
+            createStmt.executeUpdate();
+
+            conn.commit(); // Her şey başarılıysa kaydet
+            return "BASARILI";
 
         } catch (SQLException e) {
-            System.out.println("Vadeli Hesap Açma Hatası: " + e.getMessage());
-            return false;
+            try { if (conn != null) conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            return "HATA: Veritabanı sorunu: " + e.getMessage();
+        } finally {
+            try {
+                if (checkStmt != null) checkStmt.close();
+                if (deductStmt != null) deductStmt.close();
+                if (createStmt != null) createStmt.close();
+                if (conn != null) { conn.setAutoCommit(true); conn.close(); }
+            } catch (SQLException e) { e.printStackTrace(); }
         }
     }
 
-    // --- KULLANICININ VADELİ HESAPLARINI LİSTELE (Ad ve Bakiye) ---
+    // --- KULLANICININ VADELİ HESAPLARINI LİSTELE (GÜNCELLENMİŞ) ---
     public static java.util.ArrayList<String> getVadeliAccountNames(String userId) {
         java.util.ArrayList<String> hesapListesi = new java.util.ArrayList<>();
-        String sql = "SELECT AccountName, Money_In_Account FROM Accounts WHERE BelongedUserId = ? AND AccountType = 'DEPOSIT'";
+
+        // DÜZELTME: AccountType kontrolünü 'DEPOSIT' veya 'Deposit' olabilecek şekilde esnettik.
+        // Ayrıca SQL'de UPPER() fonksiyonu kullanarak büyük/küçük harf sorununu çözüyoruz.
+        String sql = "SELECT AccountName, Money_In_Account FROM Accounts WHERE BelongedUserId = ? AND UPPER(AccountType) = 'DEPOSIT'";
 
         try (Connection conn = DriverManager.getConnection(URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -1092,16 +1133,101 @@ public class DataBaseManager {
                 String ad = rs.getString("AccountName");
                 double bakiye = rs.getDouble("Money_In_Account");
 
-                // İsim boşsa varsayılan bir şey yazalım
                 if (ad == null || ad.isEmpty()) { ad = "Vadeli Hesap"; }
 
-                // Listeye ekle: "Araba Parası (50.000 TL)" formatında
                 hesapListesi.add(ad + " (" + bakiye + " TL)");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return hesapListesi;
+    }
+
+    // --- GÜVENLİ PARA TRANSFERİ METODU ---
+    // Gönderen ID'den parayı düşer, Alıcı IBAN'a parayı ekler.
+    public static String paraTransferiYap(String gonderenUserId, String aliciIban, double miktar) {
+        Connection conn = null;
+        PreparedStatement checkBalanceStmt = null;
+        PreparedStatement checkReceiverStmt = null;
+        PreparedStatement deductStmt = null;
+        PreparedStatement addStmt = null;
+
+        try {
+            conn = DriverManager.getConnection(URL);
+            conn.setAutoCommit(false); // Otomatik kaydı kapat (Transaction Başlat)
+
+            // 1. Gönderenin Vadesiz TL Hesabını ve Bakiyesini Bul
+            String checkBalanceSql = "SELECT AccountId, Money_In_Account FROM Accounts WHERE BelongedUserId = ? AND AccountType = 'CHECKING' AND CurrencyType = 'TL'";
+            checkBalanceStmt = conn.prepareStatement(checkBalanceSql);
+            checkBalanceStmt.setString(1, gonderenUserId);
+            ResultSet rsSender = checkBalanceStmt.executeQuery();
+
+            if (!rsSender.next()) {
+                return "HATA: Vadesiz TL hesabınız bulunamadı.";
+            }
+
+            String senderAccountId = rsSender.getString("AccountId");
+            double currentBalance = rsSender.getDouble("Money_In_Account");
+
+            if (currentBalance < miktar) {
+                return "HATA: Yetersiz bakiye!";
+            }
+
+            // 2. Alıcı IBAN Var mı Kontrol Et
+            String checkReceiverSql = "SELECT AccountId FROM Accounts WHERE Iban = ?";
+            checkReceiverStmt = conn.prepareStatement(checkReceiverSql);
+            checkReceiverStmt.setString(1, aliciIban);
+            ResultSet rsReceiver = checkReceiverStmt.executeQuery();
+
+            if (!rsReceiver.next()) {
+                return "HATA: Alıcı IBAN bulunamadı.";
+            }
+            String receiverAccountId = rsReceiver.getString("AccountId");
+
+            // Kendi kendine transferi engelle
+            if(senderAccountId.equals(receiverAccountId)) {
+                return "HATA: Kendi hesabınıza bu menüden transfer yapamazsınız.";
+            }
+
+            // 3. Gönderenden Parayı Düş
+            String deductSql = "UPDATE Accounts SET Money_In_Account = Money_In_Account - ? WHERE AccountId = ?";
+            deductStmt = conn.prepareStatement(deductSql);
+            deductStmt.setDouble(1, miktar);
+            deductStmt.setString(2, senderAccountId);
+            deductStmt.executeUpdate();
+
+            // 4. Alıcıya Parayı Ekle
+            String addSql = "UPDATE Accounts SET Money_In_Account = Money_In_Account + ? WHERE AccountId = ?";
+            addStmt = conn.prepareStatement(addSql);
+            addStmt.setDouble(1, miktar);
+            addStmt.setString(2, receiverAccountId);
+            addStmt.executeUpdate();
+
+            conn.commit(); // Her şey yolundaysa KAYDET
+            return "BASARILI";
+
+        } catch (SQLException e) {
+            try {
+                if (conn != null) conn.rollback(); // Hata varsa geri al
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            return "HATA: Veritabanı hatası oluştu.";
+        } finally {
+            try {
+                if (checkBalanceStmt != null) checkBalanceStmt.close();
+                if (checkReceiverStmt != null) checkReceiverStmt.close();
+                if (deductStmt != null) deductStmt.close();
+                if (addStmt != null) addStmt.close();
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
