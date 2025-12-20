@@ -13,7 +13,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         // Başlangıçta Ana Sayfa Açık
         panelAdiLabel.setText("ANA SAYFA");
 
-        bilesenBoyutlariniSabitle();
 
         // Verileri Veritabanından Çek ve Doldur
         kullaniciBilgileriniGoster();
@@ -2288,41 +2287,4 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     private javax.swing.JLabel lbl9;
     private javax.swing.JLabel panelAdiLabel;
     // End of variables declaration
-
-    private void bilesenBoyutlariniSabitle() {
-        // İdeal Boyut (Genişlik: 150px, Yükseklik: 30px)
-        // Ekran tasarımına göre 150 yerine 200 de yapabilirsin.
-        java.awt.Dimension standartBoyut = new java.awt.Dimension(180, 30);
-
-        // --- 1. PARA GÖNDERME EKRANI ---
-        GonderilecekAdTextF.setPreferredSize(standartBoyut);
-        GonderilecekAdTextF.setMinimumSize(standartBoyut); // Asla bundan küçük olma
-
-        GonderilecekSoyadTextF.setPreferredSize(standartBoyut);
-        GonderilecekSoyadTextF.setMinimumSize(standartBoyut);
-
-        GonderilecekIBANTextF.setPreferredSize(standartBoyut);
-        GonderilecekIBANTextF.setMinimumSize(standartBoyut);
-
-        GonderilecekMiktarTextF.setPreferredSize(standartBoyut);
-        GonderilecekMiktarTextF.setMinimumSize(standartBoyut);
-
-        // --- 2. VADELİ HESAP EKRANI ---
-        IslVadeliHesapAdlandirmaTextF.setPreferredSize(standartBoyut);
-        IslVadeYatirilacakMiktarTextF.setPreferredSize(standartBoyut);
-
-        // --- 3. DÖVİZ EKRANI ---
-        IslAlınacakDolarMiktariTextF.setPreferredSize(standartBoyut);
-        IslSatilacakDolarMiktariTextF.setPreferredSize(standartBoyut);
-
-        IslAlınacakEuroMiktariTextF.setPreferredSize(standartBoyut);
-        IslSatilacakEuroMiktariTextF.setPreferredSize(standartBoyut);
-
-        IslAlınacakAltınMiktariTextF.setPreferredSize(standartBoyut);
-        IslSatılacakAlMiktariTextF.setPreferredSize(standartBoyut);
-
-        // --- 4. NAKİT AVANS EKRANI ---
-        IslNakitAvansMiktariTextF.setPreferredSize(standartBoyut);
-    }
-
 }
