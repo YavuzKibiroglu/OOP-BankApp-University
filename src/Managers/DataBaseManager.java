@@ -268,6 +268,17 @@ public class DataBaseManager {
         }
     }
 
+    public static boolean updateBalance(String accountId, float amountChange, boolean isAddition) throws SQLException {
+        // Önce mevcut hesabı bul
+        Account acc = getAccountById(accountId);
+        if (acc == null) return false;
+
+        float currentBalance = acc.getMoneyInAccount();
+        float newBalance = isAddition ? (currentBalance + amountChange) : (currentBalance - amountChange);
+
+        return updateBalance(accountId, newBalance); // Ana metodu çağırır
+    }
+
     //region Account Checks
     // 1. Genel Hesap Kontrolü (Vadesiz ve Vadeli için)
     public static boolean hasAccountType(String userId, String accountType) {

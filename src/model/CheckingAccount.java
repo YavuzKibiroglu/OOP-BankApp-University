@@ -69,6 +69,12 @@ public class CheckingAccount extends Account {
         DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
     }
 
+    public void addMoneyToAccount(float moneyToAdd, String description) {
+        this.moneyInAccount += moneyToAdd;
+        DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
+        System.out.println("Para Eklendi (" + description + "): " + moneyToAdd + " TL");
+    }
+
     // Transfer İşlemi (UI tarafında kullanılıyor)
     public boolean transferTo(Account targetAccount, double amount) {
         if (targetAccount == null || amount <= 0) return false;
