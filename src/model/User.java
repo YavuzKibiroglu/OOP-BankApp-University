@@ -1,5 +1,7 @@
 package model;
 
+import java.time.LocalDate;
+
 public abstract class User implements IUserOperations {
     // Encapsulation: Değişkenler private [cite: 37]
     private String userId;
@@ -15,6 +17,9 @@ public abstract class User implements IUserOperations {
     public String getUserId() {
         return userId;
     }
+
+    //public String getUserId() { return tcKimlik; }
+    public abstract LocalDate getBirthDate();
 
     @Override
     public String getInformation()

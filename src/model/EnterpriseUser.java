@@ -21,6 +21,12 @@ public class EnterpriseUser extends User {
     public String getEnterpriseName() { return enterpriseName; }
     public LocalDate getEnterpriseEstablishment() { return enterpriseEstablishment; }
     public String getEnterpriseHQ() { return enterpriseHQ; }
+    @Override
+    public java.time.LocalDate getBirthDate() {
+        // Şirketlerin doğum günü olmaz, kuruluş tarihi olur.
+        // İstersen burada null döndürebilirsin ya da kuruluş tarihini verebilirsin.
+        return this.enterpriseEstablishment;
+    }
 
     // YENİ: Getter Metodu
     @Override

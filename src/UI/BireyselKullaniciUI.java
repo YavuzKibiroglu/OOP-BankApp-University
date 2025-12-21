@@ -31,14 +31,9 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
             vadeliIslemBilgisiniGuncelle();
             guncelKurlariGuncelle();
 
-            // Tabloları baştan boşalt (Sonra tıklayınca dolacak)
-            temizleTablolar();
+            abonelikleriGuncelle(); // Abonelikler tablosunu doldur
+            faturalariGuncelle();   // Faturalar tablosunu doldur
         }
-    }
-
-    private void temizleTablolar() {
-        ((DefaultTableModel) FtrAboneliklerimTable.getModel()).setRowCount(0);
-        ((DefaultTableModel) FtrFaturalarimTable.getModel()).setRowCount(0);
     }
 
     /**

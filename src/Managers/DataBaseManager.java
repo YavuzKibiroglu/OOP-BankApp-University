@@ -1436,9 +1436,11 @@ public class DataBaseManager {
     // 1. Müşterinin Aboneliklerini Getir
     public static java.util.ArrayList<String[]> getBireyselAbonelikler(String tc) {
         java.util.ArrayList<String[]> liste = new java.util.ArrayList<>();
+
+        // DÜZELTME: e.UserId YERİNE e.Corporate_Code KULLANIYORUZ
         String sql = "SELECT s.ServiceName, e.Enterprise_Name, s.FixedAmount, s.BillingDay " +
                 "FROM Subscriptions s " +
-                "JOIN Enterprise_Users e ON s.CompanyUserId = e.UserId " +
+                "JOIN Enterprise_Users e ON s.CompanyUserId = e.Corporate_Code " + // <-- DEĞİŞTİ
                 "WHERE s.SubscriberTC = ? AND s.IsActive = 1";
 
         try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
@@ -1464,10 +1466,12 @@ public class DataBaseManager {
     // 2. Müşterinin Ödenmemiş Faturalarını Getir
     public static java.util.ArrayList<String[]> getBireyselFaturalar(String tc) {
         java.util.ArrayList<String[]> liste = new java.util.ArrayList<>();
+
+        // DÜZELTME: e.UserId YERİNE e.Corporate_Code KULLANIYORUZ
         String sql = "SELECT i.InvoiceId, s.ServiceName, e.Enterprise_Name, i.Amount, i.DueDate " +
                 "FROM Invoices i " +
                 "JOIN Subscriptions s ON i.SubscriptionId = s.SubscriptionId " +
-                "JOIN Enterprise_Users e ON s.CompanyUserId = e.UserId " +
+                "JOIN Enterprise_Users e ON s.CompanyUserId = e.Corporate_Code " + // <-- DEĞİŞTİ
                 "WHERE s.SubscriberTC = ? AND i.IsPaid = 0";
 
         try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
@@ -1546,15 +1550,16 @@ public class DataBaseManager {
             // ---------------------------------------------------------
             // ADIM 3: Şirketin (Alıcının) TL Hesabını Bul (KRİTİK NOKTA)
             // ---------------------------------------------------------
-            String sqlCorp = "SELECT AccountId FROM Accounts WHERE BelongedUserId = ? AND CurrencyType = 'TL'";
+            String sqlCorp = "SELECT a.AccountId FROM Accounts a " +
+                    "JOIN Enterprise_Users e ON a.BelongedUserId = e.UserId " +
+                    "WHERE e.Corporate_Code = ? AND a.CurrencyType = 'TL'";
+
             java.sql.PreparedStatement pstmtCorp = conn.prepareStatement(sqlCorp);
-            pstmtCorp.setString(1, sirketId);
+            pstmtCorp.setString(1, sirketId); // sirketId değişkeni burada Corporate Code taşıyor
             java.sql.ResultSet rsCorp = pstmtCorp.executeQuery();
 
             if(!rsCorp.next()) {
-                // !!! HATA BURADA OLABİLİR !!!
-                System.out.println("!!! HATA !!!: Şirket ID (" + sirketId + ") için 'Accounts' tablosunda TL hesabı bulunamadı!");
-                System.out.println("Lütfen DB Browser'dan 'Accounts' tablosunu kontrol edin.");
+                System.out.println("!!! HATA !!!: Şirket Kodu (" + sirketId + ") için hesap bulunamadı!");
                 return "HATA: Şirketin banka hesabı bulunamadı.";
             }
 
