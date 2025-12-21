@@ -17,12 +17,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         this.pack(); // Pencereyi içindeki elemanlara göre otomatik sığdırır (Taşmayı önler)
         this.setLocationRelativeTo(null); // Pencereyi tekrar ekranın ortasına alır
 
-        HspVadeliListComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                vadeliHesapDetaylariniGetir();
-            }
-        });
-
         // --- BUTON İKONLARI (32x32 Boyutunda Ayarlandı) ---
         AnaSayfaBtn.setIcon(IconHelper.createIcon("/resources/home.png", 32, 32));
         IslemlerBtn.setIcon(IconHelper.createIcon("/resources/transaction-history.png", 32, 32));
@@ -2754,29 +2748,28 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     private void vadeliHesapSayfasiniYonet() {
         if (aktifKullanici == null) return;
 
-        // 1. Hesap Listesini Çek
         java.util.ArrayList<String> hesapListesi = Managers.DataBaseManager.getVadeliAccountNames(aktifKullanici.getUserId());
-
-        // 2. CardLayout'u Hazırla
         java.awt.CardLayout layout = (java.awt.CardLayout) HspVadeliPanel.getLayout();
 
         if (hesapListesi.isEmpty()) {
-            // HESAP YOKSA
             layout.show(HspVadeliPanel, "cardHspVadeliYokPanel");
         } else {
-            // HESAP VARSA
             layout.show(HspVadeliPanel, "cardHspVadeliVarPanel");
 
-            // Listeyi temizle ve yeniden doldur
+            // --- BU KISMI EKLE: LABELLARI TAMAMEN GİZLE ---
+            HspVadeliTürüLbl.setVisible(false);
+            HspVadeliYatirilanTutarLbl.setVisible(false);
+            HspVadeliKalanGunLbl.setVisible(false);
+            HspVadeliKalanGetirisiLbl.setVisible(false);
+            jLabel22.setVisible(false);
+            jLabel23.setVisible(false);
+            jLabel24.setVisible(false);
+            jLabel25.setVisible(false);
+            // ----------------------------------------------
+
             HspVadeliListComboBox.removeAllItems();
             for (String hesapAdi : hesapListesi) {
                 HspVadeliListComboBox.addItem(hesapAdi);
-            }
-
-            // Listenin ilk elemanını seçili yap ve detayları getir
-            if (HspVadeliListComboBox.getItemCount() > 0) {
-                HspVadeliListComboBox.setSelectedIndex(0);
-                vadeliHesapDetaylariniGetir();
             }
         }
     }
@@ -3021,59 +3014,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         kartlariGuncelle();
     }
 
-    // --- VADELİ HESAP DETAYLARINI GÜNCELLEME METODU ---
-    private void vadeliHesapDetaylariniGetir() {
-        // 1. ComboBox'tan seçilen hesap ismini al
-        String secilenHesapAdi = (String) HspVadeliListComboBox.getSelectedItem();
-
-        if (secilenHesapAdi == null || aktifKullanici == null) return;
-
-        // 2. Veritabanından o hesabın nesnesini çek
-        // (DataBaseManager'da getDepositAccountByName metodunun olduğunu varsayıyoruz)
-        model.DepositAccount vadeliHesap = Managers.DataBaseManager.getDepositAccountByName(aktifKullanici.getUserId(), secilenHesapAdi);
-
-        if (vadeliHesap != null) {
-            // A) YATIRILAN TUTAR
-            HspVadeliYatirilanTutarLbl.setText(String.format("%,.2f TL", vadeliHesap.getBalance()));
-
-            // B) TÜRÜ (Gün sayısına göre belirleyelim)
-            int vadeGun = vadeliHesap.getOriginalTermDays(); // Hesabın vade günü
-            String tur = "Özel Vade";
-            if (vadeGun == 32) tur = "Kısa Vade (32 Gün)";
-            else if (vadeGun == 92) tur = "Orta Vade (92 Gün)";
-            else if (vadeGun == 181) tur = "Uzun Vade (181 Gün)";
-            else if (vadeGun == 365) tur = "Yıllık (365 Gün)";
-
-            HspVadeliTürüLbl.setText(tur);
-
-            // C) KALAN GÜN HESAPLAMA
-            // Simülasyon tarihini çek
-            java.time.LocalDate bugun = Managers.TimeManager.getCurrentDate();
-            // Hesabın açılış tarihini çek (SQL Date -> LocalDate dönüşümü)
-            java.time.LocalDate acilisTarihi = vadeliHesap.getCreationDate(); // Modelinde getCreationDate Date dönüyorsa toLocalDate() gerekir.
-
-            // Vade bitiş tarihini bul
-            java.time.LocalDate bitisTarihi = acilisTarihi.plusDays(vadeGun);
-
-            // Aradaki farkı bul
-            long kalanGun = java.time.temporal.ChronoUnit.DAYS.between(bugun, bitisTarihi);
-
-            if (kalanGun < 0) kalanGun = 0; // Vade dolmuşsa 0 göster
-            HspVadeliKalanGunLbl.setText(kalanGun + " Gün Kaldı");
-
-            // D) GETİRİ HESAPLAMA
-            // Modelindeki hesaplama metodunu kullanıyoruz
-            double tahminiGetiri = model.DepositAccount.calculateProjectedNetProfit(vadeliHesap.getBalance(), vadeGun);
-            HspVadeliKalanGetirisiLbl.setText(String.format("%,.2f TL", tahminiGetiri));
-
-        } else {
-            // Hata durumu veya veri yoksa
-            HspVadeliTürüLbl.setText("---");
-            HspVadeliYatirilanTutarLbl.setText("---");
-            HspVadeliKalanGunLbl.setText("---");
-            HspVadeliKalanGetirisiLbl.setText("---");
-        }
-    }
     private void dovizInputlariniDuzenle() {
         // Genişlik: 140px, Yükseklik: 35px olarak ayarlıyoruz
         java.awt.Dimension inputBoyutu = new java.awt.Dimension(68, 33);
