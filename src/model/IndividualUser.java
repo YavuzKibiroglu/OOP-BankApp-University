@@ -25,7 +25,8 @@ public class IndividualUser extends User {
     // Getter Metotları [cite: 38]
     public String getName() { return name; }
     public String getSurname() { return surname; }
-    public String getTcKimlik() { return tcKimlik; }
+    @Override
+    public String getUserId() { return tcKimlik; }
     public LocalDate getBirthDate() { return birthDate; }
     public String getCity() { return city; }
     public String getPhoneNumber() { return phoneNumber; }

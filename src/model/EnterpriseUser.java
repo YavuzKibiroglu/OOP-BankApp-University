@@ -23,7 +23,9 @@ public class EnterpriseUser extends User {
     public String getEnterpriseHQ() { return enterpriseHQ; }
 
     // YENİ: Getter Metodu
-    public String getCorporateCode() { return corporateCode; }
+    @Override
+    public String getUserId() { return corporateCode; }
+
 
     @Override
     public String getInformation() {

@@ -547,7 +547,7 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
     private void sirketBilgileriniGoster() {
         if (aktifSirket != null) {
             KurumAdiLabel.setText(aktifSirket.getEnterpriseName());
-            KurumKodLabel.setText("Kurum Kodu: " + aktifSirket.getCorporateCode());
+            KurumKodLabel.setText("Kurum Kodu: " + aktifSirket.getUserId());
         }
     }
 
