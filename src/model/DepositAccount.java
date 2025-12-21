@@ -86,6 +86,15 @@ public class DepositAccount extends Account {
     }
 
     @Override
+    public boolean withdraw(double amount) throws Exceptions.YetersizBakiyeException {
+        if (this.moneyInAccount < amount) {
+            throw new Exceptions.YetersizBakiyeException("Vadeli Hesap Bakiyesi Yetersiz", this.moneyInAccount, amount);
+        }
+        this.moneyInAccount -= amount;
+        return true;
+    }
+
+    @Override
     public void transferToCurrent(float moneyAmount, String targetAccountId) throws SQLException {
         // (Senin mevcut mantığın burada kalacak)
     }

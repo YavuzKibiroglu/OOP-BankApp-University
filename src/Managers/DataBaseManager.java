@@ -76,7 +76,7 @@ public class DataBaseManager {
                 "IsPaid INTEGER)"; // 1: Ödendi, 0: Ödenmedi
 
 
-
+        CurrencyManager.start();
         try (Connection conn = DriverManager.getConnection(URL);
              Statement stmt = conn.createStatement()) {
             stmt.execute(sqlIndividualUsers);
@@ -931,7 +931,7 @@ public class DataBaseManager {
                 pstmtAccount.setString(3, vadesizIban);
                 pstmtAccount.setDouble(4, 0.0);        // Bakiye 0
                 pstmtAccount.setString(5, "CHECKING");  // Hesap Türü: Vadesiz
-                pstmtAccount.setString(6, java.time.LocalDate.now().toString());
+                pstmtAccount.setString(6, TimeManager.getCurrentDate().toString());
                 pstmtAccount.setString(7, "TL");
                 pstmtAccount.executeUpdate();
 
@@ -1073,7 +1073,7 @@ public class DataBaseManager {
             pstmt.setString(3, newIban);
             pstmt.setDouble(4, miktar);
             pstmt.setString(5, "DEPOSIT");
-            pstmt.setString(6, java.time.LocalDate.now().toString());
+            pstmt.setString(6, TimeManager.getCurrentDate().toString());
             pstmt.setString(7, "TL");
             pstmt.setInt(8, vadeGun);
             pstmt.setString(9, hesapAdi);
@@ -1700,6 +1700,148 @@ public class DataBaseManager {
             System.out.println("Şirkete Yatırma Hatası: " + e.getMessage());
         }
         return false;
+    }
+
+    // =============================================================
+    // ZAMAN SİMÜLASYONU (ADMIN KONSOLUNDAN ÇAĞRILIR)
+    // =============================================================
+    public static void processDailyOperations(int daysToAdvance) {
+        java.time.LocalDate currentDate = Managers.TimeManager.getCurrentDate();
+
+        for (int i = 0; i < daysToAdvance; i++) {
+            currentDate = currentDate.plusDays(1);
+
+            // A. Vadeli Hesap Kontrolü
+            checkDepositMaturity(currentDate);
+
+            // B. Otomatik Fatura Kesimi
+            generateAutoInvoices(currentDate);
+        }
+
+        // Tarihi kalıcı olarak kaydet
+        Managers.TimeManager.advanceDate(daysToAdvance);
+    }
+
+    // A. VADELİ HESAP FAİZ DAĞITIMI (SQLITE_BUSY HATASI GİDERİLMİŞ VERSİYON)
+    private static void checkDepositMaturity(java.time.LocalDate simulationDate) {
+        String sql = "SELECT * FROM Accounts WHERE UPPER(AccountType) IN ('DEPOSIT', 'VADELI', 'DEPOSITACCOUNT')";
+
+        // İşlem yapılacakları geçici hafızaya alıyoruz (DB Kilidini önlemek için)
+        // [0]: AccountId (Vadeli), [1]: UserId, [2]: ToplamPara (Ana+Faiz)
+        java.util.ArrayList<String[]> islemListesi = new java.util.ArrayList<>();
+
+        // ADIM 1: OKUMA (READ) - Sadece veri topluyoruz, işlem yapmıyoruz
+        try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
+             java.sql.Statement stmt = conn.createStatement();
+             java.sql.ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                String accId = rs.getString("AccountId");
+                String userId = rs.getString("BelongedUserId");
+                double anapara = rs.getDouble("Money_In_Account");
+                int vadeGun = rs.getInt("DepositDays");
+                String createDateStr = rs.getString("CreationDate");
+
+                if (createDateStr == null) continue;
+
+                java.time.LocalDate createDate = java.time.LocalDate.parse(createDateStr);
+                java.time.LocalDate vadeSonu = createDate.plusDays(vadeGun);
+
+                // Vade doldu mu?
+                if (!simulationDate.isBefore(vadeSonu)) {
+                    double netKazanc = model.DepositAccount.calculateProjectedNetProfit(anapara, vadeGun);
+                    double toplam = anapara + netKazanc;
+
+                    // Listeye ekle (Veritabanına dokunma!)
+                    islemListesi.add(new String[]{accId, userId, String.valueOf(toplam), String.valueOf(netKazanc)});
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Okuma Hatası: " + e.getMessage());
+        }
+
+        // --- BURADA VERİTABANI BAĞLANTISI KENDİLİĞİNDEN KAPANDI ---
+        // Artık yazma işlemi yapabiliriz, kilit yok.
+
+        // ADIM 2: YAZMA (WRITE) - Para yatırma ve Silme
+        if (!islemListesi.isEmpty()) {
+            for (String[] islem : islemListesi) {
+                String vadeliAccId = islem[0];
+                String userId = islem[1];
+                double toplamTutar = Double.parseDouble(islem[2]);
+                String kazancStr = islem[3]; // Log için
+
+                System.out.println(">>> 💰 VADE DOLDU! Hesap: " + vadeliAccId + " | Kazanç: " + kazancStr + " TL");
+
+                // A) Parayı Vadesiz Hesaba Aktar (UPDATE)
+                model.CheckingAccount vadesiz = getCheckingAccountObject(userId);
+                if (vadesiz != null) {
+                    try {
+                        vadesiz.addMoneyToAccount((float) toplamTutar);
+                        saveAccount(vadesiz); // Bu metot artık güvenle çalışır
+                        System.out.println("    -> ✅ " + String.format("%.2f", toplamTutar) + " TL Müşterinin (ID: " + userId + ") Vadesiz Hesabına Yatırıldı.");
+                    } catch (Exception e) {
+                        System.out.println("    -> ❌ Transfer Hatası: " + e.getMessage());
+                    }
+                }
+
+                // B) Vadeli Hesabı Sil (DELETE)
+                try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
+                     java.sql.PreparedStatement pstmt = conn.prepareStatement("DELETE FROM Accounts WHERE AccountId = ?")) {
+                    pstmt.setString(1, vadeliAccId);
+                    pstmt.executeUpdate();
+                    System.out.println("    -> 🗑️ Vadeli Hesap (ID: " + vadeliAccId + ") kapatıldı ve silindi.");
+                } catch (Exception e) {
+                    System.out.println("    -> ❌ Silme Hatası: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    // B. OTOMATİK FATURA KESİMİ (GÜVENLİ VERSİYON)
+    private static void generateAutoInvoices(java.time.LocalDate simulationDate) {
+        int bugunGun = simulationDate.getDayOfMonth();
+        String sql = "SELECT SubscriptionId, FixedAmount FROM Subscriptions WHERE BillingDay = ? AND IsActive = 1";
+
+        // Fatura kesilecekleri önce hafızaya alıyoruz
+        java.util.ArrayList<String[]> faturaListesi = new java.util.ArrayList<>();
+
+        try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, bugunGun);
+            java.sql.ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String subId = rs.getString("SubscriptionId");
+                double tutar = rs.getDouble("FixedAmount");
+                // Listeye ekle
+                faturaListesi.add(new String[]{subId, String.valueOf(tutar)});
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+
+        // Bağlantı kapandı. Şimdi listeyi dönüp faturaları kesebiliriz (Çakışma olmaz)
+        for (String[] veri : faturaListesi) {
+            String subId = veri[0];
+            double tutar = Double.parseDouble(veri[1]);
+
+            if (addInvoice(subId, tutar)) {
+                System.out.println(">>> OTOMATİK FATURA: AboneID " + subId + " için " + tutar + " TL kesildi.");
+            }
+        }
+    }
+
+    // =============================================================
+    // GENEL HESAP KAYDETME (Polimorfizm İçin)
+    // =============================================================
+    // Bu metot, CheckingAccount, DepositAccount veya ForeignCurrencyAccount fark etmeksizin
+    // gelen her türlü hesabın sadece bakiyesini günceller.
+    public static boolean saveAccount(model.Account account) {
+        if (account == null) return false;
+
+        // Hesabın ID'sini ve güncel parasını alıp updateBalance'a yolluyoruz.
+        // updateBalance metodu zaten Accounts tablosunda ID'ye göre güncelleme yapıyor.
+        return updateBalance(account.getAccountId(), account.getMoneyInAccount());
     }
 
 }

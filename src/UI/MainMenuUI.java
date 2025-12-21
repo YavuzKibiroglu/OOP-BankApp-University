@@ -6,10 +6,23 @@ public class MainMenuUI extends javax.swing.JFrame {
 
     public MainMenuUI() {
         initComponents();
-        GeriDonBtn.setVisible(false);
-        bilesenBoyutlariniSabitle();
-    }
 
+        GeriDonBtn.setVisible(false);
+        // 1. Açılışta Tarihi Yaz
+        tarihiGuncelle();
+
+        // 2. OTOMATİK GÜNCELLEME (Timer)
+        // Her 1 saniyede bir tarihi kontrol eder, konsoldan değiştiyse günceller.
+        javax.swing.Timer timer = new javax.swing.Timer(1000, new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                tarihiGuncelle();
+            }
+        });
+        timer.start();
+        bilesenBoyutlariniSabitle();
+
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
@@ -67,6 +80,7 @@ public class MainMenuUI extends javax.swing.JFrame {
         BankaAdiLabel.setText("DİNO BANK");
 
         AdminControlsBtn.setText("AdminControls");
+        AdminControlsBtn.addActionListener(this::AdminControlsBtnActionPerformed);
 
         TarihveSaatLabel.setText("Tarih ve Saat");
 
@@ -347,7 +361,7 @@ public class MainMenuUI extends javax.swing.JFrame {
 
         PanelContainer.add(KurumsalKayitPanel, "cardKurumsalKayitPanel");
 
-        GeriDonBtn.setBackground(new java.awt.Color(0, 153, 102));
+        GeriDonBtn.setBackground(new java.awt.Color(0, 102, 204));
         GeriDonBtn.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         GeriDonBtn.setText("<");
         GeriDonBtn.addActionListener(this::GeriDonBtnActionPerformed);
@@ -357,20 +371,21 @@ public class MainMenuUI extends javax.swing.JFrame {
         MainPanelLayout.setHorizontalGroup(
                 MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(UstPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(PanelContainer, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(PanelContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(MainPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(GeriDonBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(42, 42, 42)
+                                .addComponent(GeriDonBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         MainPanelLayout.setVerticalGroup(
                 MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(MainPanelLayout.createSequentialGroup()
                                 .addComponent(UstPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(GeriDonBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 37, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(PanelContainer, javax.swing.GroupLayout.PREFERRED_SIZE, 444, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(GeriDonBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(PanelContainer, javax.swing.GroupLayout.PREFERRED_SIZE, 444, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -590,6 +605,21 @@ public class MainMenuUI extends javax.swing.JFrame {
         sayfaDegistir("cardFirstPanel");
     }
 
+    private void AdminControlsBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        // Kullanıcıya bilgi ver
+        javax.swing.JOptionPane.showMessageDialog(this,
+                "Admin Paneli Konsolda (Output Ekranında) başlatıldı.\n" +
+                        "Lütfen IDE'nizin altındaki Output/Terminal penceresini kullanın.");
+
+        // Konsol işlemini yeni bir Thread içinde başlatıyoruz
+        // Böylece UI donmuyor.
+        new Thread(() -> {
+            UI.AdminConsole.startConsole();
+        }).start();
+    }
+
+
+
     //======EVENTLER-SON=========
 
     /**
@@ -632,6 +662,15 @@ public class MainMenuUI extends javax.swing.JFrame {
             // Diğer tüm sayfalarda butonu GÖSTER
             GeriDonBtn.setVisible(true);
         }
+    }
+
+    // --- TARİH GÖSTERME METODU ---
+    private void tarihiGuncelle() {
+        // TimeManager'dan tarihi çek
+        java.time.LocalDate bugun = Managers.TimeManager.getCurrentDate();
+
+        // Label'a yazdır (Değişken adın DateLabel değilse burayı düzelt!)
+        TarihveSaatLabel.setText(bugun.toString());
     }
 
     // Variables declaration - do not modify

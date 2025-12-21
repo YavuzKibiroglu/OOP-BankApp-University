@@ -1,7 +1,6 @@
 package UI;
 
-import javax.swing.table.DefaultTableModel;
-import java.util.ArrayList;
+import Exceptions.HesapBulunamadiException;
 
 public class BireyselKullaniciUI extends javax.swing.JFrame {
 
@@ -1664,38 +1663,55 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         String aliciIban = GonderilecekIBANTextF.getText().trim();
         String miktarStr = GonderilecekMiktarTextF.getText().trim();
 
-        if(aliciIban.isEmpty() || miktarStr.isEmpty()) return;
+        if(aliciIban.isEmpty() || miktarStr.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Lütfen tüm alanları doldurun.");
+            return;
+        }
 
         try {
             double miktar = Double.parseDouble(miktarStr);
 
-            // 1. Kaynak Hesabı Getir (Bizim hesap)
+            // 1. Kaynak Hesabı (Kendi Hesabını) Getir
             model.CheckingAccount sourceAccount = Managers.DataBaseManager.getCheckingAccountObject(aktifKullanici.getUserId());
 
-            // 2. Hedef Hesabı Bul (IBAN'dan)
-            // (Bu noktada helper olarak Manager'dan ID veya Account bulmak zorundayız, bu normal)
+            // 2. Hedef Hesabı (Karşı Tarafı) IBAN ile Bul
             String targetAccountId = Managers.DataBaseManager.getAccountIdByIBAN(aliciIban);
+
+            if (targetAccountId == null) {
+                // Eğer veritabanından NULL dönerse, demek ki böyle bir hesap yok.
+                // Manuel olarak hatayı fırlatıyoruz:
+                throw new Exceptions.HesapBulunamadiException("Girilen IBAN (" + aliciIban + ") sistemde bulunamadı!");
+            }
+
+            // Hesap varsa nesneyi çek
             model.Account targetAccount = Managers.DataBaseManager.getAccountById(targetAccountId);
 
-            if (sourceAccount != null && targetAccount != null) {
-
-                // 3. İŞLEMİ NESNEYE YAPTIR (Manager'a değil!)
-                // "Benim hesabımdan, şu hesaba, şu kadar yolla"
+            if (sourceAccount != null) {
+                // Transferi Yap (Bu da YetersizBakiyeException fırlatabilir)
                 boolean sonuc = sourceAccount.transferTo(targetAccount, miktar);
 
                 if (sonuc) {
-                    javax.swing.JOptionPane.showMessageDialog(this, "Transfer Başarılı (OOP)!");
+                    javax.swing.JOptionPane.showMessageDialog(this, "Transfer Başarılı!");
                     hesaplariGuncelle();
                     anaSayfaGuncelle();
-                } else {
-                    javax.swing.JOptionPane.showMessageDialog(this, "Transfer Başarısız! (Bakiye yetersiz olabilir)");
+                    varliklariGuncelle();
                 }
-            } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Hesap bulunamadı.");
             }
 
+            // --- HATALARI YAKALADIĞIMIZ YER (CATCH BLOKLARI) ---
+
+        } catch (Exceptions.HesapBulunamadiException e) {
+            // Yanlış IBAN girilince burası çalışır
+            javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Hesap Bulunamadı", javax.swing.JOptionPane.ERROR_MESSAGE);
+
+        } catch (Exceptions.YetersizBakiyeException e) {
+            // Para yetmezse burası çalışır
+            javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Yetersiz Bakiye", javax.swing.JOptionPane.WARNING_MESSAGE);
+
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Lütfen geçerli bir tutar giriniz.");
         } catch (Exception e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Hata: " + e.getMessage());
+            javax.swing.JOptionPane.showMessageDialog(this, "Beklenmedik Hata: " + e.getMessage());
         }
     }
 
@@ -2142,16 +2158,16 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     // --- A. DÖVİZ KURLARINI EKRANA BASMA ---
     private void dovizKurlariniEkranaYaz() {
         // Dolar
-        IslDovizDolarAlısKur.setText(String.valueOf(Managers.CurrencyManager.USD_BUY));
-        IslDovizDolarSatısKur.setText(String.valueOf(Managers.CurrencyManager.USD_SELL));
+        IslDovizDolarAlısKur.setText(String.valueOf(Managers.CurrencyManager.getUsdBuy()));
+        IslDovizDolarSatısKur.setText(String.valueOf(Managers.CurrencyManager.getUsdSell()));
 
         // Euro
-        IslDovizEuroAlısKur.setText(String.valueOf(Managers.CurrencyManager.EUR_BUY));
-        IslDovizEuroSatısKur.setText(String.valueOf(Managers.CurrencyManager.EUR_SELL));
+        IslDovizEuroAlısKur.setText(String.valueOf(Managers.CurrencyManager.getEurBuy()));
+        IslDovizEuroSatısKur.setText(String.valueOf(Managers.CurrencyManager.getEurSell()));
 
         // Altın
-        IslDovizAltinAlısKur.setText(String.valueOf(Managers.CurrencyManager.ALTIN_BUY));
-        IslDovizAltinSatisKur.setText(String.valueOf(Managers.CurrencyManager.ALTIN_SELL));
+        IslDovizAltinAlısKur.setText(String.valueOf(Managers.CurrencyManager.getGauBuy()));
+        IslDovizAltinSatisKur.setText(String.valueOf(Managers.CurrencyManager.getGauSell()));
     }
 
     // --- E. DÖVİZ İŞLEMLERİ (ORTAK METOT) ---
@@ -2299,14 +2315,14 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
 
     // --- B. GÜNCEL KURLARI GÜNCELLE ---
     private void guncelKurlariGuncelle() {
-        GuncelKurDolarAlısLabel.setText("Dolar Alış: " + Managers.CurrencyManager.USD_BUY);
-        GuncelKurDolarSatısLabel.setText("Dolar Satış: " + Managers.CurrencyManager.USD_SELL);
+        GuncelKurDolarAlısLabel.setText("Dolar Alış: " + Managers.CurrencyManager.getUsdBuy());
+        GuncelKurDolarSatısLabel.setText("Dolar Satış: " + Managers.CurrencyManager.getUsdSell());
 
-        GuncelKurEuroAlısLabel.setText("Euro Alış: " + Managers.CurrencyManager.EUR_BUY);
-        GuncelKurEuroSatisLabel.setText("Euro Satış: " + Managers.CurrencyManager.EUR_SELL);
+        GuncelKurEuroAlısLabel.setText("Euro Alış: " + Managers.CurrencyManager.getEurBuy());
+        GuncelKurEuroSatisLabel.setText("Euro Satış: " + Managers.CurrencyManager.getEurSell());
 
-        GuncelKurAltinAlısLabel.setText("Altın Alış: " + Managers.CurrencyManager.ALTIN_BUY);
-        GuncelKurAltinSatisLabel.setText("Altın Satış: " + Managers.CurrencyManager.ALTIN_SELL);
+        GuncelKurAltinAlısLabel.setText("Altın Alış: " + Managers.CurrencyManager.getGauBuy());
+        GuncelKurAltinSatisLabel.setText("Altın Satış: " + Managers.CurrencyManager.getGauSell());
     }
 
     // --- C. İŞLEMLER SAYFASINDAKİ VADELİ HESAP BİLGİSİ ---

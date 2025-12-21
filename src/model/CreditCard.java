@@ -1,6 +1,6 @@
 package model;
 
-import Managers.DataBaseManager;
+import Exceptions.YetersizBakiyeException;
 
 public class CreditCard extends Card {
 
@@ -38,20 +38,24 @@ public class CreditCard extends Card {
     // --- 2. BORÇ ÖDE (DÜZELTİLDİ: Try-Catch Yapısı) ---
     public boolean payDebt(CheckingAccount sourceAccount, float amount) {
         if (amount <= 0) return false;
-
-        // KURAL: Borçtan fazla ödeme yapılamaz
         if (amount > currentDebt) return false;
 
         try {
-            // Hesaptan parayı çekmeyi dene (Hata verirse catch'e düşer)
-            sourceAccount.withdraw(amount);
+            // Hesaptan parayı çekmeyi dene
+            sourceAccount.withdraw(amount); // <-- HATA FIRLATABİLİR
 
             // Para çekildiyse borcu düş
             this.currentDebt -= amount;
+
+            // Veritabanı güncellemeleri
+            Managers.DataBaseManager.updateCardDebt(this.cardNumber, this.currentDebt);
+            Managers.DataBaseManager.updateBalance(sourceAccount.getAccountId(), sourceAccount.getMoneyInAccount());
+
             return true;
 
-        } catch (Exception e) {
-            return false; // Bakiye yetersiz
+        } catch (Exceptions.YetersizBakiyeException e) {
+            // Bakiye yetmezse işlem iptal
+            return false;
         }
     }
 }

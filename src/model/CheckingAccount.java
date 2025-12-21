@@ -2,6 +2,7 @@ package model;
 
 import Managers.DataBaseManager;
 import java.sql.SQLException;
+import Exceptions.YetersizBakiyeException;
 
 public class CheckingAccount extends Account {
 
@@ -27,15 +28,20 @@ public class CheckingAccount extends Account {
 
     // Para Çekme (Sadece RAM'de işlem yapar, kuralı kontrol eder)
     // BankService bunu çağırır ve sonra saveAccount yapar.
-    public boolean withdraw(double amount) {
+    @Override
+    public boolean withdraw(double amount) throws Exceptions.YetersizBakiyeException {
         if (amount <= 0) {
             throw new IllegalArgumentException("Çekilecek tutar 0'dan büyük olmalı.");
         }
+
+        // Bakiye Kontrolü
         if (this.moneyInAccount < amount) {
-            throw new IllegalStateException("Yetersiz Bakiye!"); // Service bunu yakalar
+            // Hata Fırlatılıyor
+            throw new Exceptions.YetersizBakiyeException("Yetersiz Vadesiz Hesap Bakiyesi!", this.moneyInAccount, amount);
         }
+
         this.moneyInAccount -= amount;
-        return false;
+        return true;
     }
 
     // Para Yatırma (Sadece RAM'de işlem yapar)
@@ -76,22 +82,36 @@ public class CheckingAccount extends Account {
     }
 
     // Transfer İşlemi (UI tarafında kullanılıyor)
-    public boolean transferTo(Account targetAccount, double amount) {
+    public boolean transferTo(Account targetAccount, double amount) throws Exceptions.YetersizBakiyeException {
         if (targetAccount == null || amount <= 0) return false;
 
-        try {
-            // 1. Kendinden düş
-            this.withdraw(amount);
-            DataBaseManager.updateBalance(this.accountId, this.moneyInAccount); // Kaydet
+        // BURASI ARTIK HATA FIRLATABİLİR (withdraw metodundan dolayı)
+        // Biz burada try-catch kullanmıyoruz, çünkü hatayı UI (Ekran) yakalasın istiyoruz.
 
-            // 2. Hedefe ekle
-            if (targetAccount instanceof CheckingAccount) {
-                ((CheckingAccount) targetAccount).addMoneyToAccount((float)amount);
-                return true;
-            }
-        } catch (Exception e) {
-            return false;
+        // 1. Kendinden düş (withdraw metodu YetersizBakiye hatası fırlatırsa işlem durur ve UI'a gider)
+        this.withdraw(amount);
+
+        // Para düştüyse veritabanını güncelle
+        Managers.DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
+
+        // 2. Hedefe ekle
+        if (targetAccount instanceof CheckingAccount) {
+            ((CheckingAccount) targetAccount).addMoneyToAccount((float)amount);
+            // Hedef hesap DB kaydı addMoneyToAccount içinde yapılıyor olabilir,
+            // yapılmıyorsa buraya Managers.DataBaseManager.saveAccount(targetAccount); eklenebilir.
+            return true;
+        } else if (targetAccount instanceof DepositAccount) {
+            // Vadeli hesaba dışarıdan para girişi genellikle olmaz ama senaryona göre ekleyebilirsin
+            targetAccount.deposit(amount);
+            Managers.DataBaseManager.saveAccount(targetAccount);
+            return true;
+        } else if (targetAccount instanceof ForeignCurrencyAccount) {
+            // Dövize TL atılmaz, burası ayrı mantık gerektirir ama şimdilik bakiye ekle geç
+            targetAccount.deposit(amount);
+            Managers.DataBaseManager.saveAccount(targetAccount);
+            return true;
         }
+
         return false;
     }
 
