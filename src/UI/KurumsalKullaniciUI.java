@@ -12,19 +12,15 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
         this.aktifSirket = sirket;
         initComponents();
 
-        // Başlangıç Ayarları
-        panelAdiLabel.setText("KURUMSAL ANA SAYFA");
+        AnaSayfaBtn.setIcon(UI.IconHelper.createIcon("/resources/home.png", 32, 32));
+        AboneYonetimiBtn.setIcon(UI.IconHelper.createIcon("/resources/subscription.png", 32, 32));
+        FaturaYonetimiBtn.setIcon(UI.IconHelper.createIcon("/resources/bill.png", 32, 32));
 
         // Verileri Yükle
         sirketBilgileriniGoster();
         anaSayfaGuncelle();
         aboneListesiniDoldur(); // Tabloyu Doldur
         faturaAboneListesiniDoldur(); // Fatura tablosunu doldur
-    }
-
-    // Test İçin Boş Constructor (Opsiyonel)
-    public KurumsalKullaniciUI() {
-        initComponents();
     }
 
     @SuppressWarnings("unchecked")
@@ -40,17 +36,24 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
         YeniAboneAylıkOdemeTutarTextF = new javax.swing.JTextField();
         YeniAboneOlusturBtn = new javax.swing.JButton();
         lbl2 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
         FaturaOlusturmaFrame = new javax.swing.JFrame();
         FaturaOlusturmaPanel = new javax.swing.JPanel();
         FaturaOlusturalacakKisiAdSoyadLabel = new javax.swing.JLabel();
         FaturaTutariTextF = new javax.swing.JTextField();
         FaturaSonTarihFTextF = new javax.swing.JFormattedTextField();
         FaturaOlusturBtn = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
         MainPanel = new javax.swing.JPanel();
         UstPanel = new javax.swing.JPanel();
         lbl1 = new javax.swing.JLabel();
         KurumAdiLabel = new javax.swing.JLabel();
-        panelAdiLabel = new javax.swing.JLabel();
         KurumKodLabel = new javax.swing.JLabel();
         YonlendirmePanel = new javax.swing.JPanel();
         AnaSayfaBtn = new javax.swing.JButton();
@@ -61,6 +64,9 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
         AnaSayfaKurumBakiyesiLabel = new javax.swing.JLabel();
         AnaSayfaKurumBeklenenTahsilatLabel = new javax.swing.JLabel();
         AnaSayfaKurumAboneSayisiLabel = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
         AboneYonetimiPanel = new javax.swing.JPanel();
         AboneListesiTableScrollPane = new javax.swing.JScrollPane();
         AboneListesiTable = new javax.swing.JTable();
@@ -70,34 +76,61 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
         FaturaAboneTableScrollPane = new javax.swing.JScrollPane();
         FaturaAboneTable = new javax.swing.JTable();
 
-        YeniAboneSoyadTextF.setText("jTextField2");
+        YeniAboneAdTextF.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
 
-        YeniAboneTCTextF.setText("jTextField3");
+        YeniAboneSoyadTextF.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
 
-        YeniAboneFaturaGünüTextF.setText("jTextField4");
+        YeniAboneTCTextF.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
 
-        YeniAboneAylıkOdemeTutarTextF.setText("jTextField5");
+        YeniAboneFaturaGünüTextF.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
 
-        YeniAboneOlusturBtn.setText("jButton3");
+        YeniAboneAylıkOdemeTutarTextF.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+
+        YeniAboneOlusturBtn.setBackground(new java.awt.Color(0, 102, 153));
+        YeniAboneOlusturBtn.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        YeniAboneOlusturBtn.setText("Abone Oluştur");
         YeniAboneOlusturBtn.addActionListener(this::YeniAboneOlusturBtnActionPerformed);
 
+        lbl2.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         lbl2.setText("Yeni Abone Oluşturucu");
+
+        jLabel1.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel1.setText("Ad");
+
+        jLabel2.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel2.setText("Soyad");
+
+        jLabel3.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel3.setText("TC");
+
+        jLabel4.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel4.setText("Fatura Günü");
+
+        jLabel5.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel5.setText("Aylık Ödeme Tutarı");
 
         javax.swing.GroupLayout YeniAbonePanelLayout = new javax.swing.GroupLayout(YeniAbonePanel);
         YeniAbonePanel.setLayout(YeniAbonePanelLayout);
         YeniAbonePanelLayout.setHorizontalGroup(
                 YeniAbonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(YeniAbonePanelLayout.createSequentialGroup()
-                                .addGap(151, 151, 151)
+                                .addGap(23, 23, 23)
+                                .addGroup(YeniAbonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel1)
+                                        .addComponent(jLabel2)
+                                        .addComponent(jLabel4)
+                                        .addComponent(jLabel5)
+                                        .addComponent(jLabel3))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(YeniAbonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                                         .addComponent(YeniAboneAdTextF)
-                                        .addComponent(YeniAboneOlusturBtn)
                                         .addComponent(YeniAboneSoyadTextF)
                                         .addComponent(YeniAboneTCTextF)
                                         .addComponent(YeniAboneFaturaGünüTextF)
                                         .addComponent(YeniAboneAylıkOdemeTutarTextF)
-                                        .addComponent(lbl2))
-                                .addGap(170, 170, 170))
+                                        .addComponent(lbl2)
+                                        .addComponent(YeniAboneOlusturBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(148, 148, 148))
         );
         YeniAbonePanelLayout.setVerticalGroup(
                 YeniAbonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -105,18 +138,28 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
                                 .addContainerGap()
                                 .addComponent(lbl2)
                                 .addGap(27, 27, 27)
-                                .addComponent(YeniAboneAdTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(YeniAbonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(YeniAboneAdTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel1))
                                 .addGap(18, 18, 18)
-                                .addComponent(YeniAboneSoyadTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(YeniAbonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(YeniAboneSoyadTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel2))
                                 .addGap(18, 18, 18)
-                                .addComponent(YeniAboneTCTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(YeniAbonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(YeniAboneTCTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel3))
                                 .addGap(18, 18, 18)
-                                .addComponent(YeniAboneFaturaGünüTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(YeniAbonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(YeniAboneFaturaGünüTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel4))
                                 .addGap(18, 18, 18)
-                                .addComponent(YeniAboneAylıkOdemeTutarTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(59, 59, 59)
-                                .addComponent(YeniAboneOlusturBtn)
-                                .addContainerGap(163, Short.MAX_VALUE))
+                                .addGroup(YeniAbonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(YeniAboneAylıkOdemeTutarTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel5))
+                                .addGap(39, 39, 39)
+                                .addComponent(YeniAboneOlusturBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(54, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout YeniAboneFrameLayout = new javax.swing.GroupLayout(YeniAboneFrame.getContentPane());
@@ -127,12 +170,15 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
         );
         YeniAboneFrameLayout.setVerticalGroup(
                 YeniAboneFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(YeniAbonePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(YeniAboneFrameLayout.createSequentialGroup()
+                                .addComponent(YeniAbonePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 25, Short.MAX_VALUE))
         );
 
+        FaturaOlusturalacakKisiAdSoyadLabel.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         FaturaOlusturalacakKisiAdSoyadLabel.setText("FaturaOlusturalacakKisiAdSoyad");
 
-        FaturaTutariTextF.setText("jTextField1");
+        FaturaTutariTextF.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
 
         try {
             FaturaSonTarihFTextF.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##/##/####")));
@@ -140,45 +186,68 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
             ex.printStackTrace();
         }
 
-        FaturaOlusturBtn.setText("jButton1");
+        FaturaOlusturBtn.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        FaturaOlusturBtn.setText("Fatura Oluştur");
         FaturaOlusturBtn.addActionListener(this::FaturaOlusturBtnActionPerformed);
+
+        jLabel6.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel6.setText("Ad Soyad:");
+
+        jLabel7.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel7.setText("Fatura Tutarı:");
+
+        jLabel8.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel8.setText("Son Ödeme Tarihi:");
 
         javax.swing.GroupLayout FaturaOlusturmaPanelLayout = new javax.swing.GroupLayout(FaturaOlusturmaPanel);
         FaturaOlusturmaPanel.setLayout(FaturaOlusturmaPanelLayout);
         FaturaOlusturmaPanelLayout.setHorizontalGroup(
                 FaturaOlusturmaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(FaturaOlusturmaPanelLayout.createSequentialGroup()
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, FaturaOlusturmaPanelLayout.createSequentialGroup()
+                                .addContainerGap(51, Short.MAX_VALUE)
                                 .addGroup(FaturaOlusturmaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(FaturaOlusturmaPanelLayout.createSequentialGroup()
-                                                .addGap(49, 49, 49)
+                                                .addComponent(jLabel6)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(FaturaOlusturalacakKisiAdSoyadLabel))
                                         .addGroup(FaturaOlusturmaPanelLayout.createSequentialGroup()
-                                                .addGap(76, 76, 76)
-                                                .addGroup(FaturaOlusturmaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(FaturaSonTarihFTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(FaturaTutariTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(FaturaOlusturBtn))))
-                                .addContainerGap(225, Short.MAX_VALUE))
+                                                .addGroup(FaturaOlusturmaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(jLabel7)
+                                                        .addComponent(jLabel8))
+                                                .addGap(25, 25, 25)
+                                                .addGroup(FaturaOlusturmaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(FaturaTutariTextF)
+                                                        .addComponent(FaturaSonTarihFTextF, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addGroup(FaturaOlusturmaPanelLayout.createSequentialGroup()
+                                                .addGap(62, 62, 62)
+                                                .addComponent(FaturaOlusturBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(29, 29, 29))
         );
         FaturaOlusturmaPanelLayout.setVerticalGroup(
                 FaturaOlusturmaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(FaturaOlusturmaPanelLayout.createSequentialGroup()
                                 .addGap(46, 46, 46)
-                                .addComponent(FaturaOlusturalacakKisiAdSoyadLabel)
-                                .addGap(43, 43, 43)
-                                .addComponent(FaturaTutariTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(FaturaOlusturmaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(FaturaOlusturalacakKisiAdSoyadLabel)
+                                        .addComponent(jLabel6))
+                                .addGap(31, 31, 31)
+                                .addGroup(FaturaOlusturmaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(FaturaTutariTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel7))
                                 .addGap(18, 18, 18)
-                                .addComponent(FaturaSonTarihFTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(44, 44, 44)
-                                .addComponent(FaturaOlusturBtn)
-                                .addContainerGap(254, Short.MAX_VALUE))
+                                .addGroup(FaturaOlusturmaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(FaturaSonTarihFTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel8))
+                                .addGap(31, 31, 31)
+                                .addComponent(FaturaOlusturBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(61, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout FaturaOlusturmaFrameLayout = new javax.swing.GroupLayout(FaturaOlusturmaFrame.getContentPane());
         FaturaOlusturmaFrame.getContentPane().setLayout(FaturaOlusturmaFrameLayout);
         FaturaOlusturmaFrameLayout.setHorizontalGroup(
                 FaturaOlusturmaFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(FaturaOlusturmaPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(FaturaOlusturmaPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         FaturaOlusturmaFrameLayout.setVerticalGroup(
                 FaturaOlusturmaFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -189,12 +258,13 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
 
         UstPanel.setBackground(new java.awt.Color(0, 102, 255));
 
+        lbl1.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
         lbl1.setText("DİNO BANK");
 
+        KurumAdiLabel.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
         KurumAdiLabel.setText("KurumAdı");
 
-        panelAdiLabel.setText("panelAdi");
-
+        KurumKodLabel.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
         KurumKodLabel.setText("KurumKod");
 
         javax.swing.GroupLayout UstPanelLayout = new javax.swing.GroupLayout(UstPanel);
@@ -204,37 +274,28 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
                         .addGroup(UstPanelLayout.createSequentialGroup()
                                 .addGap(25, 25, 25)
                                 .addComponent(KurumAdiLabel)
-                                .addGap(395, 395, 395)
-                                .addGroup(UstPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                                        .addComponent(panelAdiLabel)
-                                        .addComponent(lbl1))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lbl1)
+                                .addGap(318, 318, 318)
                                 .addComponent(KurumKodLabel)
                                 .addGap(76, 76, 76))
         );
         UstPanelLayout.setVerticalGroup(
                 UstPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, UstPanelLayout.createSequentialGroup()
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(lbl1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(panelAdiLabel)
-                                .addGap(16, 16, 16))
                         .addGroup(UstPanelLayout.createSequentialGroup()
-                                .addGap(18, 18, 18)
+                                .addGap(15, 15, 15)
                                 .addGroup(UstPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(KurumAdiLabel)
-                                        .addComponent(KurumKodLabel))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGroup(UstPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(KurumKodLabel)
+                                                .addComponent(lbl1)))
+                                .addContainerGap(33, Short.MAX_VALUE))
         );
 
-        AnaSayfaBtn.setText("jButton1");
         AnaSayfaBtn.addActionListener(this::AnaSayfaBtnActionPerformed);
 
-        AboneYonetimiBtn.setText("jButton2");
         AboneYonetimiBtn.addActionListener(this::AboneYonetimiBtnActionPerformed);
 
-        FaturaYonetimiBtn.setText("jButton2");
         FaturaYonetimiBtn.addActionListener(this::FaturaYonetimiBtnActionPerformed);
 
         javax.swing.GroupLayout YonlendirmePanelLayout = new javax.swing.GroupLayout(YonlendirmePanel);
@@ -263,38 +324,67 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
 
         PanelContainer.setLayout(new java.awt.CardLayout());
 
+        AnaSayfaKurumBakiyesiLabel.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
         AnaSayfaKurumBakiyesiLabel.setText("mevcutbakiye");
 
+        AnaSayfaKurumBeklenenTahsilatLabel.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
         AnaSayfaKurumBeklenenTahsilatLabel.setText("beklenentahsilat");
 
+        AnaSayfaKurumAboneSayisiLabel.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
         AnaSayfaKurumAboneSayisiLabel.setText("abonesayısı");
+
+        jLabel9.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
+        jLabel9.setText("Mevcut Bakiye:");
+
+        jLabel10.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
+        jLabel10.setText("Aylık Beklenen Minimum Tahsilat:");
+
+        jLabel11.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
+        jLabel11.setText("Abone Sayısı:");
 
         javax.swing.GroupLayout AnaSayfaPanelLayout = new javax.swing.GroupLayout(AnaSayfaPanel);
         AnaSayfaPanel.setLayout(AnaSayfaPanelLayout);
         AnaSayfaPanelLayout.setHorizontalGroup(
                 AnaSayfaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(AnaSayfaPanelLayout.createSequentialGroup()
-                                .addGap(78, 78, 78)
+                                .addGap(184, 184, 184)
                                 .addGroup(AnaSayfaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(AnaSayfaKurumBakiyesiLabel)
-                                        .addComponent(AnaSayfaKurumBeklenenTahsilatLabel)
-                                        .addComponent(AnaSayfaKurumAboneSayisiLabel))
-                                .addContainerGap(836, Short.MAX_VALUE))
+                                        .addGroup(AnaSayfaPanelLayout.createSequentialGroup()
+                                                .addGap(193, 193, 193)
+                                                .addComponent(jLabel9)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(AnaSayfaKurumBakiyesiLabel))
+                                        .addGroup(AnaSayfaPanelLayout.createSequentialGroup()
+                                                .addGroup(AnaSayfaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(jLabel10)
+                                                        .addComponent(jLabel11))
+                                                .addGap(18, 18, 18)
+                                                .addGroup(AnaSayfaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(AnaSayfaKurumAboneSayisiLabel)
+                                                        .addComponent(AnaSayfaKurumBeklenenTahsilatLabel))))
+                                .addContainerGap(296, Short.MAX_VALUE))
         );
         AnaSayfaPanelLayout.setVerticalGroup(
                 AnaSayfaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(AnaSayfaPanelLayout.createSequentialGroup()
-                                .addGap(65, 65, 65)
-                                .addComponent(AnaSayfaKurumBakiyesiLabel)
-                                .addGap(65, 65, 65)
-                                .addComponent(AnaSayfaKurumBeklenenTahsilatLabel)
-                                .addGap(65, 65, 65)
-                                .addComponent(AnaSayfaKurumAboneSayisiLabel)
-                                .addContainerGap(233, Short.MAX_VALUE))
+                                .addGap(76, 76, 76)
+                                .addGroup(AnaSayfaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(AnaSayfaKurumBakiyesiLabel)
+                                        .addComponent(jLabel9))
+                                .addGap(58, 58, 58)
+                                .addGroup(AnaSayfaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(AnaSayfaKurumBeklenenTahsilatLabel)
+                                        .addComponent(jLabel10))
+                                .addGap(57, 57, 57)
+                                .addGroup(AnaSayfaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(AnaSayfaKurumAboneSayisiLabel)
+                                        .addComponent(jLabel11))
+                                .addContainerGap(195, Short.MAX_VALUE))
         );
 
         PanelContainer.add(AnaSayfaPanel, "cardAnaSayfaPanel");
 
+        AboneListesiTable.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
         AboneListesiTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object [][] {
                         {null, null, null, null},
@@ -308,7 +398,9 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
         ));
         AboneListesiTableScrollPane.setViewportView(AboneListesiTable);
 
-        AboneYonetimiYeniAboneBtn.setText("yeniabonekayıt");
+        AboneYonetimiYeniAboneBtn.setBackground(new java.awt.Color(0, 102, 153));
+        AboneYonetimiYeniAboneBtn.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        AboneYonetimiYeniAboneBtn.setText("Yeni Abone Kayıt");
         AboneYonetimiYeniAboneBtn.addActionListener(this::AboneYonetimiYeniAboneBtnActionPerformed);
 
         javax.swing.GroupLayout AboneYonetimiPanelLayout = new javax.swing.GroupLayout(AboneYonetimiPanel);
@@ -316,27 +408,30 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
         AboneYonetimiPanelLayout.setHorizontalGroup(
                 AboneYonetimiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(AboneYonetimiPanelLayout.createSequentialGroup()
-                                .addGap(122, 122, 122)
-                                .addComponent(AboneYonetimiYeniAboneBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(AboneYonetimiPanelLayout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(AboneListesiTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 994, Short.MAX_VALUE))
+                        .addGroup(AboneYonetimiPanelLayout.createSequentialGroup()
+                                .addGap(386, 386, 386)
+                                .addComponent(AboneYonetimiYeniAboneBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
         );
         AboneYonetimiPanelLayout.setVerticalGroup(
                 AboneYonetimiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, AboneYonetimiPanelLayout.createSequentialGroup()
-                                .addComponent(AboneListesiTableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(AboneYonetimiYeniAboneBtn)
-                                .addGap(14, 14, 14))
+                                .addComponent(AboneListesiTableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 385, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(AboneYonetimiYeniAboneBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE)
+                                .addGap(20, 20, 20))
         );
 
         PanelContainer.add(AboneYonetimiPanel, "cardAboneYonetimiPanel");
 
-        FaturaOlusturmaBtn.setText("faturaoluşturma");
+        FaturaOlusturmaBtn.setBackground(new java.awt.Color(0, 102, 153));
+        FaturaOlusturmaBtn.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        FaturaOlusturmaBtn.setText("Fatura Oluştur");
         FaturaOlusturmaBtn.addActionListener(this::FaturaOlusturmaBtnActionPerformed);
 
+        FaturaAboneTable.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
         FaturaAboneTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object [][] {
                         {null, null, null, null},
@@ -355,19 +450,22 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
         FaturaYonetimiPanelLayout.setHorizontalGroup(
                 FaturaYonetimiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(FaturaYonetimiPanelLayout.createSequentialGroup()
-                                .addGap(39, 39, 39)
-                                .addComponent(FaturaOlusturmaBtn)
-                                .addGap(18, 18, 18)
-                                .addComponent(FaturaAboneTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 818, Short.MAX_VALUE)
+                                .addGap(14, 14, 14)
+                                .addComponent(FaturaOlusturmaBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(29, 29, 29)
+                                .addComponent(FaturaAboneTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 828, Short.MAX_VALUE)
                                 .addContainerGap())
         );
         FaturaYonetimiPanelLayout.setVerticalGroup(
                 FaturaYonetimiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(FaturaYonetimiPanelLayout.createSequentialGroup()
-                                .addGap(24, 24, 24)
-                                .addGroup(FaturaYonetimiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(FaturaOlusturmaBtn)
-                                        .addComponent(FaturaAboneTableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(FaturaYonetimiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(FaturaYonetimiPanelLayout.createSequentialGroup()
+                                                .addGap(24, 24, 24)
+                                                .addComponent(FaturaAboneTableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(FaturaYonetimiPanelLayout.createSequentialGroup()
+                                                .addGap(395, 395, 395)
+                                                .addComponent(FaturaOlusturmaBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addContainerGap(21, Short.MAX_VALUE))
         );
 
@@ -529,7 +627,7 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new KurumsalKullaniciUI().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new KurumsalKullaniciUI(null).setVisible(true));
     }
 
     //=======Kendi özel fonksiyonlarım=========
@@ -637,8 +735,18 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
     private javax.swing.JTextField YeniAboneSoyadTextF;
     private javax.swing.JTextField YeniAboneTCTextF;
     private javax.swing.JPanel YonlendirmePanel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel lbl1;
     private javax.swing.JLabel lbl2;
-    private javax.swing.JLabel panelAdiLabel;
     // End of variables declaration
 }

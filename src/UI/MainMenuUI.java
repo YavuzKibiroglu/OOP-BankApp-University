@@ -7,6 +7,10 @@ public class MainMenuUI extends javax.swing.JFrame {
     public MainMenuUI() {
         initComponents();
 
+        GeriDonBtn.setIcon(UI.IconHelper.createIcon("/resources/back.png", 32, 32));
+        GeriDonBtn.setContentAreaFilled(false); // Arka plan rengini kapat
+        GeriDonBtn.setBorderPainted(false);     // Çerçeve çizgisini kapat
+        GeriDonBtn.setFocusPainted(false);      // Tıklanınca çıkan odak çizgisini kapat
         GeriDonBtn.setVisible(false);
         // 1. Açılışta Tarihi Yaz
         tarihiGuncelle();
@@ -21,8 +25,9 @@ public class MainMenuUI extends javax.swing.JFrame {
         });
         timer.start();
         bilesenBoyutlariniSabitle();
-
+        sifreGosterGizleAyarlari();
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
@@ -49,11 +54,15 @@ public class MainMenuUI extends javax.swing.JFrame {
         BireyselTypeGirisTextF = new javax.swing.JTextField();
         BireyselSifreGirisPasswordTF = new javax.swing.JPasswordField();
         BireyselGirisSifreGoster = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         KurumsalGirisPanel = new javax.swing.JPanel();
         KurumsalGirisTamamlaBtn = new javax.swing.JButton();
         KurumKoduGirisTextF = new javax.swing.JTextField();
         KurumsalSifreGirisPasswordTF = new javax.swing.JPasswordField();
         KurumsalGirisSifreGoster = new javax.swing.JCheckBox();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
         BireyselKayitPanel = new javax.swing.JPanel();
         BireyselKayıtTamamlaBtn = new javax.swing.JButton();
         BireyselAdGirisTextF = new javax.swing.JTextField();
@@ -64,6 +73,13 @@ public class MainMenuUI extends javax.swing.JFrame {
         BireyselTelefonGirisTextF = new javax.swing.JFormattedTextField();
         BireyselSifreKayitPasswordTF = new javax.swing.JPasswordField();
         BireyselKayitSifreGoster = new javax.swing.JCheckBox();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
         KurumsalKayitPanel = new javax.swing.JPanel();
         KurumsalKayıtTamamlaBtn = new javax.swing.JButton();
         KurumsalAdGirisTextF = new javax.swing.JTextField();
@@ -71,17 +87,25 @@ public class MainMenuUI extends javax.swing.JFrame {
         KurumsalSehirGirisTextF = new javax.swing.JTextField();
         KurumsalSifreKayitPasswordTF = new javax.swing.JPasswordField();
         KurumsalKayitSifreGoster = new javax.swing.JCheckBox();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
         GeriDonBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         UstPanel.setBackground(new java.awt.Color(0, 102, 153));
 
+        BankaAdiLabel.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
         BankaAdiLabel.setText("DİNO BANK");
 
+        AdminControlsBtn.setBackground(new java.awt.Color(102, 0, 0));
+        AdminControlsBtn.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
         AdminControlsBtn.setText("AdminControls");
         AdminControlsBtn.addActionListener(this::AdminControlsBtnActionPerformed);
 
+        TarihveSaatLabel.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
         TarihveSaatLabel.setText("Tarih ve Saat");
 
         javax.swing.GroupLayout UstPanelLayout = new javax.swing.GroupLayout(UstPanel);
@@ -91,9 +115,9 @@ public class MainMenuUI extends javax.swing.JFrame {
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, UstPanelLayout.createSequentialGroup()
                                 .addGap(16, 16, 16)
                                 .addComponent(TarihveSaatLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 390, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 356, Short.MAX_VALUE)
                                 .addComponent(BankaAdiLabel)
-                                .addGap(333, 333, 333)
+                                .addGap(310, 310, 310)
                                 .addComponent(AdminControlsBtn)
                                 .addGap(16, 16, 16))
         );
@@ -113,14 +137,20 @@ public class MainMenuUI extends javax.swing.JFrame {
         PanelContainer.setLayout(new java.awt.CardLayout());
 
         AnaMenuKullaniciTipiRDB.add(BireyselRadioBtn);
+        BireyselRadioBtn.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
         BireyselRadioBtn.setText("Bireysel");
 
         AnaMenuKullaniciTipiRDB.add(KurumsalRadioBtn);
+        KurumsalRadioBtn.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
         KurumsalRadioBtn.setText("Kurumsal");
 
+        GirisYapBtn.setBackground(new java.awt.Color(0, 102, 153));
+        GirisYapBtn.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
         GirisYapBtn.setText("Giriş Yap");
         GirisYapBtn.addActionListener(this::GirisYapBtnActionPerformed);
 
+        HesapOlusturBtn.setBackground(new java.awt.Color(0, 102, 153));
+        HesapOlusturBtn.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
         HesapOlusturBtn.setText("Hesap Oluştur");
         HesapOlusturBtn.addActionListener(this::HesapOlusturBtnActionPerformed);
 
@@ -137,7 +167,7 @@ public class MainMenuUI extends javax.swing.JFrame {
                                                 .addComponent(KurumsalRadioBtn))
                                         .addComponent(GirisYapBtn)
                                         .addComponent(HesapOlusturBtn))
-                                .addContainerGap(421, Short.MAX_VALUE))
+                                .addContainerGap(342, Short.MAX_VALUE))
         );
         FirstPanelLayout.setVerticalGroup(
                 FirstPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -148,106 +178,167 @@ public class MainMenuUI extends javax.swing.JFrame {
                                         .addComponent(KurumsalRadioBtn))
                                 .addGap(48, 48, 48)
                                 .addComponent(GirisYapBtn)
-                                .addGap(47, 47, 47)
+                                .addGap(31, 31, 31)
                                 .addComponent(HesapOlusturBtn)
-                                .addContainerGap(212, Short.MAX_VALUE))
+                                .addContainerGap(186, Short.MAX_VALUE))
         );
 
         PanelContainer.add(FirstPanel, "cardFirstPanel");
 
+        BireyselGirisTamamlaBtn.setBackground(new java.awt.Color(0, 102, 102));
+        BireyselGirisTamamlaBtn.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
         BireyselGirisTamamlaBtn.setText("Giriş Yap");
         BireyselGirisTamamlaBtn.addActionListener(this::BireyselGirisTamamlaBtnActionPerformed);
 
         BireyselGirisTipiRDB.add(TCGirisRadioBtn);
+        TCGirisRadioBtn.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         TCGirisRadioBtn.setText("TC İle Giriş");
 
         BireyselGirisTipiRDB.add(MusteriNoGirisRadioBtn);
+        MusteriNoGirisRadioBtn.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         MusteriNoGirisRadioBtn.setText("Müşteri No İle Giriş");
 
         BireyselGirisTipiRDB.add(TelNoGirisRadioBtn);
+        TelNoGirisRadioBtn.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         TelNoGirisRadioBtn.setText("Telefon No İle Giriş");
 
+        BireyselTypeGirisTextF.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
+
+        BireyselSifreGirisPasswordTF.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
+
+        BireyselGirisSifreGoster.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
         BireyselGirisSifreGoster.setText("Şifreyi Göster");
+
+        jLabel1.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
+        jLabel1.setText("TC / Müşteri No / Telefon");
+
+        jLabel2.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
+        jLabel2.setText("Şifre");
 
         javax.swing.GroupLayout BireyselGirisYapPanelLayout = new javax.swing.GroupLayout(BireyselGirisYapPanel);
         BireyselGirisYapPanel.setLayout(BireyselGirisYapPanelLayout);
         BireyselGirisYapPanelLayout.setHorizontalGroup(
                 BireyselGirisYapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(BireyselGirisYapPanelLayout.createSequentialGroup()
-                                .addGap(316, 316, 316)
-                                .addGroup(BireyselGirisYapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                                        .addGroup(BireyselGirisYapPanelLayout.createSequentialGroup()
-                                                .addComponent(TCGirisRadioBtn)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(MusteriNoGirisRadioBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(TelNoGirisRadioBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(BireyselGirisYapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addGap(29, 29, 29)
+                                .addGroup(BireyselGirisYapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addComponent(BireyselTypeGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(BireyselGirisYapPanelLayout.createSequentialGroup()
-                                                .addComponent(BireyselSifreGirisPasswordTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(9, 9, 9)
-                                                .addComponent(BireyselGirisSifreGoster))
-                                        .addComponent(BireyselGirisTamamlaBtn))
-                                .addContainerGap(341, Short.MAX_VALUE))
+                                        .addComponent(BireyselSifreGirisPasswordTF, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BireyselGirisSifreGoster)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BireyselGirisYapPanelLayout.createSequentialGroup()
+                                .addContainerGap(250, Short.MAX_VALUE)
+                                .addComponent(TCGirisRadioBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(20, 20, 20)
+                                .addComponent(MusteriNoGirisRadioBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(12, 12, 12)
+                                .addComponent(TelNoGirisRadioBtn)
+                                .addGap(190, 190, 190))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BireyselGirisYapPanelLayout.createSequentialGroup()
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(BireyselGirisTamamlaBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(405, 405, 405))
         );
         BireyselGirisYapPanelLayout.setVerticalGroup(
                 BireyselGirisYapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(BireyselGirisYapPanelLayout.createSequentialGroup()
                                 .addGap(45, 45, 45)
                                 .addGroup(BireyselGirisYapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                                        .addComponent(TCGirisRadioBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
-                                        .addComponent(MusteriNoGirisRadioBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(TCGirisRadioBtn)
+                                        .addComponent(MusteriNoGirisRadioBtn)
                                         .addComponent(TelNoGirisRadioBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(47, 47, 47)
-                                .addComponent(BireyselTypeGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(BireyselGirisYapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(BireyselTypeGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel1))
                                 .addGap(18, 18, 18)
                                 .addGroup(BireyselGirisYapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(BireyselSifreGirisPasswordTF)
-                                        .addComponent(BireyselGirisSifreGoster))
-                                .addGap(51, 51, 51)
-                                .addComponent(BireyselGirisTamamlaBtn)
-                                .addGap(167, 167, 167))
+                                        .addComponent(BireyselGirisSifreGoster)
+                                        .addComponent(jLabel2))
+                                .addGap(36, 36, 36)
+                                .addComponent(BireyselGirisTamamlaBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(162, 162, 162))
         );
 
         PanelContainer.add(BireyselGirisYapPanel, "cardBireyselGirisYapPanel");
 
+        KurumsalGirisTamamlaBtn.setBackground(new java.awt.Color(0, 102, 102));
+        KurumsalGirisTamamlaBtn.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
         KurumsalGirisTamamlaBtn.setText("Giriş Yap");
         KurumsalGirisTamamlaBtn.addActionListener(this::KurumsalGirisTamamlaBtnActionPerformed);
 
+        KurumKoduGirisTextF.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
+
+        KurumsalSifreGirisPasswordTF.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
+
+        KurumsalGirisSifreGoster.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
         KurumsalGirisSifreGoster.setText("Şifreyi Göster");
+
+        jLabel3.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
+        jLabel3.setText("Kurum Kodu");
+
+        jLabel4.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
+        jLabel4.setText("Şifre");
 
         javax.swing.GroupLayout KurumsalGirisPanelLayout = new javax.swing.GroupLayout(KurumsalGirisPanel);
         KurumsalGirisPanel.setLayout(KurumsalGirisPanelLayout);
         KurumsalGirisPanelLayout.setHorizontalGroup(
                 KurumsalGirisPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(KurumsalGirisPanelLayout.createSequentialGroup()
-                                .addGap(413, 413, 413)
-                                .addGroup(KurumsalGirisPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                                        .addComponent(KurumKoduGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(KurumsalSifreGirisPasswordTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(KurumsalGirisTamamlaBtn))
-                                .addGap(18, 18, 18)
-                                .addComponent(KurumsalGirisSifreGoster)
-                                .addContainerGap(395, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, KurumsalGirisPanelLayout.createSequentialGroup()
+                                .addContainerGap(289, Short.MAX_VALUE)
+                                .addGroup(KurumsalGirisPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(KurumsalGirisPanelLayout.createSequentialGroup()
+                                                .addComponent(jLabel3)
+                                                .addGap(18, 18, 18))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, KurumsalGirisPanelLayout.createSequentialGroup()
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jLabel4)
+                                                .addGap(31, 31, 31)))
+                                .addGroup(KurumsalGirisPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(KurumKoduGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(KurumsalGirisPanelLayout.createSequentialGroup()
+                                                .addGap(1, 1, 1)
+                                                .addGroup(KurumsalGirisPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(KurumsalGirisTamamlaBtn)
+                                                        .addGroup(KurumsalGirisPanelLayout.createSequentialGroup()
+                                                                .addComponent(KurumsalSifreGirisPasswordTF, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(12, 12, 12)
+                                                                .addComponent(KurumsalGirisSifreGoster)))))
+                                .addGap(249, 249, 249))
         );
         KurumsalGirisPanelLayout.setVerticalGroup(
                 KurumsalGirisPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(KurumsalGirisPanelLayout.createSequentialGroup()
-                                .addGap(40, 40, 40)
-                                .addComponent(KurumKoduGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(77, 77, 77)
+                                .addGroup(KurumsalGirisPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(KurumKoduGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel3))
                                 .addGap(32, 32, 32)
                                 .addGroup(KurumsalGirisPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(KurumsalSifreGirisPasswordTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(KurumsalGirisSifreGoster))
-                                .addGap(57, 57, 57)
+                                        .addComponent(KurumsalGirisSifreGoster)
+                                        .addComponent(jLabel4))
+                                .addGap(48, 48, 48)
                                 .addComponent(KurumsalGirisTamamlaBtn)
-                                .addContainerGap(236, Short.MAX_VALUE))
+                                .addContainerGap(166, Short.MAX_VALUE))
         );
 
         PanelContainer.add(KurumsalGirisPanel, "cardKurumsalGirisPanel");
 
+        BireyselKayıtTamamlaBtn.setBackground(new java.awt.Color(0, 102, 102));
+        BireyselKayıtTamamlaBtn.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         BireyselKayıtTamamlaBtn.setText("Kayıt Ol");
         BireyselKayıtTamamlaBtn.addActionListener(this::BireyselKayıtTamamlaBtnActionPerformed);
+
+        BireyselAdGirisTextF.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+
+        BireyselSoyadGirisTextF.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
 
         try {
             BireyselTcGirisFormattedTextF.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###########")));
@@ -261,61 +352,119 @@ public class MainMenuUI extends javax.swing.JFrame {
             ex.printStackTrace();
         }
 
+        BireyselSehirGirisTextF.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+
         try {
             BireyselTelefonGirisTextF.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###########")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
 
+        BireyselSifreKayitPasswordTF.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+
+        BireyselKayitSifreGoster.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         BireyselKayitSifreGoster.setText("Şifreyi Göster");
+
+        jLabel5.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel5.setText("Ad");
+
+        jLabel6.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel6.setText("Soyad");
+
+        jLabel7.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel7.setText("TC Kimlik No");
+
+        jLabel8.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel8.setText("Doğum Tarihi");
+
+        jLabel9.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel9.setText("Şehir");
+
+        jLabel10.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel10.setText("Telefon");
+
+        jLabel11.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel11.setText("Şifre Oluştur(6 Haneli)");
 
         javax.swing.GroupLayout BireyselKayitPanelLayout = new javax.swing.GroupLayout(BireyselKayitPanel);
         BireyselKayitPanel.setLayout(BireyselKayitPanelLayout);
         BireyselKayitPanelLayout.setHorizontalGroup(
                 BireyselKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BireyselKayitPanelLayout.createSequentialGroup()
-                                .addContainerGap(415, Short.MAX_VALUE)
+                        .addGroup(BireyselKayitPanelLayout.createSequentialGroup()
+                                .addGap(269, 269, 269)
+                                .addGroup(BireyselKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel11, javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(BireyselKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                                        .addComponent(BireyselAdGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(BireyselSoyadGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(BireyselTcGirisFormattedTextF, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(BireyselDogumTGirisFormattedTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(BireyselSehirGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(BireyselTelefonGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(BireyselSifreKayitPasswordTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(BireyselKayıtTamamlaBtn))
+                                        .addComponent(BireyselSoyadGirisTextF, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(BireyselTcGirisFormattedTextF, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(BireyselDogumTGirisFormattedTextF, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(BireyselSifreKayitPasswordTF, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(BireyselKayitPanelLayout.createSequentialGroup()
+                                                .addGroup(BireyselKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                                        .addComponent(BireyselAdGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(BireyselTelefonGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(BireyselSehirGirisTextF, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGap(0, 0, Short.MAX_VALUE)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(BireyselKayitSifreGoster)
-                                .addGap(344, 344, 344))
+                                .addGap(249, 249, 249))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BireyselKayitPanelLayout.createSequentialGroup()
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(BireyselKayıtTamamlaBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(418, 418, 418))
         );
         BireyselKayitPanelLayout.setVerticalGroup(
                 BireyselKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(BireyselKayitPanelLayout.createSequentialGroup()
-                                .addGap(25, 25, 25)
-                                .addComponent(BireyselAdGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap()
+                                .addGroup(BireyselKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(BireyselAdGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel5))
                                 .addGap(27, 27, 27)
-                                .addComponent(BireyselSoyadGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(BireyselKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(BireyselSoyadGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel6))
                                 .addGap(18, 18, 18)
-                                .addComponent(BireyselTcGirisFormattedTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(26, 26, 26)
-                                .addComponent(BireyselDogumTGirisFormattedTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(BireyselKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(BireyselTcGirisFormattedTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel7))
+                                .addGap(27, 27, 27)
+                                .addGroup(BireyselKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(BireyselDogumTGirisFormattedTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel8))
                                 .addGap(18, 18, 18)
-                                .addComponent(BireyselSehirGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(BireyselKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(BireyselSehirGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel9))
                                 .addGap(11, 11, 11)
-                                .addComponent(BireyselTelefonGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(BireyselKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(BireyselTelefonGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel10))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(BireyselKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(BireyselSifreKayitPasswordTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(BireyselKayitSifreGoster))
+                                        .addComponent(BireyselKayitSifreGoster)
+                                        .addComponent(jLabel11))
                                 .addGap(18, 18, 18)
-                                .addComponent(BireyselKayıtTamamlaBtn)
-                                .addContainerGap(80, Short.MAX_VALUE))
+                                .addComponent(BireyselKayıtTamamlaBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(49, Short.MAX_VALUE))
         );
 
         PanelContainer.add(BireyselKayitPanel, "cardBireyselKayitPanel");
 
+        KurumsalKayıtTamamlaBtn.setBackground(new java.awt.Color(0, 102, 102));
+        KurumsalKayıtTamamlaBtn.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         KurumsalKayıtTamamlaBtn.setText("Kayıt Ol");
         KurumsalKayıtTamamlaBtn.addActionListener(this::KurumsalKayıtTamamlaBtnActionPerformed);
+
+        KurumsalAdGirisTextF.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
 
         try {
             KurumsalTarihGirisFormattedTF.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##/##/####")));
@@ -323,47 +472,82 @@ public class MainMenuUI extends javax.swing.JFrame {
             ex.printStackTrace();
         }
 
+        KurumsalSehirGirisTextF.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+
+        KurumsalSifreKayitPasswordTF.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+
+        KurumsalKayitSifreGoster.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         KurumsalKayitSifreGoster.setText("Şifreyi Göster");
+
+        jLabel12.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel12.setText("Kurum Adı");
+
+        jLabel13.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel13.setText("Kurum Kuruluş Tarihi");
+
+        jLabel14.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel14.setText("Kurumun Bulunduğu Şehir");
+
+        jLabel15.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel15.setText("Şifre Oluştur(6 Haneli)");
 
         javax.swing.GroupLayout KurumsalKayitPanelLayout = new javax.swing.GroupLayout(KurumsalKayitPanel);
         KurumsalKayitPanel.setLayout(KurumsalKayitPanelLayout);
         KurumsalKayitPanelLayout.setHorizontalGroup(
                 KurumsalKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, KurumsalKayitPanelLayout.createSequentialGroup()
-                                .addContainerGap(445, Short.MAX_VALUE)
-                                .addGroup(KurumsalKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                                        .addComponent(KurumsalAdGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(KurumsalTarihGirisFormattedTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(KurumsalSehirGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(KurumsalSifreKayitPasswordTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(KurumsalKayıtTamamlaBtn))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(KurumsalKayitSifreGoster)
-                                .addGap(379, 379, 379))
+                        .addGroup(KurumsalKayitPanelLayout.createSequentialGroup()
+                                .addGroup(KurumsalKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(KurumsalKayitPanelLayout.createSequentialGroup()
+                                                .addGap(271, 271, 271)
+                                                .addGroup(KurumsalKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(jLabel12)
+                                                        .addComponent(jLabel13)
+                                                        .addComponent(jLabel14)
+                                                        .addComponent(jLabel15))
+                                                .addGap(18, 18, 18)
+                                                .addGroup(KurumsalKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                                        .addComponent(KurumsalAdGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(KurumsalSehirGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(KurumsalSifreKayitPasswordTF, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(KurumsalTarihGirisFormattedTF, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(KurumsalKayitSifreGoster))
+                                        .addGroup(KurumsalKayitPanelLayout.createSequentialGroup()
+                                                .addGap(444, 444, 444)
+                                                .addComponent(KurumsalKayıtTamamlaBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap(247, Short.MAX_VALUE))
         );
         KurumsalKayitPanelLayout.setVerticalGroup(
                 KurumsalKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(KurumsalKayitPanelLayout.createSequentialGroup()
-                                .addGap(34, 34, 34)
-                                .addComponent(KurumsalAdGirisTextF, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
+                                .addGap(66, 66, 66)
+                                .addGroup(KurumsalKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(KurumsalAdGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel12))
                                 .addGap(18, 18, 18)
-                                .addComponent(KurumsalTarihGirisFormattedTF, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
-                                .addGap(18, 18, 18)
-                                .addComponent(KurumsalSehirGirisTextF, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
+                                .addGroup(KurumsalKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jLabel13)
+                                        .addGroup(KurumsalKayitPanelLayout.createSequentialGroup()
+                                                .addGap(4, 4, 4)
+                                                .addComponent(KurumsalTarihGirisFormattedTF, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(KurumsalKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(KurumsalSehirGirisTextF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel14))
                                 .addGap(18, 18, 18)
                                 .addGroup(KurumsalKayitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                                         .addComponent(KurumsalKayitSifreGoster)
-                                        .addComponent(KurumsalSifreKayitPasswordTF, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE))
-                                .addGap(18, 18, 18)
-                                .addComponent(KurumsalKayıtTamamlaBtn)
-                                .addGap(113, 113, 113))
+                                        .addComponent(KurumsalSifreKayitPasswordTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel15))
+                                .addGap(29, 29, 29)
+                                .addComponent(KurumsalKayıtTamamlaBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(106, Short.MAX_VALUE))
         );
 
         PanelContainer.add(KurumsalKayitPanel, "cardKurumsalKayitPanel");
 
         GeriDonBtn.setBackground(new java.awt.Color(0, 102, 204));
         GeriDonBtn.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
-        GeriDonBtn.setText("<");
         GeriDonBtn.addActionListener(this::GeriDonBtnActionPerformed);
 
         javax.swing.GroupLayout MainPanelLayout = new javax.swing.GroupLayout(MainPanel);
@@ -401,7 +585,6 @@ public class MainMenuUI extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>
-
 
 
 
@@ -673,6 +856,53 @@ public class MainMenuUI extends javax.swing.JFrame {
         TarihveSaatLabel.setText(bugun.toString());
     }
 
+    // --- ŞİFRE GÖSTER / GİZLE AYARLARI ---
+    private void sifreGosterGizleAyarlari() {
+        // 1. BİREYSEL GİRİŞ EKRANI
+        BireyselGirisSifreGoster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (BireyselGirisSifreGoster.isSelected()) {
+                    BireyselSifreGirisPasswordTF.setEchoChar((char) 0); // Göster
+                } else {
+                    BireyselSifreGirisPasswordTF.setEchoChar('*'); // Gizle
+                }
+            }
+        });
+
+        // 2. KURUMSAL GİRİŞ EKRANI
+        KurumsalGirisSifreGoster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (KurumsalGirisSifreGoster.isSelected()) {
+                    KurumsalSifreGirisPasswordTF.setEchoChar((char) 0); // Göster
+                } else {
+                    KurumsalSifreGirisPasswordTF.setEchoChar('*'); // Gizle
+                }
+            }
+        });
+
+        // 3. BİREYSEL KAYIT EKRANI
+        BireyselKayitSifreGoster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (BireyselKayitSifreGoster.isSelected()) {
+                    BireyselSifreKayitPasswordTF.setEchoChar((char) 0); // Göster
+                } else {
+                    BireyselSifreKayitPasswordTF.setEchoChar('*'); // Gizle
+                }
+            }
+        });
+
+        // 4. KURUMSAL KAYIT EKRANI
+        KurumsalKayitSifreGoster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (KurumsalKayitSifreGoster.isSelected()) {
+                    KurumsalSifreKayitPasswordTF.setEchoChar((char) 0); // Göster
+                } else {
+                    KurumsalSifreKayitPasswordTF.setEchoChar('*'); // Gizle
+                }
+            }
+        });
+    }
+
     // Variables declaration - do not modify
     private javax.swing.JButton AdminControlsBtn;
     private javax.swing.ButtonGroup AnaMenuKullaniciTipiRDB;
@@ -718,6 +948,21 @@ public class MainMenuUI extends javax.swing.JFrame {
     private javax.swing.JLabel TarihveSaatLabel;
     private javax.swing.JRadioButton TelNoGirisRadioBtn;
     private javax.swing.JPanel UstPanel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JSeparator jSeparator2;
     // End of variables declaration
 

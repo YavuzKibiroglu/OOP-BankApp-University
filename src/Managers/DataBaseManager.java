@@ -1844,6 +1844,40 @@ public class DataBaseManager {
         return updateBalance(account.getAccountId(), account.getMoneyInAccount());
     }
 
+    public static model.DepositAccount getDepositAccountByName(String userId, String accountName) {
+        String query = "SELECT * FROM DepositAccounts WHERE User_ID = ? AND Account_Name = ?";
+
+        try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, userId);
+            pstmt.setString(2, accountName);
+            java.sql.ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                // 1. Tarih Dönüşümü (SQL Date -> Java LocalDate)
+                java.sql.Date sqlDate = rs.getDate("Creation_Date");
+                java.time.LocalDate creationDate = (sqlDate != null) ? sqlDate.toLocalDate() : java.time.LocalDate.now();
+
+                // 2. Nesneyi Oluştur (Sıralama tam senin Constructor'ına göre)
+                model.DepositAccount acc = new model.DepositAccount(
+                        rs.getString("Account_ID"),           // 1. String id
+                        rs.getString("User_ID"),              // 2. String userId
+                        (float) rs.getDouble("Balance"),      // 3. float balance (CAST işlemi şart!)
+                        rs.getInt("Term_Days"),               // 4. int termDays
+                        creationDate                          // 5. LocalDate creationDate
+                );
+
+                // Eğer modelinde isim set etme özelliği varsa sonradan ekleyebilirsin:
+                // acc.setAccountName(rs.getString("Account_Name"));
+
+                return acc;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
 
 
