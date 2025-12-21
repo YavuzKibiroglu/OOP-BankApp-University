@@ -58,6 +58,11 @@ public class CheckingAccount extends Account {
         DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
     }
 
+    @Override
+    public void transferToCurrent() throws SQLException {
+
+    }
+
     // Helper: Hızlı para ekleme (Eski kodlarla uyum için)
     public void addMoneyToAccount(float moneyToAdd) {
         deposit(moneyToAdd);

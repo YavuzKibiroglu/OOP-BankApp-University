@@ -27,6 +27,11 @@ public class ForeignCurrencyAccount extends Account {
         DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
     }
 
+    @Override
+    public void transferToCurrent() throws SQLException {
+
+    }
+
     // =================================================================
     // 1. DÖVİZ AL (DÜZELTİLDİ: Miktar * Kur)
     // =================================================================

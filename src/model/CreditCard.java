@@ -4,8 +4,8 @@ import Managers.DataBaseManager;
 
 public class CreditCard extends Card {
 
-    private float creditLimit;
-    private float currentDebt;
+    private Float creditLimit;
+    private Float currentDebt;
 
     public CreditCard(String cardNumber, String userId, String cvv, String expiryDate, float creditLimit, float currentDebt) {
         super(cardNumber, userId, cvv, expiryDate);

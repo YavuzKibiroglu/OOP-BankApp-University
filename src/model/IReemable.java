@@ -7,4 +7,6 @@ public interface IReemable{
 
     public void transferToCurrent(float moneyAmount) throws SQLException;
 
+    public void transferToCurrent() throws SQLException;
+
 }

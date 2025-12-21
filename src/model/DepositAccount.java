@@ -94,4 +94,9 @@ public class DepositAccount extends Account {
     public void transferToCurrent(float moneyAmount) throws SQLException {
         // boş
     }
+
+    @Override
+    public void transferToCurrent() throws SQLException {
+
+    }
 }

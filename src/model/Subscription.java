@@ -7,7 +7,7 @@ public class Subscription {
     private String subscriberUserId; // Bireysel Müşteri ID
     private String companyUserId;    // Kurumsal Şirket ID
     private String serviceName;      // Örn: Netflix, Enerjisa, İSKİ
-    private boolean isActive;        // Hizmet açık mı kesik mi?
+    private Boolean isActive;        // Hizmet açık mı kesik mi?
     private LocalDate startDate;
 
     public Subscription(String subscriptionId, String subscriberUserId, String companyUserId, String serviceName, boolean isActive, LocalDate startDate) {
