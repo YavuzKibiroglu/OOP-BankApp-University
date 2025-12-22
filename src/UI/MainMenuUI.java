@@ -12,10 +12,10 @@ public class MainMenuUI extends javax.swing.JFrame {
         GeriDonBtn.setBorderPainted(false);     // Çerçeve çizgisini kapat
         GeriDonBtn.setFocusPainted(false);      // Tıklanınca çıkan odak çizgisini kapat
         GeriDonBtn.setVisible(false);
-        // 1. Açılışta Tarihi Yaz
+        //Açılışta Tarihi Yaz
         tarihiGuncelle();
 
-        // 2. OTOMATİK GÜNCELLEME (Timer)
+        //OTOMATİK GÜNCELLEME
         // Her 1 saniyede bir tarihi kontrol eder, konsoldan değiştiyse günceller.
         javax.swing.Timer timer = new javax.swing.Timer(1000, new java.awt.event.ActionListener() {
             @Override
@@ -758,7 +758,6 @@ public class MainMenuUI extends javax.swing.JFrame {
             java.time.LocalDate kurulusTarihi = java.time.LocalDate.parse(tarihMetni, formatlayici);
 
             // 4. Kaydet ve KODU AL (String olusanKod)
-            // Artık metodumuz bize String bir kod veriyor, onu yakalıyoruz:
             String olusanKod = Managers.DataBaseManager.addEnterpriseUser(sirketAdi, sifre, kurulusTarihi, sehirHQ);
 
             if (olusanKod != null) {
@@ -784,7 +783,6 @@ public class MainMenuUI extends javax.swing.JFrame {
 
     private void GeriDonBtnActionPerformed(java.awt.event.ActionEvent evt) {
         // Ana menüye (Seçim Ekranına) dön
-        // Dün bu kartın ismini "cardFirstPanel" koymuştuk.
         sayfaDegistir("cardFirstPanel");
     }
 
@@ -809,11 +807,6 @@ public class MainMenuUI extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
         Managers.DataBaseManager.start();
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {

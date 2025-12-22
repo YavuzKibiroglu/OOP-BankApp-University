@@ -11,7 +11,7 @@ public class YetersizBakiyeException extends Exception {
         this.istenenTutar = istenenTutar;
     }
 
-    // Hata mesajını özelleştirmek için override edelim
+    // Hata mesajını özelleştirmek için override etme
     @Override
     public String getMessage() {
         return super.getMessage() + " (Mevcut: " + mevcutBakiye + " TL, İstenen: " + istenenTutar + " TL)";

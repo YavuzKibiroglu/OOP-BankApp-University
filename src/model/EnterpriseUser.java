@@ -28,14 +28,13 @@ public class EnterpriseUser extends User {
         return this.enterpriseEstablishment;
     }
 
-    // YENİ: Getter Metodu
+    //Getter Metodu
     @Override
     public String getUserId() { return corporateCode; }
 
 
     @Override
     public String getInformation() {
-        // Bilgi çıktısına Kurum Kodu eklendi
         return String.format("Kurumsal Müşteri: %s (Kod: %s) - Merkez: %s",
                 enterpriseName, corporateCode, enterpriseHQ);
     }

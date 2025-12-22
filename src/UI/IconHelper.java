@@ -20,7 +20,7 @@ public class IconHelper {
                 ImageIcon originalIcon = new ImageIcon(imgURL);
                 Image img = originalIcon.getImage();
 
-                // 3. SİHİRLİ KISIM: Resmi yeniden boyutlandır (SCALE_SMOOTH = kaliteli küçültme)
+                // 3. Resmi yeniden boyutlandır (SCALE_SMOOTH = kaliteli küçültme)
                 Image resizedImg = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
 
                 // 4. Yeni boyuttaki resmi ImageIcon'a çevirip döndür

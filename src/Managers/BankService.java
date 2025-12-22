@@ -4,9 +4,7 @@ import model.CheckingAccount;
 
 public class BankService {
 
-    // =================================================================
     // 1. VADELİ HESAP AÇMA İŞ AKIŞI
-    // =================================================================
     public static String openDepositAccount(String userId, String accountName, double amount, int days) {
 
         CheckingAccount vadesizHesap = DataBaseManager.getCheckingAccountObject(userId);
@@ -16,7 +14,7 @@ public class BankService {
         }
 
         try {
-            // 2. Parayı Çek (RAM)
+            // 2. Parayı Çek
             vadesizHesap.withdraw(amount);
 
             // 3. Vadesiz Hesabı Kaydet
@@ -32,7 +30,6 @@ public class BankService {
             if (hesapOlustu) {
                 return "BASARILI";
             } else {
-                // ROLLBACK
                 vadesizHesap.deposit(amount);
                 DataBaseManager.saveAccount(vadesizHesap);
                 return "HATA: Hesap oluşturulamadı (Tutar iade edildi).";
@@ -47,9 +44,7 @@ public class BankService {
         }
     }
 
-    // =================================================================
     // 2. PARA YATIRMA
-    // =================================================================
     public static String paraYatir(String userId, double miktar) {
         CheckingAccount hesap = DataBaseManager.getCheckingAccountObject(userId);
         if (hesap == null) return "Hesap Bulunamadı";
@@ -63,9 +58,7 @@ public class BankService {
         }
     }
 
-    // =================================================================
     // 3. PARA ÇEKME
-    // =================================================================
     public static String paraCek(String userId, double miktar) {
         CheckingAccount hesap = DataBaseManager.getCheckingAccountObject(userId);
         if (hesap == null) return "Hesap Bulunamadı";
@@ -79,9 +72,7 @@ public class BankService {
         }
     }
 
-    // =================================================================
     // 4. BANKA KARTI İLE HARCAMA
-    // =================================================================
     public static String bankaKartiIleHarcama(String userId, double miktar) {
         model.DebitCard kart = DataBaseManager.getDebitCardObject(userId);
         if (kart == null) return "HATA: Kart bulunamadı.";
@@ -97,9 +88,7 @@ public class BankService {
         }
     }
 
-    // =================================================================
     // 5. KREDİ KARTI BORCU ÖDEME (EKSİK OLAN KISIMDI)
-    // =================================================================
     public static String krediKartiBorcuOde(String userId, double miktar) {
         CheckingAccount hesap = DataBaseManager.getCheckingAccountObject(userId);
         model.CreditCard kart = DataBaseManager.getCreditCardObject(userId);
@@ -107,13 +96,10 @@ public class BankService {
         if (hesap == null || kart == null) return "HATA: Hesap veya Kart bulunamadı.";
 
         try {
-            // OOP Mantığı: Kart nesnesine "Borcumu şu hesaptan öde" diyoruz.
             boolean islemBasarili = kart.payDebt(hesap, (float)miktar);
 
             if (islemBasarili) {
-                // İkisini de kaydet
                 boolean hesapKayit = DataBaseManager.saveAccount(hesap);
-                // CreditCard borcu güncellendi, onu da kaydetmeliyiz (updateCardDebt ile)
                 boolean kartKayit = DataBaseManager.updateCardDebt(kart.getCardNumber(), kart.getCurrentDebt());
 
                 if (hesapKayit && kartKayit) return "BASARILI";
@@ -126,24 +112,16 @@ public class BankService {
         }
     }
 
-    // =================================================================
     // 6. NAKİT AVANS ÇEKME (EKSİK OLAN KISIMDI)
-    // =================================================================
     public static String nakitAvansCek(String userId, double miktar) {
         CheckingAccount hesap = DataBaseManager.getCheckingAccountObject(userId);
         model.CreditCard kart = DataBaseManager.getCreditCardObject(userId);
 
         if (hesap == null || kart == null) return "HATA: Bilgilere erişilemedi.";
-
-        // 1. Karttan Harcama Yap (Limit düşer/Borç Artar)
-        // Nakit avans aslında karttan para harcamaktır.
         boolean harcamaBasarili = kart.spend((float)miktar);
 
         if (harcamaBasarili) {
-            // 2. Hesaba Para Ekle (Nakit giriş)
             hesap.deposit(miktar);
-
-            // 3. Kaydet
             DataBaseManager.updateCardDebt(kart.getCardNumber(), kart.getCurrentDebt());
             DataBaseManager.saveAccount(hesap);
             return "BASARILI";

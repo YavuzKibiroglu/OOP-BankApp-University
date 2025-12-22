@@ -32,8 +32,6 @@ public class DataBaseManager {
                 "Enterprise_HQ TEXT, " +
                 "Corporate_Code TEXT UNIQUE)";
 
-        // GÜNCELLEME: Accounts tablosuna CreationDate ve DepositDays eklendi
-        // Checking hesaplar için bu alanlar NULL kalabilir.
         String sqlAccounts = "CREATE TABLE IF NOT EXISTS Accounts (" +
                 "BelongedUserId TEXT, " +
                 "AccountId TEXT PRIMARY KEY, " +
@@ -48,24 +46,24 @@ public class DataBaseManager {
         String sqlCards = "CREATE TABLE IF NOT EXISTS Cards (" +
                 "CardNumber TEXT PRIMARY KEY, " +
                 "UserId TEXT, " +
-                "CardType TEXT, " +         // 'DEBIT' veya 'CREDIT'
+                "CardType TEXT, " +
                 "CVV TEXT, " +
                 "ExpiryDate TEXT, " +
-                "LinkedAccountId TEXT, " +  // Sadece Debit için dolu
-                "CreditLimit REAL, " +      // Sadece Credit için dolu
-                "CurrentDebt REAL)";        // Sadece Credit için dolu
+                "LinkedAccountId TEXT, " +
+                "CreditLimit REAL, " +
+                "CurrentDebt REAL)";
 
         String sqlSubscriptions = "CREATE TABLE IF NOT EXISTS Subscriptions (" +
-                "SubscriptionId INTEGER PRIMARY KEY AUTOINCREMENT, " + // Otomatik artan ID daha iyidir
-                "SubscriberUserId TEXT, " + // (Opsiyonel: UserId varsa buraya)
-                "SubscriberTC TEXT, " +     // YENİ: TC Kimlik
-                "SubscriberName TEXT, " +   // YENİ: Ad
-                "SubscriberSurname TEXT, " +// YENİ: Soyad
+                "SubscriptionId INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "SubscriberUserId TEXT, " +
+                "SubscriberTC TEXT, " +
+                "SubscriberName TEXT, " +
+                "SubscriberSurname TEXT, " +
                 "CompanyUserId TEXT, " +
                 "ServiceName TEXT, " +
                 "IsActive INTEGER, " +
-                "BillingDay INTEGER, " +    // YENİ: Fatura Günü
-                "FixedAmount REAL, " +      // YENİ: Sabit Tutar
+                "BillingDay INTEGER, " +
+                "FixedAmount REAL, " +
                 "StartDate TEXT)";
 
         String sqlInvoices = "CREATE TABLE IF NOT EXISTS Invoices (" +
@@ -73,7 +71,7 @@ public class DataBaseManager {
                 "SubscriptionId TEXT, " +
                 "Amount REAL, " +
                 "DueDate TEXT, " +
-                "IsPaid INTEGER)"; // 1: Ödendi, 0: Ödenmedi
+                "IsPaid INTEGER)";
 
 
         CurrencyManager.start();
@@ -94,7 +92,6 @@ public class DataBaseManager {
     //region User Logic
     public static String addIndividualUser(String tc_Id, String name, String surname, String password, java.time.LocalDate birthDate, String city, String phoneNumber) {
 
-        // 1. Validasyonlar (Hata varsa null döndürür)
         if (!isValidPassword(password)) {
             System.out.println("Hata: Geçersiz şifre.");
             return null;
@@ -109,13 +106,11 @@ public class DataBaseManager {
         try (Connection conn = DriverManager.getConnection(URL);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // 2. Benzersiz Müşteri No Üret
             String uniqueId;
             do {
-                uniqueId = ProduceRandomID(); // Senin yazdığın veya var olan ID üretici
+                uniqueId = ProduceRandomID();
             } while (isIDExists(uniqueId));
 
-            // 3. Kullanıcıyı Kaydet
             stmt.setString(1, uniqueId);
             stmt.setString(2, tc_Id);
             stmt.setString(3, name);
@@ -128,11 +123,7 @@ public class DataBaseManager {
             stmt.executeUpdate();
             System.out.println("Bireysel kullanıcı eklendi. ID: " + uniqueId);
 
-            // --- KRİTİK NOKTA: Kayıt bitti, şimdi Hoş Geldin Paketini oluştur ---
             createWelcomePackage(uniqueId);
-            // -------------------------------------------------------------------
-
-            // 4. Müşteri Numarasını Geri Döndür (UI tarafında kullanacağız)
             return uniqueId;
 
         } catch (SQLException e) {
@@ -143,7 +134,7 @@ public class DataBaseManager {
 
     public static String addEnterpriseUser(String enterpriseName, String password, LocalDate enterpriseEstablishment, String enterpriseHQ) {
 
-        // Şifre kontrolü (Hata varsa null döndürür)
+        // Şifre kontrolü
         if (!isValidPassword(password)) {
             System.out.println("Hata: Geçersiz şifre.");
             return null;
@@ -154,16 +145,13 @@ public class DataBaseManager {
         try (Connection conn = DriverManager.getConnection(URL);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // User ID üret (Konsolda görünecek)
             String uniqueId;
             do {
                 uniqueId = ProduceRandomID();
             } while (isIDExists(uniqueId));
 
-            // YENİ: 12 Haneli Benzersiz Kurum Kodu üret (Ekranda görünecek)
             String uniqueCorpCode;
             do {
-                // Eğer generateCorporateCode metodun yoksa aşağıya onun kodunu da ekledim
                 uniqueCorpCode = generateCorporateCode();
             } while (isCorporateCodeExists(uniqueCorpCode));
 
@@ -177,10 +165,7 @@ public class DataBaseManager {
             stmt.executeUpdate();
 
             createAccountRaw(uniqueId, "TL", 0.0);
-            // KONSOL ÇIKTISI: ID burada görünüyor (İstediğin gibi)
             System.out.println("Kurumsal kullanıcı eklendi. ID: " + uniqueId);
-
-            // EKRAN ÇIKTISI İÇİN: Kurum Kodunu geri döndürüyoruz
             return uniqueCorpCode;
 
         } catch (SQLException e) {
@@ -189,7 +174,7 @@ public class DataBaseManager {
         }
     }
 
-    //12 Haneli Sadece Rakamlardan Oluşan Kod Üretici
+    //12 Haneli Kod Üretici
     private static String generateCorporateCode() {
         Random rnd = new Random();
         StringBuilder code = new StringBuilder();
@@ -245,9 +230,6 @@ public class DataBaseManager {
         }
         return id.toString();
     }
-    //endregion
-
-    //region Account Logic & Updates
 
     // 1. UPDATE METODU (Bakiye Güncelleme)
     public static boolean updateBalance(String accountId, float newBalance) {
@@ -268,19 +250,7 @@ public class DataBaseManager {
         }
     }
 
-    public static boolean updateBalance(String accountId, float amountChange, boolean isAddition) throws SQLException {
-        // Önce mevcut hesabı bul
-        Account acc = getAccountById(accountId);
-        if (acc == null) return false;
-
-        float currentBalance = acc.getMoneyInAccount();
-        float newBalance = isAddition ? (currentBalance + amountChange) : (currentBalance - amountChange);
-
-        return updateBalance(accountId, newBalance); // Ana metodu çağırır
-    }
-
-    //region Account Checks
-    // 1. Genel Hesap Kontrolü (Vadesiz ve Vadeli için)
+    //Genel Hesap Kontrolü (Vadesiz ve Vadeli için)
     public static boolean hasAccountType(String userId, String accountType) {
         String sql = "SELECT 1 FROM Accounts WHERE BelongedUserId = ? AND AccountType = ?";
         try (Connection conn = DriverManager.getConnection(URL);
@@ -297,8 +267,7 @@ public class DataBaseManager {
         }
     }
 
-    // 2. Döviz Hesabı Kontrolü (Döviz türüne özel kontrol)
-    // Kullanıcının Dolar'ı varsa yeni Dolar açamasın ama Euro açabilsin diye.
+    //Döviz Hesabı Kontrolü (Döviz türüne özel kontrol)
     public static boolean hasCurrencyAccount(String userId, String currencyType) {
         String sql = "SELECT 1 FROM Accounts WHERE BelongedUserId = ? AND CurrencyType = ?";
         try (Connection conn = DriverManager.getConnection(URL);
@@ -314,118 +283,8 @@ public class DataBaseManager {
             return false;
         }
     }
-    //endregion
 
-    // 2. STANDART HESAP EKLEME (Vadesiz / Checking)
-    public static void addAccount(String belongedUserId, String accountId, String ibanNumber, float moneyInAccount, AccountType accountType) throws SQLException {
-
-        // Eğer Vadesiz (Checking) hesapsa ve zaten varsa izin verme!
-        if (accountType == AccountType.Checking && hasAccountType(belongedUserId, "Checking")) {
-            System.out.println("UYARI: Zaten bir Vadesiz Hesabınız var. İkinciyi açamazsınız.");
-            return; // İşlemi iptal et
-        }
-        // -------------------------------
-
-        // Vadesiz hesap aslında "Vadesi 0 olan" bir hesaptır, o yüzden addDepositAccount metodunu çağırabiliriz
-        // (Ama oradaki kısıtlamayı kaldırdığımız için yukarıdaki IF bloğu bizi koruyacak)
-        addDepositAccount(belongedUserId, accountId, ibanNumber, moneyInAccount, accountType, 0, null);
-    }
-
-    // 3. VADELİ HESAP EKLEME (Deposit - Overloaded)
-    // Bu metod hem checking hem deposit ekleyebilir, alttaki SQL ona göre ayarlandı.
-    public static void addDepositAccount(String belongedUserId, String accountId, String ibanNumber, float moneyInAccount, AccountType accountType, int depositDays, LocalDate creationDate) throws SQLException {
-
-        String sql = "INSERT INTO Accounts (BelongedUserId, AccountId, Iban, Money_In_Account, AccountType, DepositDays, CreationDate) VALUES(?, ?, ?, ?, ?, ?, ?)";
-
-        try(Connection conn = DriverManager.getConnection(URL);
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, belongedUserId);
-            stmt.setString(2, accountId);
-
-            if (accountType == AccountType.Checking) {
-                stmt.setString(3, ibanNumber);
-            } else {
-                stmt.setString(3, null); // Vadeli hesaplarda IBAN hücresi boş (NULL) kalır
-            }
-
-            stmt.setFloat(4, moneyInAccount);
-            stmt.setString(5, accountType.toString());
-
-            // Eğer Vadesiz hesapsa bu değerler veritabanına NULL veya 0 olarak gider
-            stmt.setInt(6, depositDays);
-            if (creationDate != null) {
-                stmt.setString(7, creationDate.toString());
-            } else {
-                stmt.setString(7, null);
-            }
-
-            stmt.executeUpdate();
-            System.out.println("Hesap başarıyla eklendi (" + accountType + "): " + ibanNumber);
-
-        } catch (SQLException e) {
-            System.out.println("Hesap eklenirken hata oluştu: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    //DÖVİZ HESABI EKLEME
-    public static void addForeignCurrencyAccount(String belongedUserId, String accountId, float moneyInAccount, String currencyType) throws SQLException {
-
-        if (hasCurrencyAccount(belongedUserId, currencyType)) {
-            System.out.println("UYARI: Zaten bir " + currencyType + " hesabınız mevcut.");
-            return;
-        }
-
-        String sql = "INSERT INTO Accounts (BelongedUserId, AccountId, Money_In_Account, AccountType, CurrencyType) VALUES(?, ?, ?, ?, ?)";
-
-        try(Connection conn = DriverManager.getConnection(URL);
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, belongedUserId);
-            stmt.setString(2, accountId);
-            stmt.setFloat(3, moneyInAccount);
-            stmt.setString(4, "Foreign"); // Tip olarak 'Foreign' kullanıyoruz
-            stmt.setString(5, currencyType); // "USD", "EUR" vs.
-
-            stmt.executeUpdate();
-            System.out.println("Döviz Hesabı Açıldı (" + currencyType + "): " + accountId);
-        } catch (SQLException e) {
-            System.out.println("Döviz Hesabı Hatası: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    public static String getUniqueAccountId() {
-        String id = "";
-        do {
-            id = getRandomAccountId();
-        } while (isAccountIdExists(id));
-        return id;
-    }
-
-    public static String getRandomAccountId() {
-        Random rnd = new Random();
-        StringBuilder id = new StringBuilder();
-        for(int i = 0; i < 8; i++) {
-            id.append(rnd.nextInt(10));
-        }
-        return id.toString();
-    }
-
-    public static boolean isAccountIdExists(String tempId) {
-        String sql = "SELECT AccountId FROM Accounts WHERE AccountId = ?";
-        try(Connection conn = DriverManager.getConnection(URL);
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1,tempId);
-            ResultSet rs = stmt.executeQuery();
-            return rs.next();
-        } catch (SQLException e){
-            return false;
-        }
-    }
-
-    // 4. HESAP GETİRME (Deposit Entegrasyonu)
+    //HESAP GETİRME (Deposit Entegrasyonu)
     public static Account getAccountById(String id) throws SQLException {
         String sql = "SELECT * FROM Accounts WHERE AccountId = ?";
 
@@ -467,7 +326,6 @@ public class DataBaseManager {
         return null;
     }
 
-    //region IBAN Logic
     public static String getUniqueIBAN() throws SQLException {
         String iban = "";
         do {
@@ -521,10 +379,7 @@ public class DataBaseManager {
         // Kayıt bulunamazsa null döner
         return null;
     }
-    //endregion
-    //endregion
 
-    //region Card Logic
     public static void addDebitCard(String userId, String linkedAccountId) {
         String cardNo = getRandomCardNumber();
         String sql = "INSERT INTO Cards(CardNumber, UserId, CardType, CVV, ExpiryDate, LinkedAccountId) VALUES(?,?,?,?,?,?)";
@@ -562,7 +417,7 @@ public class DataBaseManager {
         }
     }
 
-    // 2. KREDİ KARTI ÇEKME (Cards tablosundan)
+    //KREDİ KARTI ÇEKME (Cards tablosundan)
     public static model.CreditCard getCreditCardObject(String userId) {
         // Kartı bulmak için: UserId ve Tip = 'CREDIT' kontrolü yapıyoruz
         String sql = "SELECT * FROM Cards WHERE UserId = ? AND CardType = 'CREDIT'";
@@ -589,9 +444,7 @@ public class DataBaseManager {
         return null;
     }
 
-    // --- EĞER YOKSA: BORÇ GÜNCELLEME METODU ---
-    // (CreditCard sınıfında harcama yaparken bu metot çağrılıyor)
-    // 3. KREDİ KARTI BORÇ GÜNCELLEME (Cards tablosunu günceller)
+    //KREDİ KARTI BORÇ GÜNCELLEME (Cards tablosunu günceller)
     public static boolean updateCardDebt(String cardNumber, float newDebt) {
         // Tablo adı: Cards
         String sql = "UPDATE Cards SET CurrentDebt = ? WHERE CardNumber = ?";
@@ -617,9 +470,7 @@ public class DataBaseManager {
         return sb.toString();
     }
 
-    //region SubscriptionLogic
-
-    // 1. ABONELİK OLUŞTURMA (Tarih TimeManager'dan gelir)
+    //ABONELİK OLUŞTURMA (Tarih TimeManager'dan gelir)
     public static void createSubscription(String subscriberId, String companyId, String serviceName) {
         String subId = ProduceRandomID();
         String sql = "INSERT INTO Subscriptions(SubscriptionId, SubscriberUserId, CompanyUserId, ServiceName, IsActive, StartDate) VALUES(?,?,?,?,?,?)";
@@ -643,8 +494,7 @@ public class DataBaseManager {
         }
     }
 
-    // 2. OTOMATİK FATURA KESME SİMÜLASYONU
-    // Bu metot, her ay döngüsü geldiğinde yeni fatura keser.
+    //OTOMATİK FATURA KESME SİMÜLASYON
     public static void generateMonthlyInvoices() {
         LocalDate simulationDate = TimeManager.getCurrentDate();
 
@@ -693,7 +543,7 @@ public class DataBaseManager {
         }
     }
 
-    // 3. ZAMAN ATLAYINCA BORÇLU HİZMETLERİ KESME
+    //ZAMAN ATLAYINCA BORÇLU HİZMETLERİ KESME
     public static void checkOverdueAndCutServices() {
         LocalDate simulationDate = TimeManager.getCurrentDate();
 
@@ -727,7 +577,7 @@ public class DataBaseManager {
         } catch(SQLException e){ e.printStackTrace(); }
     }
 
-    // ID ile Fatura Bulma Metodu
+    //ID ile Fatura Bulma Metodu
     public static model.Invoice getInvoiceById(String invoiceId) {
         String sql = "SELECT * FROM Invoices WHERE InvoiceId = ?";
 
@@ -738,16 +588,13 @@ public class DataBaseManager {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                // Veritabanından gelen verileri Model nesnesine çeviriyoruz
                 String subId = rs.getString("SubscriptionId");
                 float amount = rs.getFloat("Amount");
                 String dateStr = rs.getString("DueDate");
                 int isPaidInt = rs.getInt("IsPaid");
 
-                // Tarihi String'den LocalDate'e çevir
                 LocalDate dueDate = (dateStr != null) ? LocalDate.parse(dateStr) : null;
 
-                // 1 ise true (Ödendi), 0 ise false (Ödenmedi)
                 boolean isPaid = (isPaidInt == 1);
 
                 return new model.Invoice(invoiceId, subId, amount, dueDate, isPaid);
@@ -757,10 +604,10 @@ public class DataBaseManager {
             System.out.println("Fatura Bulma Hatası: " + e.getMessage());
         }
 
-        return null; // Fatura bulunamazsa null döner
+        return null;
     }
 
-    // Faturayı 'Ödendi' yap ve Hizmeti Tekrar Aç
+    //Faturayı Ödendi yapma ve Hizmeti Tekrar Açma
     public static void markInvoiceAsPaidAndActivateService(String invoiceId) {
         // 1. Önce faturanın kime ait olduğunu bulalım (SubscriptionId lazım)
         model.Invoice inv = getInvoiceById(invoiceId);
@@ -773,13 +620,9 @@ public class DataBaseManager {
              PreparedStatement pstmtPay = conn.prepareStatement(sqlPay);
              PreparedStatement pstmtActivate = conn.prepareStatement(sqlActivate)) {
 
-            // Transaction başlatılabilir ama basit tutuyoruz
-
-            // A) Faturayı Ödendi İşaretle
             pstmtPay.setString(1, invoiceId);
             pstmtPay.executeUpdate();
 
-            // B) Abonelik Hizmetini Aç (Kesikse açılır, açıksa açık kalır)
             pstmtActivate.setString(1, inv.getSubscriptionId());
             pstmtActivate.executeUpdate();
 
@@ -789,12 +632,10 @@ public class DataBaseManager {
             System.out.println("Fatura Güncelleme Hatası: " + e.getMessage());
         }
     }
-    //endregion
 
     public static model.IndividualUser getIndividualUserByLogin(String input, String password, String loginType) {
         String sql = "";
 
-        // Hangi yöntemle giriş yapılıyor?
         switch (loginType) {
             case "TC":
                 sql = "SELECT * FROM Individual_Users WHERE TC_Kimlik = ? AND password = ?";
@@ -852,14 +693,12 @@ public class DataBaseManager {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                // Şirket bulundu! Verileri çekip nesne yapalım.
                 String userId = rs.getString("UserId");
                 String name = rs.getString("Enterprise_Name");
                 String dbPass = rs.getString("password");
                 String hq = rs.getString("Enterprise_HQ");
                 String code = rs.getString("Corporate_Code");
 
-                // Tarih dönüşümü
                 String dateStr = rs.getString("Enterprise_Establishment");
                 LocalDate estDate = (dateStr != null) ? LocalDate.parse(dateStr) : LocalDate.now();
 
@@ -872,8 +711,7 @@ public class DataBaseManager {
         return null;
     }
 
-// --- YARDIMCI ARAÇLAR (Rastgele Numara Üreticiler) ---
-
+//YARDIMCI ARAÇLAR (Rastgele Numara Üreticiler)
     // Rastgele TR ile başlayan IBAN üretir
     private static String generateIBAN() {
         java.util.Random rand = new java.util.Random();
@@ -906,7 +744,7 @@ public class DataBaseManager {
         return futureDate.getMonthValue() + "/" + futureDate.getYear();
     }
 
-    // --- OTOMATİK HESAP VE KART OLUŞTURUCU ---
+    //OTOMATİK HESAP VE KART OLUŞTURUCU
     private static void createWelcomePackage(String userId) {
         // Hesaplar tablosuna ekleme komutu
         String sqlAccount = "INSERT INTO Accounts(BelongedUserId, AccountId, Iban, Money_In_Account, AccountType, CreationDate, CurrencyType) VALUES(?,?,?,?,?,?,?)";
@@ -914,15 +752,12 @@ public class DataBaseManager {
         String sqlCard = "INSERT INTO Cards(CardNumber, UserId, CardType, CVV, ExpiryDate, LinkedAccountId, CreditLimit, CurrentDebt) VALUES(?,?,?,?,?,?,?,?)";
 
         try (Connection conn = DriverManager.getConnection(URL)) {
-            // Hata olursa yarım kalmasın diye otomatik kaydı durduruyoruz (Transaction)
             conn.setAutoCommit(false);
 
             try (PreparedStatement pstmtAccount = conn.prepareStatement(sqlAccount);
                  PreparedStatement pstmtCard = conn.prepareStatement(sqlCard)) {
 
-                // ---------------------------------------------------------
-                // 1. VADESİZ TL HESABI (ANA HESAP)
-                // ---------------------------------------------------------
+                //VADESİZ TL HESABI
                 String vadesizAccountId = String.valueOf(new java.util.Random().nextInt(900000) + 100000);
                 String vadesizIban = generateIBAN();
 
@@ -935,9 +770,7 @@ public class DataBaseManager {
                 pstmtAccount.setString(7, "TL");
                 pstmtAccount.executeUpdate();
 
-                // ---------------------------------------------------------
-                // 2. DÖVİZ HESAPLARI (DOLAR, EURO, ALTIN)
-                // ---------------------------------------------------------
+                //DÖVİZ HESAPLARI (DOLAR, EURO, ALTIN)
                 String[] dovizTurleri = {"USD", "EUR", "ALTIN"};
 
                 for (String doviz : dovizTurleri) {
@@ -954,9 +787,7 @@ public class DataBaseManager {
                     pstmtAccount.executeUpdate();
                 }
 
-                // ---------------------------------------------------------
-                // 3. BANKA KARTI (DEBIT) -> Vadesiz TL Hesabına Bağlı
-                // ---------------------------------------------------------
+                //BANKA KARTI (DEBIT) -> Vadesiz TL Hesabına Bağlı
                 pstmtCard.setString(1, generateCardNumber());
                 pstmtCard.setString(2, userId);
                 pstmtCard.setString(3, "DEBIT");
@@ -967,9 +798,7 @@ public class DataBaseManager {
                 pstmtCard.setDouble(8, 0.0); // Borcu yok
                 pstmtCard.executeUpdate();
 
-                // ---------------------------------------------------------
-                // 4. KREDİ KARTI (CREDIT) -> 20.000 TL Limitli
-                // ---------------------------------------------------------
+                //KREDİ KARTI (CREDIT) -> 20.000 TL Limitli
                 pstmtCard.setString(1, generateCardNumber());
                 pstmtCard.setString(2, userId);
                 pstmtCard.setString(3, "CREDIT");
@@ -1004,8 +833,7 @@ public class DataBaseManager {
         return bakiye;
     }
 
-    // --- KREDİ KARTI BİLGİSİ SORGULA ---
-    // Dönüş Tipi: double dizisi [Limit, Borç]
+    //KREDİ KARTI BİLGİSİ SORGULA
     public static double[] getCreditCardInfo(String userId) {
         double[] kartBilgisi = {0.0, 0.0}; // [0]: Limit, [1]: Borç
 
@@ -1027,19 +855,17 @@ public class DataBaseManager {
         return kartBilgisi;
     }
 
-    // --- HESAP DETAYI GETİR (Bakiye ve IBAN) ---
-    // Dönüş: String dizisi -> [0]: Bakiye, [1]: IBAN
+    //HESAP DETAYI GETİR (Bakiye ve IBAN)
     public static String[] getAccountDetails(String userId, String currencyType) {
         String[] details = {"0.0", "TR..."}; // Varsayılan değerler
 
-        // Vadesiz veya Döviz fark etmez, CurrencyType'a göre arıyoruz
         String sql = "SELECT Money_In_Account, Iban FROM Accounts WHERE BelongedUserId = ? AND CurrencyType = ?";
 
         try (Connection conn = DriverManager.getConnection(URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, userId);
-            pstmt.setString(2, currencyType); // "TL", "USD", "EUR", "ALTIN"
+            pstmt.setString(2, currencyType);
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
@@ -1055,9 +881,8 @@ public class DataBaseManager {
         return details;
     }
 
-    // --- YENİ VADELİ HESAP AÇMA ---
-    // --- SADECE KAYIT YAPAN METOT (Logic Yok, Sadece SQL) ---
-    // BankService tarafından çağrılır.
+    //YENİ VADELİ HESAP AÇMA
+    //SADECE KAYIT YAPAN METOT (Logic Yok, Sadece SQL)
     public static boolean createDepositAccountRaw(String userId, String hesapAdi, double miktar, int vadeGun) {
         String sql = "INSERT INTO Accounts(BelongedUserId, AccountId, Iban, Money_In_Account, AccountType, CreationDate, CurrencyType, DepositDays, AccountName) VALUES(?,?,?,?,?,?,?,?,?)";
 
@@ -1086,12 +911,10 @@ public class DataBaseManager {
         }
     }
 
-    // --- KULLANICININ VADELİ HESAPLARINI LİSTELE (GÜNCELLENMİŞ) ---
+    //KULLANICININ VADELİ HESAPLARINI LİSTELE (GÜNCELLENMİŞ)
     public static java.util.ArrayList<String> getVadeliAccountNames(String userId) {
         java.util.ArrayList<String> hesapListesi = new java.util.ArrayList<>();
 
-        // DÜZELTME: AccountType kontrolünü 'DEPOSIT' veya 'Deposit' olabilecek şekilde esnettik.
-        // Ayrıca SQL'de UPPER() fonksiyonu kullanarak büyük/küçük harf sorununu çözüyoruz.
         String sql = "SELECT AccountName, Money_In_Account FROM Accounts WHERE BelongedUserId = ? AND UPPER(AccountType) = 'DEPOSIT'";
 
         try (Connection conn = DriverManager.getConnection(URL);
@@ -1114,7 +937,7 @@ public class DataBaseManager {
         return hesapListesi;
     }
 
-    // --- GÜVENLİ PARA TRANSFERİ METODU ---
+    //GÜVENLİ PARA TRANSFERİ METODU
     // Gönderen ID'den parayı düşer, Alıcı IBAN'a parayı ekler.
     public static String paraTransferiYap(String gonderenUserId, String aliciIban, double miktar) {
         Connection conn = null;
@@ -1127,7 +950,7 @@ public class DataBaseManager {
             conn = DriverManager.getConnection(URL);
             conn.setAutoCommit(false); // Otomatik kaydı kapat (Transaction Başlat)
 
-            // 1. Gönderenin Vadesiz TL Hesabını ve Bakiyesini Bul
+            //Gönderenin Vadesiz TL Hesabını ve Bakiyesini Bul
             String checkBalanceSql = "SELECT AccountId, Money_In_Account FROM Accounts WHERE BelongedUserId = ? AND AccountType = 'CHECKING' AND CurrencyType = 'TL'";
             checkBalanceStmt = conn.prepareStatement(checkBalanceSql);
             checkBalanceStmt.setString(1, gonderenUserId);
@@ -1144,7 +967,7 @@ public class DataBaseManager {
                 return "HATA: Yetersiz bakiye!";
             }
 
-            // 2. Alıcı IBAN Var mı Kontrol Et
+            //Alıcı IBAN Var mı Kontrol Et
             String checkReceiverSql = "SELECT AccountId FROM Accounts WHERE Iban = ?";
             checkReceiverStmt = conn.prepareStatement(checkReceiverSql);
             checkReceiverStmt.setString(1, aliciIban);
@@ -1155,19 +978,19 @@ public class DataBaseManager {
             }
             String receiverAccountId = rsReceiver.getString("AccountId");
 
-            // Kendi kendine transferi engelle
+            //Kendi kendine transferi engelle
             if(senderAccountId.equals(receiverAccountId)) {
                 return "HATA: Kendi hesabınıza bu menüden transfer yapamazsınız.";
             }
 
-            // 3. Gönderenden Parayı Düş
+            //Gönderenden Parayı Düş
             String deductSql = "UPDATE Accounts SET Money_In_Account = Money_In_Account - ? WHERE AccountId = ?";
             deductStmt = conn.prepareStatement(deductSql);
             deductStmt.setDouble(1, miktar);
             deductStmt.setString(2, senderAccountId);
             deductStmt.executeUpdate();
 
-            // 4. Alıcıya Parayı Ekle
+            //Alıcıya Parayı Ekle
             String addSql = "UPDATE Accounts SET Money_In_Account = Money_In_Account + ? WHERE AccountId = ?";
             addStmt = conn.prepareStatement(addSql);
             addStmt.setDouble(1, miktar);
@@ -1179,7 +1002,7 @@ public class DataBaseManager {
 
         } catch (SQLException e) {
             try {
-                if (conn != null) conn.rollback(); // Hata varsa geri al
+                if (conn != null) conn.rollback(); //Hata varsa geri al
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -1201,7 +1024,7 @@ public class DataBaseManager {
         }
     }
 
-    // --- OOP İÇİN: KULLANICININ VADESİZ HESABINI NESNE OLARAK GETİR ---
+    //KULLANICININ VADESİZ HESABINI NESNE OLARAK GETİR
     public static model.CheckingAccount getCheckingAccountObject(String userId) {
         String sql = "SELECT * FROM Accounts WHERE BelongedUserId = ? AND AccountType = 'CHECKING' AND CurrencyType = 'TL'";
         try (Connection conn = DriverManager.getConnection(URL);
@@ -1220,7 +1043,7 @@ public class DataBaseManager {
         return null;
     }
 
-    // --- OOP İÇİN: KULLANICININ DÖVİZ HESABINI NESNE OLARAK GETİR ---
+    //KULLANICININ DÖVİZ HESABINI NESNE OLARAK GETİR
     public static model.ForeignCurrencyAccount getForeignCurrencyAccountObject(String userId, String currencyType) {
         String sql = "SELECT * FROM Accounts WHERE BelongedUserId = ? AND CurrencyType = ?";
         try (Connection conn = DriverManager.getConnection(URL);
@@ -1240,8 +1063,7 @@ public class DataBaseManager {
         return null;
     }
 
-    // --- NESNEYİ GÜNCELLE (Save/Update) ---
-    // Modelde değişen bakiyeyi veritabanına yazar.
+    //NESNEYİ GÜNCELLE (Save/Update)
     public static boolean saveAccount(model.CheckingAccount account) {
         String sql = "UPDATE Accounts SET Money_In_Account = ? WHERE AccountId = ?";
 
@@ -1260,7 +1082,7 @@ public class DataBaseManager {
         }
     }
 
-    // --- OOP: BANKA KARTI NESNESİNİ GETİR ---
+    //BANKA KARTI NESNESİNİ GETİR
     public static model.DebitCard getDebitCardObject(String userId) {
         // Kartı bulmak için: UserId ve Tip = 'DEBIT' kontrolü yapıyoruz
         String sql = "SELECT * FROM Cards WHERE UserId = ? AND CardType = 'DEBIT'";
@@ -1272,11 +1094,8 @@ public class DataBaseManager {
             java.sql.ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                // Önce bağlı olduğu hesabı nesne olarak çekiyoruz
-                // Veritabanındaki sütun adı: LinkedAccountId
                 String linkedAccountId = rs.getString("LinkedAccountId");
 
-                // Eğer AccountId null ise veya hesap bulunamazsa kartı oluşturamayız
                 if (linkedAccountId == null) return null;
 
                 model.Account account = getAccountById(linkedAccountId);
@@ -1296,10 +1115,7 @@ public class DataBaseManager {
         return null;
     }
 
-    // =============================================================
-    // KURUMSAL MODÜL VE ABONELİK (YENİ EKLENEN KISIMLAR)
-    // =============================================================
-
+    // KURUMSAL MODÜL VE ABONELİK
     public static int getAboneSayisi(String corpId) {
         String sql = "SELECT COUNT(*) FROM Subscriptions WHERE CompanyUserId = ? AND IsActive = 1";
         try (Connection conn = DriverManager.getConnection(URL); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -1334,7 +1150,7 @@ public class DataBaseManager {
         return liste;
     }
 
-    // 4. YENİ ABONE KAYDETME (GÜNCELLENDİ)
+    //YENİ ABONE KAYDETME
     public static boolean addSubscription(String corpId, String tc, String ad, String soyad, int gun, double tutar) {
 
         // --- DEĞİŞİKLİK BURADA: Artık 3 parametreyi de kontrol ediyoruz ---
@@ -1343,7 +1159,6 @@ public class DataBaseManager {
             System.out.println("Doğrulama Başarısız: " + tc + " - " + ad + " " + soyad);
             return false;
         }
-        // ------------------------------------------------------------------
 
         String sql = "INSERT INTO Subscriptions(CompanyUserId, SubscriberTC, SubscriberName, SubscriberSurname, BillingDay, FixedAmount, IsActive, StartDate, ServiceName) VALUES(?,?,?,?,?,?,?,?,?)";
 
@@ -1368,23 +1183,18 @@ public class DataBaseManager {
         }
     }
 
-    // 5. GÜNCELLENMİŞ VE HATA AYIKLAYICI DOĞRULAMA METODU
+    //HATA AYIKLAYICI DOĞRULAMA METODU
     public static boolean validateIndividualUser(String tc, String ad, String soyad) {
 
-        // Girdileri temizle (Boşlukları sil)
         String cleanTC = tc.trim();
         String cleanAd = ad.trim();
         String cleanSoyad = soyad.trim();
 
-        // Konsola ne aradığımızı yazdıralım (Hata ayıklama için)
         System.out.println("--- KULLANICI SORGULANIYOR ---");
         System.out.println("Aranan TC: '" + cleanTC + "'");
         System.out.println("Aranan Ad: '" + cleanAd + "'");
         System.out.println("Aranan Soyad: '" + cleanSoyad + "'");
 
-        // SQL Sorgusu:
-        // 1. LOWER() kullanarak büyük/küçük harf sorununu çözeriz.
-        // 2. TRIM() kullanımı veritabanındaki olası boşlukları yoksayar.
         String sql = "SELECT * FROM Individual_Users WHERE TC_Kimlik = ? AND LOWER(name) = LOWER(?) AND LOWER(surname) = LOWER(?)";
 
         try (Connection conn = DriverManager.getConnection(URL);
@@ -1401,7 +1211,6 @@ public class DataBaseManager {
                 return true;
             } else {
                 System.out.println("SONUÇ: Eşleşen kayıt BULUNAMADI.");
-                // Yardımcı kontrol: Sadece TC var mı bakalım? Sorun adda mı TC'de mi anlayalım.
                 checkIfOnlyTCExists(cleanTC);
                 return false;
             }
@@ -1412,7 +1221,7 @@ public class DataBaseManager {
         }
     }
 
-    // DEBUG İÇİN YARDIMCI METOT (Bunu da validateIndividualUser'ın altına ekle)
+    // DEBUG İÇİN YARDIMCI METOT
     private static void checkIfOnlyTCExists(String tc) {
         String sql = "SELECT name, surname FROM Individual_Users WHERE TC_Kimlik = ?";
         try (Connection conn = DriverManager.getConnection(URL);
@@ -1429,15 +1238,11 @@ public class DataBaseManager {
             }
         } catch (Exception e) { e.printStackTrace(); }
     }
-    // =============================================================
-    // EKSİK OLAN BİREYSEL FATURA VE ABONELİK METOTLARI
-    // =============================================================
 
-    // 1. Müşterinin Aboneliklerini Getir
+    //BİREYSEL FATURA VE ABONELİK METOTLARI
     public static java.util.ArrayList<String[]> getBireyselAbonelikler(String tc) {
         java.util.ArrayList<String[]> liste = new java.util.ArrayList<>();
 
-        // DÜZELTME: e.UserId YERİNE e.Corporate_Code KULLANIYORUZ
         String sql = "SELECT s.ServiceName, e.Enterprise_Name, s.FixedAmount, s.BillingDay " +
                 "FROM Subscriptions s " +
                 "JOIN Enterprise_Users e ON s.CompanyUserId = e.Corporate_Code " + // <-- DEĞİŞTİ
@@ -1463,11 +1268,10 @@ public class DataBaseManager {
         return liste;
     }
 
-    // 2. Müşterinin Ödenmemiş Faturalarını Getir
+    //Müşterinin Ödenmemiş Faturalarını Getir
     public static java.util.ArrayList<String[]> getBireyselFaturalar(String tc) {
         java.util.ArrayList<String[]> liste = new java.util.ArrayList<>();
 
-        // DÜZELTME: e.UserId YERİNE e.Corporate_Code KULLANIYORUZ
         String sql = "SELECT i.InvoiceId, s.ServiceName, e.Enterprise_Name, i.Amount, i.DueDate " +
                 "FROM Invoices i " +
                 "JOIN Subscriptions s ON i.SubscriptionId = s.SubscriptionId " +
@@ -1495,9 +1299,7 @@ public class DataBaseManager {
         return liste;
     }
 
-    // =============================================================
-    // 3. FATURA ÖDEME İŞLEMİ (DEBUG VERSİYONU)
-    // =============================================================
+    //FATURA ÖDEME İŞLEMİ (DEBUG VERSİYONU)
     public static String faturaOde(String userId, String invoiceId) {
         System.out.println("--- FATURA ÖDEME İŞLEMİ BAŞLADI ---");
         System.out.println("Kullanıcı ID: " + userId);
@@ -1508,9 +1310,7 @@ public class DataBaseManager {
             conn = java.sql.DriverManager.getConnection(URL);
             conn.setAutoCommit(false); // Transaction Başlangıcı
 
-            // ---------------------------------------------------------
             // ADIM 1: Faturayı ve Şirket ID'sini Bul
-            // ---------------------------------------------------------
             String sqlFatura = "SELECT i.Amount, s.CompanyUserId " +
                     "FROM Invoices i " +
                     "JOIN Subscriptions s ON i.SubscriptionId = s.SubscriptionId " +
@@ -1530,9 +1330,7 @@ public class DataBaseManager {
 
             System.out.println("1. ADIM BAŞARILI: Tutar=" + tutar + " , Alıcı Şirket ID=" + sirketId);
 
-            // ---------------------------------------------------------
             // ADIM 2: Kullanıcının (Ödeyenin) TL Hesabını Bul
-            // ---------------------------------------------------------
             String sqlUser = "SELECT AccountId, Money_In_Account FROM Accounts WHERE BelongedUserId = ? AND CurrencyType = 'TL'";
             java.sql.PreparedStatement pstmtUser = conn.prepareStatement(sqlUser);
             pstmtUser.setString(1, userId);
@@ -1547,9 +1345,7 @@ public class DataBaseManager {
 
             if (currentBalance < tutar) return "HATA: Yetersiz Bakiye.";
 
-            // ---------------------------------------------------------
-            // ADIM 3: Şirketin (Alıcının) TL Hesabını Bul (KRİTİK NOKTA)
-            // ---------------------------------------------------------
+            // ADIM 3: Şirketin (Alıcının) TL Hesabını Bulma
             String sqlCorp = "SELECT a.AccountId FROM Accounts a " +
                     "JOIN Enterprise_Users e ON a.BelongedUserId = e.UserId " +
                     "WHERE e.Corporate_Code = ? AND a.CurrencyType = 'TL'";
@@ -1566,25 +1362,21 @@ public class DataBaseManager {
             String corpAccId = rsCorp.getString("AccountId");
             System.out.println("3. ADIM BAŞARILI: Alıcı Şirket Hesap ID=" + corpAccId);
 
-            // ---------------------------------------------------------
             // ADIM 4: TRANSFER (UPDATE)
-            // ---------------------------------------------------------
-
-            // A) Kullanıcıdan Düş
             java.sql.PreparedStatement sub = conn.prepareStatement("UPDATE Accounts SET Money_In_Account = Money_In_Account - ? WHERE AccountId = ?");
             sub.setDouble(1, tutar);
             sub.setString(2, userAccId);
             int rowsUser = sub.executeUpdate();
             System.out.println("4A. Kullanıcı Bakiyesi Güncellendi: " + (rowsUser > 0 ? "EVET" : "HAYIR"));
 
-            // B) Şirkete Ekle
+            //Şirkete Ekle
             java.sql.PreparedStatement add = conn.prepareStatement("UPDATE Accounts SET Money_In_Account = Money_In_Account + ? WHERE AccountId = ?");
             add.setDouble(1, tutar);
             add.setString(2, corpAccId);
             int rowsCorp = add.executeUpdate();
             System.out.println("4B. Şirket Bakiyesi Güncellendi: " + (rowsCorp > 0 ? "EVET" : "HAYIR"));
 
-            // C) Faturayı Kapat
+            //Faturayı Kapat
             java.sql.PreparedStatement close = conn.prepareStatement("UPDATE Invoices SET IsPaid = 1 WHERE InvoiceId = ?");
             close.setString(1, invoiceId);
             close.executeUpdate();
@@ -1602,9 +1394,7 @@ public class DataBaseManager {
         }
     }
 
-    // =============================================================
     // KURUMSAL: MANUEL FATURA KESME (INSERT)
-    // =============================================================
     public static boolean addInvoice(String subscriptionId, double amount) {
         // Rastgele Fatura ID
         String invoiceId = ProduceRandomID();
@@ -1633,9 +1423,8 @@ public class DataBaseManager {
         }
         return false;
     }
-    // =============================================================
-    // EKSİK OLAN METOT: BASİT HESAP AÇMA (Kurumsal İçin)
-    // =============================================================
+
+    //BASİT HESAP AÇMA (Kurumsal İçin)
     private static void createAccountRaw(String userId, String currency, double amount) {
         // Hesaplar tablosuna ekleme yapan SQL
         String sql = "INSERT INTO Accounts(BelongedUserId, AccountId, Iban, Money_In_Account, AccountType, CurrencyType, CreationDate) VALUES(?,?,?,?,?,?,?)";
@@ -1665,9 +1454,7 @@ public class DataBaseManager {
         }
     }
 
-    // =============================================================
     // KREDİ KARTI İLE ÖDEMEDE ŞİRKETE PARA YATIRMA
-    // =============================================================
     public static boolean depositToCompany(String invoiceId) {
         String sqlInfo = "SELECT i.Amount, s.CompanyUserId FROM Invoices i " +
                 "JOIN Subscriptions s ON i.SubscriptionId = s.SubscriptionId WHERE i.InvoiceId = ?";
@@ -1702,9 +1489,7 @@ public class DataBaseManager {
         return false;
     }
 
-    // =============================================================
     // ZAMAN SİMÜLASYONU (ADMIN KONSOLUNDAN ÇAĞRILIR)
-    // =============================================================
     public static void processDailyOperations(int daysToAdvance) {
         java.time.LocalDate currentDate = Managers.TimeManager.getCurrentDate();
 
@@ -1722,15 +1507,12 @@ public class DataBaseManager {
         Managers.TimeManager.advanceDate(daysToAdvance);
     }
 
-    // A. VADELİ HESAP FAİZ DAĞITIMI (SQLITE_BUSY HATASI GİDERİLMİŞ VERSİYON)
+    //VADELİ HESAP FAİZ DAĞITIMI
     private static void checkDepositMaturity(java.time.LocalDate simulationDate) {
         String sql = "SELECT * FROM Accounts WHERE UPPER(AccountType) IN ('DEPOSIT', 'VADELI', 'DEPOSITACCOUNT')";
 
-        // İşlem yapılacakları geçici hafızaya alıyoruz (DB Kilidini önlemek için)
-        // [0]: AccountId (Vadeli), [1]: UserId, [2]: ToplamPara (Ana+Faiz)
         java.util.ArrayList<String[]> islemListesi = new java.util.ArrayList<>();
 
-        // ADIM 1: OKUMA (READ) - Sadece veri topluyoruz, işlem yapmıyoruz
         try (java.sql.Connection conn = java.sql.DriverManager.getConnection(URL);
              java.sql.Statement stmt = conn.createStatement();
              java.sql.ResultSet rs = stmt.executeQuery(sql)) {
@@ -1747,12 +1529,12 @@ public class DataBaseManager {
                 java.time.LocalDate createDate = java.time.LocalDate.parse(createDateStr);
                 java.time.LocalDate vadeSonu = createDate.plusDays(vadeGun);
 
-                // Vade doldu mu?
+                // Vade doldu mu
                 if (!simulationDate.isBefore(vadeSonu)) {
                     double netKazanc = model.DepositAccount.calculateProjectedNetProfit(anapara, vadeGun);
                     double toplam = anapara + netKazanc;
 
-                    // Listeye ekle (Veritabanına dokunma!)
+                    // Listeye ekle
                     islemListesi.add(new String[]{accId, userId, String.valueOf(toplam), String.valueOf(netKazanc)});
                 }
             }
@@ -1760,10 +1542,7 @@ public class DataBaseManager {
             System.out.println("Okuma Hatası: " + e.getMessage());
         }
 
-        // --- BURADA VERİTABANI BAĞLANTISI KENDİLİĞİNDEN KAPANDI ---
-        // Artık yazma işlemi yapabiliriz, kilit yok.
-
-        // ADIM 2: YAZMA (WRITE) - Para yatırma ve Silme
+        //Para yatırma ve Silme
         if (!islemListesi.isEmpty()) {
             for (String[] islem : islemListesi) {
                 String vadeliAccId = islem[0];
@@ -1771,7 +1550,7 @@ public class DataBaseManager {
                 double toplamTutar = Double.parseDouble(islem[2]);
                 String kazancStr = islem[3]; // Log için
 
-                System.out.println(">>> 💰 VADE DOLDU! Hesap: " + vadeliAccId + " | Kazanç: " + kazancStr + " TL");
+                System.out.println(">>>  VADE DOLDU! Hesap: " + vadeliAccId + " | Kazanç: " + kazancStr + " TL");
 
                 // A) Parayı Vadesiz Hesaba Aktar (UPDATE)
                 model.CheckingAccount vadesiz = getCheckingAccountObject(userId);
@@ -1779,9 +1558,9 @@ public class DataBaseManager {
                     try {
                         vadesiz.addMoneyToAccount((float) toplamTutar);
                         saveAccount(vadesiz); // Bu metot artık güvenle çalışır
-                        System.out.println("    -> ✅ " + String.format("%.2f", toplamTutar) + " TL Müşterinin (ID: " + userId + ") Vadesiz Hesabına Yatırıldı.");
+                        System.out.println("    -> " + String.format("%.2f", toplamTutar) + " TL Müşterinin (ID: " + userId + ") Vadesiz Hesabına Yatırıldı.");
                     } catch (Exception e) {
-                        System.out.println("    -> ❌ Transfer Hatası: " + e.getMessage());
+                        System.out.println("    -> Transfer Hatası: " + e.getMessage());
                     }
                 }
 
@@ -1790,9 +1569,9 @@ public class DataBaseManager {
                      java.sql.PreparedStatement pstmt = conn.prepareStatement("DELETE FROM Accounts WHERE AccountId = ?")) {
                     pstmt.setString(1, vadeliAccId);
                     pstmt.executeUpdate();
-                    System.out.println("    -> 🗑️ Vadeli Hesap (ID: " + vadeliAccId + ") kapatıldı ve silindi.");
+                    System.out.println("    -> Vadeli Hesap (ID: " + vadeliAccId + ") kapatıldı ve silindi.");
                 } catch (Exception e) {
-                    System.out.println("    -> ❌ Silme Hatası: " + e.getMessage());
+                    System.out.println("    -> Silme Hatası: " + e.getMessage());
                 }
             }
         }
@@ -1831,9 +1610,7 @@ public class DataBaseManager {
         }
     }
 
-    // =============================================================
-    // GENEL HESAP KAYDETME (Polimorfizm İçin)
-    // =============================================================
+    // GENEL HESAP KAYDETME (Polimorfizm)
     // Bu metot, CheckingAccount, DepositAccount veya ForeignCurrencyAccount fark etmeksizin
     // gelen her türlü hesabın sadece bakiyesini günceller.
     public static boolean saveAccount(model.Account account) {
@@ -1855,11 +1632,9 @@ public class DataBaseManager {
             java.sql.ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                // 1. Tarih Dönüşümü (SQL Date -> Java LocalDate)
                 java.sql.Date sqlDate = rs.getDate("Creation_Date");
                 java.time.LocalDate creationDate = (sqlDate != null) ? sqlDate.toLocalDate() : java.time.LocalDate.now();
 
-                // 2. Nesneyi Oluştur (Sıralama tam senin Constructor'ına göre)
                 model.DepositAccount acc = new model.DepositAccount(
                         rs.getString("Account_ID"),           // 1. String id
                         rs.getString("User_ID"),              // 2. String userId
@@ -1867,10 +1642,6 @@ public class DataBaseManager {
                         rs.getInt("Term_Days"),               // 4. int termDays
                         creationDate                          // 5. LocalDate creationDate
                 );
-
-                // Eğer modelinde isim set etme özelliği varsa sonradan ekleyebilirsin:
-                // acc.setAccountName(rs.getString("Account_Name"));
-
                 return acc;
             }
         } catch (Exception e) {

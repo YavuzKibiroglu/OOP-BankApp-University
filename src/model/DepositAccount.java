@@ -7,15 +7,12 @@ import java.time.temporal.ChronoUnit;
 
 public class DepositAccount extends Account {
 
-    // İsim karışıklığını çözmek için değişken adını 'termDays' yaptık.
     private int termDays;
     private LocalDate creationDate;
 
     private static final double TAX_RATE = 0.05;
 
-    // --- CONSTRUCTOR (YAPICI METOT) ---
-    // DataBaseManager.java'daki "new model.DepositAccount(...)" sırasıyla aynı yapıldı.
-    // Sıra: AccountID, UserID, Bakiye, VadeGünü, Tarih
+    //CONSTRUCTOR
     public DepositAccount(
             String accountId,
             String userId,
@@ -24,35 +21,30 @@ public class DepositAccount extends Account {
             LocalDate creationDate
     ) {
         // Account sınıfının constructor yapısına göre super çağrısı:
-        // (Eğer Account sınıfın super(userId, accountId, money) istiyorsa burası doğrudur)
         super(userId, accountId, moneyInAccount);
 
         this.termDays = termDays;
         this.creationDate = creationDate;
     }
 
-    // ==========================================
-    // UI VE MANAGER İÇİN GEREKLİ GETTER'LAR
-    // ==========================================
 
-    // 1. Bakiye (getBalance hatası için)
+    // UI VE MANAGER İÇİN GEREKLİ GETTER'LAR
+    // 1. Bakiye
     public double getBalance() {
         return super.getMoneyInAccount();
     }
 
-    // 2. Vade Günü (getOriginalTermDays hatası için)
+    // 2. Vade Günü
     public int getOriginalTermDays() {
         return this.termDays;
     }
 
-    // 3. Oluşturulma Tarihi (getCreationDate hatası için)
+    // 3. Oluşturulma Tarihi
     public LocalDate getCreationDate() {
         return this.creationDate;
     }
 
-    // -------------------------------
-    // FAİZ ORANI (INSTANCE İÇİN)
-    // -------------------------------
+    // FAİZ ORANI
     private double getInterestRate() {
         if (this.termDays >= 365) return 50.0;
         else if (this.termDays >= 181) return 48.0;
@@ -60,9 +52,8 @@ public class DepositAccount extends Account {
         else return 40.0;
     }
 
-    // -------------------------------
-    // NET KAZANÇ (INSTANCE İÇİN)
-    // -------------------------------
+
+    // NET KAZANÇ
     public double calculateNetProfit() {
         double rate = getInterestRate();
         // depositDays yerine termDays kullandık
@@ -70,9 +61,6 @@ public class DepositAccount extends Account {
         return grossProfit * (1.0 - TAX_RATE);
     }
 
-    /**
-     * UI için ön izleme metodu (Statik)
-     */
     public static double calculateProjectedNetProfit(double amount, int days) {
         double rate;
         if (days >= 365) rate = 50.0;
@@ -84,9 +72,7 @@ public class DepositAccount extends Account {
         return grossProfit * 0.95; // %5 stopaj
     }
 
-    // -------------------------------
     // BİLGİ METODU
-    // -------------------------------
     @Override
     public String getInformation() {
         long kalanGun = 0;

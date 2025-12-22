@@ -21,7 +21,7 @@ public class CreditCard extends Card {
         return String.format("KREDİ KARTI | Limit: %.2f | Borç: %.2f", creditLimit, currentDebt);
     }
 
-    // --- 1. HARCAMA YAP (Nakit Avans veya Alışveriş) ---
+    //HARCAMA YAP (Nakit Avans veya Alışveriş)
     @Override
     public boolean spend(float amount) {
         if (amount <= 0) return false;
@@ -35,14 +35,14 @@ public class CreditCard extends Card {
         return true;
     }
 
-    // --- 2. BORÇ ÖDE (DÜZELTİLDİ: Try-Catch Yapısı) ---
+    // BORÇ ÖDE
     public boolean payDebt(CheckingAccount sourceAccount, float amount) {
         if (amount <= 0) return false;
         if (amount > currentDebt) return false;
 
         try {
-            // Hesaptan parayı çekmeyi dene
-            sourceAccount.withdraw(amount); // <-- HATA FIRLATABİLİR
+            // Hesaptan parayı çekmeyi deneme
+            sourceAccount.withdraw(amount);
 
             // Para çekildiyse borcu düş
             this.currentDebt -= amount;

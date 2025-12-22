@@ -31,7 +31,7 @@ public class AdminConsole {
         }
     }
 
-    // 2. MENÜ DÖNGÜSÜ
+    //MENÜ DÖNGÜSÜ
     private static void showMenu(Scanner scanner) {
         boolean running = true;
 
@@ -82,7 +82,7 @@ public class AdminConsole {
             }
         }
     }
-    // --- 3. DÖVİZ GÜNCELLEME EKRANI (SEÇMELİ) ---
+    //DÖVİZ GÜNCELLEME EKRANI (SEÇMELİ)
     private static void updateCurrencyRates() {
         Scanner scanner = new Scanner(System.in);
 
@@ -119,7 +119,6 @@ public class AdminConsole {
                     System.out.print("Yeni USD Satis: ");
                     newSell = Double.parseDouble(scanner.nextLine());
 
-                    // Kaydet (USD Yeni, Diğerleri Eski Değerleriyle Kalır)
                     Managers.CurrencyManager.updateRates(
                             newBuy, newSell,
                             Managers.CurrencyManager.getEurBuy(), Managers.CurrencyManager.getEurSell(),
@@ -135,7 +134,6 @@ public class AdminConsole {
                     System.out.print("Yeni EUR Satis: ");
                     newSell = Double.parseDouble(scanner.nextLine());
 
-                    // Kaydet (EUR Yeni, Diğerleri Eski)
                     Managers.CurrencyManager.updateRates(
                             Managers.CurrencyManager.getUsdBuy(), Managers.CurrencyManager.getUsdSell(),
                             newBuy, newSell,

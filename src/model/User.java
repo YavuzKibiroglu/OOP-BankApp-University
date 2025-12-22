@@ -3,7 +3,7 @@ package model;
 import java.time.LocalDate;
 
 public abstract class User implements IUserOperations {
-    // Encapsulation: Değişkenler private [cite: 37]
+    // Encapsulation: Değişkenler private
     private String userId;
     private String password;
 
@@ -12,7 +12,7 @@ public abstract class User implements IUserOperations {
         this.password = password;
     }
 
-    // Getter ve Setter Metotları [cite: 38]
+    // Getter ve Setter Metotları
     @Override
     public String getUserId() {
         return userId;

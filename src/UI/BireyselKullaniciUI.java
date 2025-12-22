@@ -2,22 +2,22 @@ package UI;
 
 public class BireyselKullaniciUI extends javax.swing.JFrame {
 
-    // --- SINIF SEVİYESİ DEĞİŞKENLER (Global Variables) ---
+    //SINIF SEVİYESİ DEĞİŞKENLER
     private model.IndividualUser aktifKullanici;
     private String seciliFaturaId = ""; // Ödenecek faturanın ID'sini tutar
     private double seciliFaturaTutari = 0.0;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(BireyselKullaniciUI.class.getName());
 
-    // --- CONSTRUCTOR (YAPICI METOT) ---
+    //CONSTRUCTOR
     public BireyselKullaniciUI(model.IndividualUser user) {
         this.aktifKullanici = user;
         initComponents();
         dovizInputlariniDuzenle();
-        this.pack(); // Pencereyi içindeki elemanlara göre otomatik sığdırır (Taşmayı önler)
-        this.setLocationRelativeTo(null); // Pencereyi tekrar ekranın ortasına alır
+        this.pack();
+        this.setLocationRelativeTo(null);
 
-        // --- BUTON İKONLARI (32x32 Boyutunda Ayarlandı) ---
+        //BUTON İKONLARI (32x32 Boyutunda Ayarlandı)
         AnaSayfaBtn.setIcon(IconHelper.createIcon("/resources/home.png", 32, 32));
         IslemlerBtn.setIcon(IconHelper.createIcon("/resources/transaction-history.png", 32, 32));
         HesaplarBtn.setIcon(IconHelper.createIcon("/resources/user.png", 32, 32));
@@ -2207,13 +2207,8 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     }
 
     private void HspVadeliAcBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        // 1. Ana ekranı "İşlemler" paneline çevir
         mainSayfaDegistir("cardIslemlerPanel");
-
-        // 2. Başlığı güncelle
         panelAdiLabel.setText("İŞLEMLER");
-
-        // 3. İşlemler içindeki alt paneli "Vadeli İşlem Formu"na çevir
         islemlerSayfaDegistir("cardIslVadeliPanel");
     }
 
@@ -2253,15 +2248,13 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         try {
             double miktar = Double.parseDouble(miktarStr);
 
-            // 1. Kaynak Hesabı (Kendi Hesabını) Getir
+            //Kaynak Hesabı (Kendi Hesabını) Getir
             model.CheckingAccount sourceAccount = Managers.DataBaseManager.getCheckingAccountObject(aktifKullanici.getUserId());
 
-            // 2. Hedef Hesabı (Karşı Tarafı) IBAN ile Bul
+            //Hedef Hesabı (Karşı Tarafı) IBAN ile Bul
             String targetAccountId = Managers.DataBaseManager.getAccountIdByIBAN(aliciIban);
 
             if (targetAccountId == null) {
-                // Eğer veritabanından NULL dönerse, demek ki böyle bir hesap yok.
-                // Manuel olarak hatayı fırlatıyoruz:
                 throw new Exceptions.HesapBulunamadiException("Girilen IBAN (" + aliciIban + ") sistemde bulunamadı!");
             }
 
@@ -2269,7 +2262,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
             model.Account targetAccount = Managers.DataBaseManager.getAccountById(targetAccountId);
 
             if (sourceAccount != null) {
-                // Transferi Yap (Bu da YetersizBakiyeException fırlatabilir)
                 boolean sonuc = sourceAccount.transferTo(targetAccount, miktar);
 
                 if (sonuc) {
@@ -2280,8 +2272,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                 }
             }
 
-            // --- HATALARI YAKALADIĞIMIZ YER (CATCH BLOKLARI) ---
-
+        //HATALARI YAKALADIĞIMIZ YER (CATCH BLOKLARI)
         } catch (Exceptions.HesapBulunamadiException e) {
             // Yanlış IBAN girilince burası çalışır
             javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Hesap Bulunamadı", javax.swing.JOptionPane.ERROR_MESSAGE);
@@ -2310,8 +2301,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
             else if (secilenVade.contains("181")) gun = 181;
             else if (secilenVade.contains("365")) gun = 365;
 
-            // --- DEĞİŞİKLİK BURADA ---
-            // Artık formül UI'da değil, Model'de!
             double netKazanc = model.DepositAccount.calculateProjectedNetProfit(miktar, gun);
 
             IslVadeliKazancLabel.setText("Tahmini Net Getiri: " + String.format("%.2f TL", netKazanc));
@@ -2342,15 +2331,12 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
             if (sonuc.equals("BASARILI")) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Vadeli Hesap Açıldı!");
 
-                // --- EKRANLARI YENİLE ---
+                //EKRANLARI YENİLE
                 hesaplariGuncelle();
                 anaSayfaGuncelle();
                 vadeliHesapSayfasiniYonet(); // Hesaplar sekmesini yeniler
                 varliklariGuncelle();       // Varlıkları yeniler (TL azaldı, Vadeli arttı)
-
-                // --- UNUTULAN KISIM BURASIYDI: ---
                 vadeliIslemBilgisiniGuncelle(); // "Hiç hesabınız yok" yazısını günceller!
-                // ---------------------------------
 
                 // Hesaplar sayfasına yönlendir
                 mainSayfaDegistir("cardHesaplarPanel");
@@ -2365,7 +2351,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     }
 
     private void IslVadeliVadeliHesapGormeBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        // 1. Önce ANA EKRANI "Hesaplar" sekmesine geçir (Eksik olan buydu)
+        // 1. Önce ANA EKRANI "Hesaplar" sekmesine geçir
         mainSayfaDegistir("cardHesaplarPanel");
         panelAdiLabel.setText("HESAPLARIM");
 
@@ -2401,13 +2387,11 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         try {
             double miktar = Double.parseDouble(miktarStr);
 
-            // Service Katmanını Çağır
             String sonuc = Managers.BankService.nakitAvansCek(aktifKullanici.getUserId(), miktar);
 
             if (sonuc.equals("BASARILI")) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Nakit Avans Vadesiz Hesabınıza Aktarıldı!");
 
-                // Bakiyeleri Güncelle
                 anaSayfaGuncelle();
                 hesaplariGuncelle();
                 varliklariGuncelle();
@@ -2422,11 +2406,9 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     }
 
     private void KrediKartBorcOdeBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        // 1. Güncel Borcu Çek
         model.CreditCard kart = Managers.DataBaseManager.getCreditCardObject(aktifKullanici.getUserId());
 
         if (kart != null) {
-            // Formdaki Label'a borcu yaz
             KrediKartBorcGoruntulemeLabel.setText(String.format("Güncel Borcunuz: %,.2f TL", kart.getCurrentDebt()));
 
             // 2. Formu Hazırla ve Aç
@@ -2451,20 +2433,17 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     }
 
     private void KrediKartBorcOdeFormBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        // Kullanıcıdan ödeme miktarını al
         String miktarStr = javax.swing.JOptionPane.showInputDialog(KrediKartBorcOdeForm, "Ödemek istediğiniz tutarı giriniz:");
 
         if (miktarStr != null && !miktarStr.isEmpty()) {
             try {
                 double miktar = Double.parseDouble(miktarStr);
 
-                // BankService ile ödeme yap
                 String sonuc = Managers.BankService.krediKartiBorcuOde(aktifKullanici.getUserId(), miktar);
 
                 if (sonuc.equals("BASARILI")) {
                     javax.swing.JOptionPane.showMessageDialog(KrediKartBorcOdeForm, "Borç Ödeme Başarılı!");
 
-                    // Tüm ekranları güncelle
                     kartlariGuncelle();
                     anaSayfaGuncelle();
                     varliklariGuncelle();
@@ -2480,18 +2459,15 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     }
 
     private void UstPanelCıkısYapBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        // 1. Kullanıcıya emin olup olmadığını soralım (İsteğe bağlı, güvenlik için iyidir)
         int secim = javax.swing.JOptionPane.showConfirmDialog(this,
                 "Oturumu kapatmak istediğinize emin misiniz?",
                 "Çıkış Yap",
                 javax.swing.JOptionPane.YES_NO_OPTION);
 
         if (secim == javax.swing.JOptionPane.YES_OPTION) {
-            // 2. Ana Menü ekranını (Login ekranını) tekrar aç
             MainMenuUI anaMenu = new MainMenuUI();
             anaMenu.setVisible(true);
 
-            // 3. Mevcut ekranı (BireyselKullaniciUI) tamamen yok et/kapat
             this.dispose();
         }
     }
@@ -2532,7 +2508,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     }
 
     private void FaturaOdemeOdeBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        // KONSOL TAKİBİ - 1
         System.out.println("DEBUG: 'Öde' butonuna basıldı.");
 
         // Önce Fatura ID var mı kontrol et
@@ -2544,14 +2519,13 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
 
         System.out.println("DEBUG: Seçilen Fatura ID: " + seciliFaturaId);
 
-        // --- SEÇENEK 1: BANKA KARTI (VADESİZ HESAP) ---
+        //BANKA KARTI (VADESİZ HESAP)
         if (FaturaBankaKartOdeRdBtn.isSelected()) {
             System.out.println("DEBUG: Banka Kartı (Vadesiz Hesap) seçildi. Backend'e gidiliyor...");
 
-            // Backend metodunu çağırıyoruz
             String sonuc = Managers.DataBaseManager.faturaOde(aktifKullanici.getUserId(), seciliFaturaId);
 
-            // KONSOL TAKİBİ - 2 (En Kritik Yer)
+            // KONSOL TAKİBİ
             System.out.println("DEBUG: Backend'den dönen cevap: " + sonuc);
 
             if (sonuc.equals("BASARILI")) {
@@ -2563,7 +2537,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
             }
         }
 
-        // --- SEÇENEK 2: KREDİ KARTI ---
+        //KREDİ KARTI
         else if (FaturaKrediKartOdeRdBtn.isSelected()) {
             System.out.println("DEBUG: Kredi Kartı seçildi.");
 
@@ -2598,15 +2572,8 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * @param args the command line arguments
-     */
+
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -2617,14 +2584,12 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
             logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new BireyselKullaniciUI(null).setVisible(true));
     }
 
 
-    //=======Kendi özel fonksiyonlarım=========
+    //Kendi özel fonksiyonlarım
     private void mainSayfaDegistir(String kartIsmi) {
         // 1. Kartı Değiştir
         java.awt.CardLayout layout = (java.awt.CardLayout) PanelContainer.getLayout();
@@ -2647,9 +2612,8 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     }
 
 
-    // --- EKRANA VERİ BASAN METOTLAR ---
-
-    // 1. İsim ve Müşteri No Göster (Üst Panel)
+    //EKRANA VERİ BASAN METOTLAR
+    //İsim ve Müşteri No Göster
     private void kullaniciBilgileriniGoster() {
         if (aktifKullanici != null) {
             AdSoyadLabel.setText("Sn. " + aktifKullanici.getName() + " " + aktifKullanici.getSurname());
@@ -2657,22 +2621,17 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         }
     }
 
-    // 2. Ana Sayfa (Dashboard) Güncelleme
+    //Ana Sayfa Güncelleme
     private void anaSayfaGuncelle() {
         if (aktifKullanici != null) {
-            // --- DEĞİŞİKLİK BURADA ---
-            // Eskiden sadece bakiyeyi çekiyorduk (getVadesizTLBakiye).
-            // Şimdi Hesaplar sayfasındaki gibi hem BAKİYE hem IBAN'ı "TL" koduyla çekiyoruz.
             String[] hesapBilgisi = Managers.DataBaseManager.getAccountDetails(aktifKullanici.getUserId(), "TL");
 
             double miktar = Double.parseDouble(hesapBilgisi[0]); // [0] Bakiye
             String iban = hesapBilgisi[1];                       // [1] IBAN
 
             AnaSayfaVadesizBakiyeLabel.setText(String.format("%,.2f TL", miktar));
-            AnaSayfaVadesizIBANLabel.setText(iban); // <-- Artık gerçek IBAN yazıyor
-            // -------------------------
+            AnaSayfaVadesizIBANLabel.setText(iban);
 
-            // Kredi Kartı Bilgileri (Aynı kaldı)
             double[] kartBilgisi = Managers.DataBaseManager.getCreditCardInfo(aktifKullanici.getUserId());
             double limit = kartBilgisi[0];
             double borc = kartBilgisi[1];
@@ -2684,39 +2643,30 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         }
     }
 
-    // --- HESAPLAR SAYFASINI GÜNCELLE (Senin CurrencyManager ile Uyumlu) ---
+    //HESAPLAR SAYFASINI GÜNCELLE
     private void hesaplariGuncelle() {
         if (aktifKullanici == null) return;
         String userId = aktifKullanici.getUserId();
 
-        // ---------------------------------------------------------
         // 1. VADESİZ TL HESABI
-        // ---------------------------------------------------------
         String[] tlDetay = Managers.DataBaseManager.getAccountDetails(userId, "TL");
         double tlMiktar = Double.parseDouble(tlDetay[0]);
 
         HspVadesizBakiyeLbl.setText(String.format("%,.2f TL", tlMiktar));
         HspVadesizIBANLbl.setText("IBAN: " + tlDetay[1]);
 
-        // ---------------------------------------------------------
         // 2. DOLAR HESABI (USD)
-        // ---------------------------------------------------------
         String[] usdDetay = Managers.DataBaseManager.getAccountDetails(userId, "USD");
         double usdMiktar = Double.parseDouble(usdDetay[0]);
 
-        // Bakiyeyi yaz
         HspDovizDolarBakiyeLabel.setText(String.format("%,.2f $", usdMiktar));
 
-        // TL Karşılığını Hesapla (Bankanın ALIŞ fiyatından hesaplıyoruz)
-        // Senin kodunda: USD_BUY = 32.50
         double usdKur = Managers.CurrencyManager.getBuyRate("USD");
         double usdTlKarsiligi = usdMiktar * usdKur;
 
         HspDovizDolarTLLabel.setText(String.format("≈ %,.2f TL", usdTlKarsiligi));
 
-        // ---------------------------------------------------------
-        // 3. EURO HESABI (EUR)
-        // ---------------------------------------------------------
+        //EURO HESABI (EUR)
         String[] eurDetay = Managers.DataBaseManager.getAccountDetails(userId, "EUR");
         double eurMiktar = Double.parseDouble(eurDetay[0]);
 
@@ -2728,23 +2678,19 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
 
         HspDovizEuroTLLabel.setText(String.format("≈ %,.2f TL", eurTlKarsiligi));
 
-        // ---------------------------------------------------------
-        // 4. ALTIN HESABI (ALTIN / GOLD)
-        // ---------------------------------------------------------
-        // Veritabanında tür "ALTIN" olarak geçiyor, ama CurrencyManager'da "GOLD" istiyor.
+        //ALTIN HESABI
         String[] altinDetay = Managers.DataBaseManager.getAccountDetails(userId, "ALTIN");
         double altinMiktar = Double.parseDouble(altinDetay[0]);
 
         HspDovizAltınBakiyeLabel.setText(String.format("%,.2f Gr", altinMiktar));
 
-        // TL Karşılığı (Parametre olarak "GOLD" gönderiyoruz)
         double altinKur = Managers.CurrencyManager.getBuyRate("ALTIN");
         double altinTlKarsiligi = altinMiktar * altinKur;
 
         HspDovizAltınTLLabel.setText(String.format("≈ %,.2f TL", altinTlKarsiligi));
     }
 
-    // --- VADELİ HESAP EKRANI YÖNETİMİ (Mantık Burada) ---
+    //VADELİ HESAP EKRANI YÖNETİMİ
     private void vadeliHesapSayfasiniYonet() {
         if (aktifKullanici == null) return;
 
@@ -2756,7 +2702,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         } else {
             layout.show(HspVadeliPanel, "cardHspVadeliVarPanel");
 
-            // --- BU KISMI EKLE: LABELLARI TAMAMEN GİZLE ---
+            //LABELLARI TAMAMEN GİZLE
             HspVadeliTürüLbl.setVisible(false);
             HspVadeliYatirilanTutarLbl.setVisible(false);
             HspVadeliKalanGunLbl.setVisible(false);
@@ -2765,7 +2711,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
             jLabel23.setVisible(false);
             jLabel24.setVisible(false);
             jLabel25.setVisible(false);
-            // ----------------------------------------------
 
             HspVadeliListComboBox.removeAllItems();
             for (String hesapAdi : hesapListesi) {
@@ -2774,12 +2719,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         }
     }
 
-
-    // =========================================================================
-    // 5. YENİ İŞLEM MANTIKLARI (LOGIC) - BURAYI KOPYALA
-    // =========================================================================
-
-    // --- A. DÖVİZ KURLARINI EKRANA BASMA ---
+    //DÖVİZ KURLARINI EKRANA BASMA
     private void dovizKurlariniEkranaYaz() {
         // Dolar
         IslDovizDolarAlısKur.setText(String.valueOf(Managers.CurrencyManager.getUsdBuy()));
@@ -2794,7 +2734,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         IslDovizAltinSatisKur.setText(String.valueOf(Managers.CurrencyManager.getGauSell()));
     }
 
-    // --- E. DÖVİZ İŞLEMLERİ (ORTAK METOT) ---
+    //DÖVİZ İŞLEMLERİ
     private void dovizIslemiYap(String tur, javax.swing.JTextField alText, javax.swing.JTextField satText, javax.swing.JRadioButton rAl, javax.swing.JRadioButton rSat) {
         String currencyCode = "";
         if (tur.equals("DOLAR")) currencyCode = "USD";
@@ -2802,7 +2742,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         else if (tur.equals("ALTIN")) currencyCode = "ALTIN";
 
         try {
-            // 1. Gerekli Nesneleri Oluştur
             model.CheckingAccount tlAccount = Managers.DataBaseManager.getCheckingAccountObject(aktifKullanici.getUserId());
             model.ForeignCurrencyAccount forexAccount = Managers.DataBaseManager.getForeignCurrencyAccountObject(aktifKullanici.getUserId(), currencyCode);
 
@@ -2811,7 +2750,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                 return;
             }
 
-            // --- ALIŞ İŞLEMİ ---
+            //ALIŞ İŞLEMİ
             if (rAl.isSelected()) {
                 double tlAmount = Double.parseDouble(alText.getText().trim());
 
@@ -2820,15 +2759,14 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                 if(success) {
                     javax.swing.JOptionPane.showMessageDialog(this, tur + " Alışı Başarılı!");
 
-                    // --- EKRANLARI YENİLE ---
                     hesaplariGuncelle();
                     anaSayfaGuncelle();
-                    varliklariGuncelle(); // <--- YENİ EKLENEN SATIR (Varlıkları Günceller)
+                    varliklariGuncelle();
                 } else {
                     javax.swing.JOptionPane.showMessageDialog(this, "Yetersiz TL Bakiyesi!");
                 }
             }
-            // --- SATIŞ İŞLEMİ ---
+            //SATIŞ İŞLEMİ
             else if (rSat.isSelected()) {
                 double forexAmount = Double.parseDouble(satText.getText().trim());
 
@@ -2837,10 +2775,9 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
                 if(success) {
                     javax.swing.JOptionPane.showMessageDialog(this, tur + " Satışı Başarılı!");
 
-                    // --- EKRANLARI YENİLE ---
                     hesaplariGuncelle();
                     anaSayfaGuncelle();
-                    varliklariGuncelle(); // <--- YENİ EKLENEN SATIR (Varlıkları Günceller)
+                    varliklariGuncelle();
                 } else {
                     javax.swing.JOptionPane.showMessageDialog(this, "Yetersiz Döviz Bakiyesi!");
                 }
@@ -2851,14 +2788,12 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         }
     }
 
-    // =============================================================
     // KART BİLGİLERİNİ EKRANA YAZAN METOT
-    // =============================================================
     private void kartlariGuncelle() {
         if (aktifKullanici == null) return;
         String userId = aktifKullanici.getUserId();
 
-        // --- 1. BANKA KARTI (DEBIT CARD) GÜNCELLEME ---
+        //BANKA KARTI (DEBIT CARD) GÜNCELLEME
         model.DebitCard bankaKarti = Managers.DataBaseManager.getDebitCardObject(userId);
 
         if (bankaKarti != null) {
@@ -2883,7 +2818,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
             BankaKartCVVLabel.setText("---");
         }
 
-        // --- 2. KREDİ KARTI (CREDIT CARD) GÜNCELLEME ---
+        //KREDİ KARTI (CREDIT CARD) GÜNCELLEME
         model.CreditCard krediKarti = Managers.DataBaseManager.getCreditCardObject(userId);
 
         if (krediKarti != null) {
@@ -2910,13 +2845,12 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         }
     }
 
-    // --- A. VARLIKLARIMI GÜNCELLE ---
+    //VARLIKLARIMI GÜNCELLE
     private void varliklariGuncelle() {
         if (aktifKullanici == null) return;
         String userId = aktifKullanici.getUserId();
 
-        // 1. TL Varlığı (Vadesiz + Varsa Vadeli Toplamı)
-        // Basitlik için şu an sadece Vadesiz TL'yi çekiyoruz, istersen vadeli de eklenebilir.
+        // 1. TL Varlığı
         String[] tlDetay = Managers.DataBaseManager.getAccountDetails(userId, "TL");
         double tlMiktar = Double.parseDouble(tlDetay[0]);
         VarliklarTLLabel.setText(String.format("%,.2f TL", tlMiktar));
@@ -2937,7 +2871,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         VarliklarAltinLabel.setText(String.format("%,.2f Gr", altinMiktar));
     }
 
-    // --- B. GÜNCEL KURLARI GÜNCELLE ---
+    //GÜNCEL KURLARI GÜNCELLE
     private void guncelKurlariGuncelle() {
         GuncelKurDolarAlısLabel.setText("Dolar Alış: " + Managers.CurrencyManager.getUsdBuy());
         GuncelKurDolarSatısLabel.setText("Dolar Satış: " + Managers.CurrencyManager.getUsdSell());
@@ -2949,7 +2883,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         GuncelKurAltinSatisLabel.setText("Altın Satış: " + Managers.CurrencyManager.getGauSell());
     }
 
-    // --- C. İŞLEMLER SAYFASINDAKİ VADELİ HESAP BİLGİSİ ---
+    //İŞLEMLER SAYFASINDAKİ VADELİ HESAP BİLGİSİ
     private void vadeliIslemBilgisiniGuncelle() {
         if (aktifKullanici == null) return;
 
@@ -2965,10 +2899,8 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
         }
     }
 
-    // =============================================================
-    // ABONELİK VE FATURA TABLO YÖNETİMİ
-    // =============================================================
 
+    // ABONELİK VE FATURA TABLO YÖNETİMİ
     // 1. Abonelikler Tablosunu Doldur
     private void abonelikleriGuncelle() {
         if (aktifKullanici == null) return;
@@ -3004,7 +2936,7 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     // İşlem Sonrası Ekranları Yenileme Metodu
     private void islemiTamamla(String mesaj) {
         javax.swing.JOptionPane.showMessageDialog(FaturaOdemeForm, mesaj);
-        FaturaOdemeForm.dispose(); // Pencereyi kapat
+        FaturaOdemeForm.dispose();
 
         // Tüm ekranları yenile
         faturalariGuncelle();
@@ -3015,7 +2947,6 @@ public class BireyselKullaniciUI extends javax.swing.JFrame {
     }
 
     private void dovizInputlariniDuzenle() {
-        // Genişlik: 140px, Yükseklik: 35px olarak ayarlıyoruz
         java.awt.Dimension inputBoyutu = new java.awt.Dimension(68, 33);
 
         // Dolar Kutuları

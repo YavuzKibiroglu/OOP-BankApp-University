@@ -1,6 +1,5 @@
 package model;
 
-// Bu ana sınıf (Parent Class).
 // DebitCard ve CreditCard buradan özellik alır.
 public abstract class Card {
 
@@ -16,7 +15,6 @@ public abstract class Card {
         this.expiryDate = expiryDate;
     }
 
-    // --- HATAYI ÇÖZEN METOTLAR BURADA ---
     // Alt sınıflar (Debit/Credit) bu metotları miras alır.
 
     public String getCardNumber() {
@@ -39,6 +37,5 @@ public abstract class Card {
     public abstract String getInformation();
 
     // Her kartın harcama mantığı farklıdır, o yüzden abstract
-    // (Bunu eklemek, DebitCard ve CreditCard'daki @Override spend'i yasal kılar)
     public abstract boolean spend(float amount) throws java.sql.SQLException;
 }

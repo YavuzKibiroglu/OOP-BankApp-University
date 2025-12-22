@@ -523,19 +523,18 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
     }
 
     private void FaturaOlusturmaBtnActionPerformed(java.awt.event.ActionEvent evt) {
-        // 1. Tablodan seçili satırı al
+        //Tablodan seçili satırı al
         int selectedRow = FaturaAboneTable.getSelectedRow();
 
         if (selectedRow != -1) {
-            // 2. Abone ID'sini (SubscriptionId) alıp değişkene kaydet
-            // (DataBaseManager.getAboneler metodunda 0. sütuna ID koymuştuk)
+            //Abone ID'sini (SubscriptionId) alıp değişkene kaydet
             this.seciliSubscriptionId = FaturaAboneTable.getValueAt(selectedRow, 0).toString();
 
-            // İsmi alıp ekrana yaz (Görsellik için)
+            //İsmi alıp ekrana yaz
             String adSoyad = FaturaAboneTable.getValueAt(selectedRow, 2).toString();
             FaturaOlusturalacakKisiAdSoyadLabel.setText(adSoyad);
 
-            // Pencereyi Aç
+            //Pencereyi Aç
             FaturaOlusturmaFrame.pack();
             FaturaOlusturmaFrame.setLocationRelativeTo(this);
             FaturaOlusturmaFrame.setVisible(true);
@@ -591,16 +590,14 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
         try {
             double tutar = Double.parseDouble(tutarStr);
 
-            // --- KRİTİK NOKTA: Veritabanına Kaydet ---
+            //Veritabanına Kaydet
             boolean sonuc = Managers.DataBaseManager.addInvoice(this.seciliSubscriptionId, tutar);
 
             if (sonuc) {
                 javax.swing.JOptionPane.showMessageDialog(FaturaOlusturmaFrame, "Fatura Başarıyla Kesildi ve Kullanıcıya Gönderildi!");
-
-                // İstatistikleri Güncelle (Beklenen Tahsilat artmalı)
                 anaSayfaGuncelle();
 
-                FaturaOlusturmaFrame.dispose(); // Pencereyi kapat
+                FaturaOlusturmaFrame.dispose();
             } else {
                 javax.swing.JOptionPane.showMessageDialog(FaturaOlusturmaFrame, "Fatura kaydedilirken bir hata oluştu!");
             }
@@ -637,10 +634,7 @@ public class KurumsalKullaniciUI extends javax.swing.JFrame {
         layout.show(PanelContainer, kartIsmi);
     }
 
-    // =============================================================
     // YARDIMCI METOTLAR (LOGIC)
-    // =============================================================
-
     // 1. Şirket Bilgilerini Üst Panele Yaz
     private void sirketBilgileriniGoster() {
         if (aktifSirket != null) {

@@ -21,7 +21,7 @@ public abstract class Account implements IReemable {
         this.moneyInAccount += amount;
     }
 
-    // --- Diğer Getter/Setter ve Metotlar ---
+    //Diğer Getter/Setter ve Metotlar
     @Override
     public void transferToCurrent(float moneyAmount, String accountId) throws SQLException {}
 

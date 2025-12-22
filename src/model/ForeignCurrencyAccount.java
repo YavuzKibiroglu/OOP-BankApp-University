@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class ForeignCurrencyAccount extends Account {
 
-    private String currencyType; // "USD", "EUR", "GOLD"
+    private String currencyType;
 
     public ForeignCurrencyAccount(String userId, String accountId, float moneyInAccount, String currencyType) {
         super(userId, accountId, moneyInAccount);
@@ -20,7 +20,7 @@ public class ForeignCurrencyAccount extends Account {
         return String.format("%s Hesabı | Bakiye: %.2f | TL: %.2f", currencyType, moneyInAccount, tlEquivalent);
     }
 
-    // --- ZORUNLU INTERFACE METODU ---
+    //ZORUNLU INTERFACE METODU
     @Override
     public void transferToCurrent(float moneyAmount) throws SQLException {
         this.moneyInAccount -= moneyAmount;
@@ -32,85 +32,69 @@ public class ForeignCurrencyAccount extends Account {
 
     }
 
-    // =================================================================
     // 1. DÖVİZ AL (TL Hesabından Para Çeker -> Döviz Hesabına Ekler)
-    // =================================================================
     public boolean buyCurrency(CheckingAccount tlAccount, double amountToBuy) {
         // amountToBuy: Alınacak döviz miktarı (Örn: 100 Dolar)
         if (amountToBuy <= 0) return false;
 
-        // 1. Gereken TL Tutarını Hesapla
-        // (Örn: 100 Dolar * 32.50 = 3250 TL lazım)
+        //Gereken TL Tutarını Hesapla
         double rate = Managers.CurrencyManager.getSellRate(this.currencyType);
         double tlRequired = amountToBuy * rate;
 
         try {
-            // 2. TL Hesabından Parayı Çekmeyi Dene (RAM İşlemi)
-            // Eğer bakiye yetmezse burada 'YetersizBakiyeException' fırlatır ve catch'e düşer.
+            //TL Hesabından Parayı Çekmeyi Dene
             tlAccount.withdraw(tlRequired);
 
-            // 3. TL Hesabını Veritabanına Kaydet
-            // (Para çekildi, bunu DB'ye işle)
+            //TL Hesabını Veritabanına Kaydet
             boolean tlSaved = Managers.DataBaseManager.saveAccount(tlAccount);
             if (!tlSaved) {
-                // DB hatası olursa parayı iade et (Rollback) ve çık
                 tlAccount.deposit(tlRequired);
                 return false;
             }
 
-            // 4. Döviz Hesabına Ekle (RAM İşlemi)
+            //Döviz Hesabına Ekle
             this.moneyInAccount += amountToBuy;
 
-            // 5. Döviz Hesabını Veritabanına Kaydet
+            //Döviz Hesabını Veritabanına Kaydet
             boolean forexUpdated = Managers.DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
 
             if (forexUpdated) {
                 return true; // İşlem Başarılı
             } else {
-                // KRİTİK HATA: TL düştü ama Döviz DB'ye yazılamadı -> İADE ET (Rollback)
-                this.moneyInAccount -= amountToBuy; // RAM'i geri al
-                tlAccount.deposit(tlRequired);      // TL'yi iade et
-                Managers.DataBaseManager.saveAccount(tlAccount); // TL iadesini kaydet
+                this.moneyInAccount -= amountToBuy;
+                tlAccount.deposit(tlRequired);
+                Managers.DataBaseManager.saveAccount(tlAccount);
                 return false;
             }
 
         } catch (Exceptions.YetersizBakiyeException e) {
-            // Bakiye yetersizse sessizce false dön (veya logla)
-            // System.out.println("Döviz Alım Hatası: " + e.getMessage());
             return false;
         } catch (Exception e) {
-            // Diğer veritabanı hataları
             e.printStackTrace();
             return false;
         }
     }
 
-    // =================================================================
-    // 2. DÖVİZ SAT (Döviz Hesabından Çeker -> TL Hesabına Ekler)
-    // =================================================================
+    //DÖVİZ SAT (Döviz Hesabından Çeker -> TL Hesabına Ekler)
     public boolean sellCurrency(CheckingAccount tlAccount, double forexAmountToSell) {
         if (forexAmountToSell <= 0) return false;
 
-        // Burada Exception fırlatmıyoruz, basit if kontrolü yetiyor çünkü bu sınıfın içindeyiz
+
         if (this.moneyInAccount < forexAmountToSell) return false; // Yetersiz Döviz
 
-        // 1. Kazanılacak TL'yi Hesapla
         double rate = Managers.CurrencyManager.getBuyRate(this.currencyType); // Banka Alış Kuru
         double tlGained = forexAmountToSell * rate;
 
-        // 2. Döviz Hesabından Düş
         this.moneyInAccount -= forexAmountToSell;
 
-        // 3. Döviz Hesabını Güncelle
+        //Döviz Hesabını Güncelle
         boolean forexUpdated = Managers.DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
 
         if (forexUpdated) {
-            // 4. TL Hesabına Ekle
-            // addMoneyToAccount hem RAM'i günceller hem de DB'ye yazar (CheckingAccount içinde)
+            //TL Hesabına Ekle
             tlAccount.addMoneyToAccount((float)tlGained);
             return true;
         } else {
-            // Hata varsa dövizi geri koy (Rollback)
             this.moneyInAccount += forexAmountToSell;
             return false;
         }

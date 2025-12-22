@@ -6,7 +6,7 @@ import java.util.*;
 
 public class CurrencyManager {
 
-    // Kurlar artık değişken (Variable)
+    // Kur değişkenleri
     private static Double USD_BUY;
     private static Double USD_SELL;
     private static Double EUR_BUY;
@@ -16,12 +16,11 @@ public class CurrencyManager {
 
     private static final String CONFIG_FILE = "config.txt";
 
-    // Program başlarken çağrılır (DataBaseManager.start içinde çağırabilirsin)
     public static void start() {
         loadRatesFromConfig();
     }
 
-    // --- DOSYADAN OKUMA ---
+    //DOSYADAN OKUMA
     private static void loadRatesFromConfig() {
         try {
             List<String> lines = Files.readAllLines(Paths.get(CONFIG_FILE));
@@ -33,7 +32,6 @@ public class CurrencyManager {
                 else if (line.startsWith("GAU_BUY=")) GAU_BUY = Double.parseDouble(line.split("=")[1]);
                 else if (line.startsWith("GAU_SELL=")) GAU_SELL = Double.parseDouble(line.split("=")[1]);
             }
-            // System.out.println("Döviz kurları config.txt'den yüklendi.");
         } catch (Exception e) {
             System.out.println("Kurlar yüklenirken hata oluştu! Varsayılanlar kullanılıyor.");
             // Dosya yoksa veya bozuksa varsayılanlar
@@ -43,18 +41,17 @@ public class CurrencyManager {
         }
     }
 
-    // --- KURLARI GÜNCELLE VE DOSYAYA YAZ ---
+    //KURLARI GÜNCELLE VE DOSYAYA YAZ
     public static void updateRates(double usdBuy, double usdSell, double eurBuy, double eurSell, double gauBuy, double gauSell) {
         USD_BUY = usdBuy; USD_SELL = usdSell;
         EUR_BUY = eurBuy; EUR_SELL = eurSell;
         GAU_BUY = gauBuy; GAU_SELL = gauSell;
 
-        // Config Dosyasını Güncelle
+        // Config Dosyasını Güncelleme
         try {
             List<String> lines = Files.readAllLines(Paths.get(CONFIG_FILE));
             List<String> newLines = new ArrayList<>();
 
-            // Mevcut satırları kontrol et, varsa değiştir, yoksa olduğu gibi bırak
             boolean usdBuyFound = false, usdSellFound = false;
             boolean eurBuyFound = false, eurSellFound = false;
             boolean gauBuyFound = false, gauSellFound = false;
@@ -69,7 +66,6 @@ public class CurrencyManager {
                 else { newLines.add(line); } // Tarih, admin pass vs. elleme
             }
 
-            // Eğer dosyada bu satırlar hiç yoksa sona ekle (İlk kurulum için)
             if (!usdBuyFound) newLines.add("USD_BUY=" + USD_BUY);
             if (!usdSellFound) newLines.add("USD_SELL=" + USD_SELL);
             if (!eurBuyFound) newLines.add("EUR_BUY=" + EUR_BUY);
@@ -85,7 +81,7 @@ public class CurrencyManager {
         }
     }
 
-    // --- GETTER METOTLARI (Artık switch ile değişkeni döndürüyor) ---
+    //GETTER METOTLARI
     public static double getBuyRate(String currencyType) {
         switch (currencyType.toUpperCase()) {
             case "USD": return USD_BUY;

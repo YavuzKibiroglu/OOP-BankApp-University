@@ -11,7 +11,7 @@ public class IndividualUser extends User {
     private String city;
     private String phoneNumber;
 
-    // Constructor [cite: 41]
+    // Constructor
     public IndividualUser(String userId, String name, String surname, String password, String tcKimlik, LocalDate birthDate, String city, String phoneNumber) {
         super(userId, password); // Parent (User) sınıfına ID ve Şifreyi yolla
         this.name = name;
@@ -22,7 +22,7 @@ public class IndividualUser extends User {
         this.phoneNumber = phoneNumber;
     }
 
-    // Getter Metotları [cite: 38]
+    // Getter Metotları
     public String getName() { return name; }
     public String getSurname() { return surname; }
     public LocalDate getBirthDate() { return birthDate; }
@@ -30,7 +30,7 @@ public class IndividualUser extends User {
     public String getPhoneNumber() { return phoneNumber; }
 
     public String getTcNo() {
-        return this.tcKimlik; // Hata verirse burayı değişken adınla (örn: this.TC_Kimlik) düzelt.
+        return this.tcKimlik;
     }
 
     @Override

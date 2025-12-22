@@ -2,7 +2,6 @@ package model;
 
 import Managers.DataBaseManager;
 import java.sql.SQLException;
-import Exceptions.YetersizBakiyeException;
 
 public class CheckingAccount extends Account {
 
@@ -22,12 +21,7 @@ public class CheckingAccount extends Account {
         return String.format("Vadesiz Hesap | IBAN: %s | Bakiye: %.2f TL", ibanNumber, moneyInAccount);
     }
 
-    // =============================================================
-    // 1. BANKSERVICE İÇİN GEREKLİ METOTLAR (SAF OOP)
-    // =============================================================
-
-    // Para Çekme (Sadece RAM'de işlem yapar, kuralı kontrol eder)
-    // BankService bunu çağırır ve sonra saveAccount yapar.
+    //BANKSERVICE İÇİN GEREKLİ METOTLAR
     @Override
     public boolean withdraw(double amount) throws Exceptions.YetersizBakiyeException {
         if (amount <= 0) {
@@ -52,10 +46,7 @@ public class CheckingAccount extends Account {
         this.moneyInAccount += amount;
     }
 
-    // =============================================================
     // 2. DİĞER YARDIMCI METOTLAR
-    // =============================================================
-
     // Interface Zorunluluğu
     @Override
     public void transferToCurrent(float moneyAmount) throws SQLException {
@@ -69,16 +60,9 @@ public class CheckingAccount extends Account {
 
     }
 
-    // Helper: Hızlı para ekleme (Eski kodlarla uyum için)
     public void addMoneyToAccount(float moneyToAdd) {
         deposit(moneyToAdd);
         DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
-    }
-
-    public void addMoneyToAccount(float moneyToAdd, String description) {
-        this.moneyInAccount += moneyToAdd;
-        DataBaseManager.updateBalance(this.accountId, this.moneyInAccount);
-        System.out.println("Para Eklendi (" + description + "): " + moneyToAdd + " TL");
     }
 
     // Transfer İşlemi (UI tarafında kullanılıyor)
